@@ -2,6 +2,7 @@
 	<UDropdownMenu
 		v-slot="{ open }"
 		:modal="false"
+		disabled
 		:items="[
 			{
 				label: 'Starter',
