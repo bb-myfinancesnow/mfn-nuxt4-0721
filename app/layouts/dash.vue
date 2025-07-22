@@ -59,7 +59,7 @@ const navLinks = ref<NavigationMenuItem[][]>([
 		{
 			label: 'Home',
 			icon: 'i-lucide-house',
-			to: '/dashboard',
+			// to: '/dashboard',
 			onSelect: () => {
 				open.value = false;
 			}
@@ -67,7 +67,7 @@ const navLinks = ref<NavigationMenuItem[][]>([
 		{
 			label: 'Books',
 			icon: 'i-lucide-book-open',
-			to: '/books',
+			// to: '/books',
 			description: 'Example Page Table for Books',
 			onSelect: () => {
 				open.value = false;
@@ -106,8 +106,8 @@ const navLinks = ref<NavigationMenuItem[][]>([
 			icon: 'i-lucide-list',
 			children: [
 				{
-					label: 'Entities',
-					to: '/app/lists/entities'
+					label: 'Entities'
+					// to: '/app/lists/entities'
 				},
 				{
 					label: 'Assets'

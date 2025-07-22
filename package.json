@@ -15,18 +15,21 @@
     "cleanfull": "rm -rf node_modules && rm -rf .nuxt && rm -rf .output"
   },
   "dependencies": {
+    "@apollo/client": "^3.13.8",
     "@iconify-json/lucide": "^1.2.57",
     "@iconify-json/simple-icons": "^1.2.44",
     "@nuxt/content": "^3.6.3",
     "@nuxt/eslint": "1.6.0",
     "@nuxt/image": "^1.10.0",
     "@nuxt/ui-pro": "^3.2.0",
+    "@nuxtjs/apollo": "4.0.1-rc.5",
     "@tailwindcss/vite": "^4.1.11",
     "@unovis/ts": "^1.5.2",
     "@unovis/vue": "^1.5.2",
     "@vueuse/nuxt": "^13.5.0",
     "better-sqlite3": "^12.2.0",
     "date-fns": "^4.1.0",
+    "graphql": "^16.11.0",
     "motion-v": "^1.5.0",
     "nuxt": "^4.0.1",
     "nuxt-og-image": "^5.1.9",
@@ -36,6 +39,10 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.7",
+    "@graphql-codegen/typescript": "^4.1.6",
+    "@graphql-codegen/typescript-operations": "^4.6.1",
+    "@graphql-codegen/typescript-vue-apollo": "^4.1.2",
     "eslint": "^9.31.0",
     "prettier": "^3.6.2",
     "typescript": "^5.8.3",
