@@ -10,18 +10,25 @@
     "postinstall": "nuxt prepare",
     "typecheck": "nuxt typecheck",
     "lint": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "lint:fix": "eslint --fix .",
+    "cleandep": "rm -rf node_modules && pnpm -r exec rm -rf node_modules",
+    "cleanfull": "rm -rf node_modules && rm -rf .nuxt && rm -rf .output"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.57",
     "@iconify-json/simple-icons": "^1.2.44",
+    "@nuxt/content": "^3.6.3",
     "@nuxt/eslint": "1.6.0",
+    "@nuxt/image": "^1.10.0",
     "@nuxt/ui-pro": "^3.2.0",
+    "@tailwindcss/vite": "^4.1.11",
     "@unovis/ts": "^1.5.2",
     "@unovis/vue": "^1.5.2",
     "@vueuse/nuxt": "^13.5.0",
+    "better-sqlite3": "^12.2.0",
     "date-fns": "^4.1.0",
     "nuxt": "^4.0.1",
+    "nuxt-og-image": "^5.1.9",
     "tailwindcss": "^4.1.11",
     "vue": "^3.5.17",
     "vue-router": "^4.5.1",
@@ -29,6 +36,7 @@
   },
   "devDependencies": {
     "eslint": "^9.31.0",
+    "prettier": "^3.6.2",
     "typescript": "^5.8.3",
     "vue-tsc": "^3.0.3"
   },
@@ -36,10 +44,14 @@
     "unimport": "4.1.1"
   },
   "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3"
+    ],
     "ignoredBuiltDependencies": [
       "@parcel/watcher",
       "esbuild",
       "maplibre-gl",
+      "sharp",
       "vue-demi"
     ]
   },
