@@ -5,7 +5,8 @@ export default defineNuxtConfig({
 		'@nuxt/image',
 		'@nuxt/ui-pro',
 		'@nuxt/content',
-		'@vueuse/nuxt'
+		'@vueuse/nuxt',
+		'nuxt-og-image'
 	],
 
 	devtools: { enabled: true },
