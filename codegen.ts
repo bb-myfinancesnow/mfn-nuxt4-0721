@@ -10,7 +10,7 @@ const config: CodegenConfig = {
 		'composables/**/*.ts'
 	],
 	generates: {
-		'./types/graphql.ts': {
+		'app/types/graphql.ts': {
 			plugins: [
 				'typescript',
 				'typescript-operations',
@@ -19,15 +19,18 @@ const config: CodegenConfig = {
 			config: {
 				withCompositionFunctions: true,
 				vueCompositionApiImportFrom: 'vue',
-				skipTypename: false,
+				skipTypename: true,
 				useTypeImports: true,
 				apolloClientInstanceImport: '@nuxtjs/apollo',
 				scalars: {
-					DateTime: 'string',
-					JSON: 'Record<string, any>'
+					DateTime: { input: 'Date', output: 'string' },
+					JSON: 'Record<string, unknown>'
 				}
 			}
 		}
+	},
+	hooks: {
+		afterAllFileWrite: ['eslint --fix .']
 	}
 };
 
