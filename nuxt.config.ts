@@ -10,11 +10,28 @@ export default defineNuxtConfig({
 	],
 
 	devtools: { enabled: true },
+
 	css: ['~/assets/css/main.css'],
+
+	routeRules: {
+		'/docs': { redirect: '/docs/getting-started', prerender: false }
+	},
+
 	compatibilityDate: '2025-07-15',
+
+	nitro: {
+		prerender: {
+			routes: [
+				'/'
+			],
+			crawlLinks: true
+		}
+	},
+
 	typescript: {
 		typeCheck: true
 	},
+
 	eslint: {
 		config: {
 			stylistic: {
