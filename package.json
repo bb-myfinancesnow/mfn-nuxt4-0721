@@ -15,11 +15,14 @@
   "dependencies": {
     "@iconify-json/lucide": "^1.2.57",
     "@iconify-json/simple-icons": "^1.2.44",
+    "@nuxt/content": "^3.6.3",
     "@nuxt/eslint": "1.6.0",
+    "@nuxt/image": "^1.10.0",
     "@nuxt/ui-pro": "^3.2.0",
     "@unovis/ts": "^1.5.2",
     "@unovis/vue": "^1.5.2",
     "@vueuse/nuxt": "^13.5.0",
+    "better-sqlite3": "^12.2.0",
     "date-fns": "^4.1.0",
     "nuxt": "^4.0.1",
     "tailwindcss": "^4.1.11",
@@ -36,10 +39,14 @@
     "unimport": "4.1.1"
   },
   "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3"
+    ],
     "ignoredBuiltDependencies": [
       "@parcel/watcher",
       "esbuild",
       "maplibre-gl",
+      "sharp",
       "vue-demi"
     ]
   },
