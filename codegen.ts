@@ -4,10 +4,10 @@ const config: CodegenConfig = {
 	schema: 'http://localhost:3004/api/graphql',
 	documents: [
 		'app/graphql/**/*.graphql',
-		'app/graphql/**/*.gql',
-		'components/**/*.vue',
-		'pages/**/*.vue',
-		'composables/**/*.ts'
+		'app/graphql/**/*.gql'
+		// 'components/**/*.vue',
+		// 'pages/**/*.vue',
+		// 'composables/**/*.ts'
 	],
 	generates: {
 		'app/types/graphql.ts': {

@@ -6,7 +6,8 @@ export default defineNuxtConfig({
 		'@nuxt/ui-pro',
 		'@nuxt/content',
 		'@vueuse/nuxt',
-		'nuxt-og-image'
+		'nuxt-og-image',
+		'@nuxtjs/apollo'
 	],
 
 	devtools: { enabled: true },
@@ -15,6 +16,12 @@ export default defineNuxtConfig({
 	content: {
 		preview: {
 			api: 'https://api.nuxt.studio'
+		}
+	},
+	runtimeConfig: {
+		apiToken: process.env.API_TOKEN,
+		public: {
+			graphqlEndpoint: process.env.GRAPHQL_ENDPOINT
 		}
 	},
 
@@ -35,6 +42,13 @@ export default defineNuxtConfig({
 
 	typescript: {
 		typeCheck: true
+	},
+	apollo: {
+		clients: {
+			default: {
+				httpEndpoint: 'http://localhost:3004/api/graphql'
+			}
+		}
 	},
 
 	eslint: {
