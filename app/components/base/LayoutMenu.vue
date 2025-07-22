@@ -41,13 +41,13 @@ const items = computed<DropdownMenuItem[][]>(() => {
 		[
 			{
 				label: 'Go to App',
-				icon: 'i-lucide-eye',
-				to: '/app'
+				icon: 'i-lucide-list-todo',
+				to: '/mfn'
 			},
 			{
 				label: 'Go to Reporting',
 				icon: 'i-lucide-scan-eye',
-				to: '/reporting'
+				to: '/dash'
 			},
 			{
 				label: 'Manage teams',
