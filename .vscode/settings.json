@@ -1,7 +1,33 @@
 {
     "editor.formatOnSave": true,
     "eslint.useFlatConfig": true,
+    "prettier.enable": true,
     "eslint.format.enable": true,
     "workbench.colorTheme": "Default Dark Modern",
     "editor.fontSize": 14,
+    "files.associations": {
+        "*.css": "tailwindcss"
+    },
+    "editor.quickSuggestions": {
+        "strings": "on"
+    },
+    "tailwindCSS.classAttributes": [
+        "class",
+        "ui"
+    ],
+    "tailwindCSS.experimental.classRegex": [
+        [
+            "ui:\\s*{([^)]*)\\s*}",
+            "(?:'|\"|`)([^']*)(?:'|\"|`)"
+        ]
+    ],
+    "prettier.singleAttributePerLine": true,
+    "prettier.singleQuote": true,
+    "prettier.trailingComma": "none",
+    "prettier.useTabs": true,
+    "prettier.vueIndentScriptAndStyle": false,
+    "vs-code-prettier-eslint.prettierLast": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "always",
+    }
 }
