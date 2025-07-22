@@ -6,19 +6,29 @@ seo:
 navigation: false
 hero:
   links:
-    - label: Get started
-      icon: i-lucide-arrow-right
-      trailing: true
-      to: https://ui.nuxt.com/getting-started/installation/pro/nuxt
-      target: _blank
-      size: xl
-    - label: Use this template
+    # - label: Get started with Template
+    #   icon: i-lucide-arrow-right
+    #   trailing: true
+    #   to: https://ui.nuxt.com/getting-started/installation/pro/nuxt
+    #   target: _blank
+    #   size: xl
+    - label: Template Docs
       icon: i-simple-icons-github
       size: xl
       color: neutral
       variant: subtle
-      to: https://github.com/nuxt-ui-pro/saas
+      to: https://ui.nuxt.com/getting-started/installation/pro/nuxt
       target: _blank
+    - label: Go to App
+      icon: i-lucide-house
+      size: xl
+      trailing: true
+      to: /mfn
+    - label: Go to dashboard
+      icon: i-lucide-chart-area
+      size: xl
+      trailing: true
+      to: /dash
 sections:
   - title: Enterprise-Grade Solutions
     description: Transform your business with our comprehensive suite of tools. Built for scale, security, and seamless integration, our platform empowers teams to achieve more while maintaining complete control.
