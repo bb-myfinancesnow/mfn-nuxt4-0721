@@ -10,7 +10,9 @@
     "postinstall": "nuxt prepare",
     "typecheck": "nuxt typecheck",
     "lint": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "lint:fix": "eslint --fix .",
+    "cleandep": "rm -rf node_modules && pnpm -r exec rm -rf node_modules",
+    "cleanfull": "rm -rf node_modules && rm -rf .nuxt && rm -rf .output"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.57",
@@ -19,6 +21,7 @@
     "@nuxt/eslint": "1.6.0",
     "@nuxt/image": "^1.10.0",
     "@nuxt/ui-pro": "^3.2.0",
+    "@tailwindcss/vite": "^4.1.11",
     "@unovis/ts": "^1.5.2",
     "@unovis/vue": "^1.5.2",
     "@vueuse/nuxt": "^13.5.0",
