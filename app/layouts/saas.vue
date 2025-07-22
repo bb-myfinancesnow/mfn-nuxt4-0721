@@ -6,6 +6,6 @@
 			<slot />
 		</UMain>
 
-		<!-- <AppFooter /> -->
+		<AppFooter />
 	</div>
 </template>

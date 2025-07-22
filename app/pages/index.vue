@@ -1,5 +1,10 @@
 <script setup lang="ts">
-const { data: page } = await useAsyncData('index', () => queryCollection('index').first());
+definePageMeta({
+	layout: 'saas'
+});
+const { data: page } = await useAsyncData('index', () =>
+	queryCollection('index').first()
+);
 
 const title = page.value?.seo?.title || page.value?.title;
 const description = page.value?.seo?.description || page.value?.description;
@@ -21,7 +26,9 @@ useSeoMeta({
 			:links="page.hero.links"
 		>
 			<template #top>
-				<div class="absolute rounded-full dark:bg-primary blur-[300px] size-60 sm:size-80 transform -translate-x-1/2 left-1/2 -translate-y-80" />
+				<div
+					class="absolute rounded-full dark:bg-primary blur-[300px] size-60 sm:size-80 transform -translate-x-1/2 left-1/2 -translate-y-80"
+				/>
 
 				<LazyStarsBg />
 			</template>
@@ -67,7 +74,10 @@ useSeoMeta({
 					:key="index"
 					variant="subtle"
 					:description="testimonial.quote"
-					:ui="{ description: 'before:content-[open-quote] after:content-[close-quote]' }"
+					:ui="{
+						description:
+							'before:content-[open-quote] after:content-[close-quote]'
+					}"
 				>
 					<template #footer>
 						<UUser
@@ -86,7 +96,9 @@ useSeoMeta({
 			variant="naked"
 			class="overflow-hidden"
 		>
-			<div class="absolute rounded-full dark:bg-primary blur-[250px] size-40 sm:size-50 transform -translate-x-1/2 left-1/2 -translate-y-80" />
+			<div
+				class="absolute rounded-full dark:bg-primary blur-[250px] size-40 sm:size-50 transform -translate-x-1/2 left-1/2 -translate-y-80"
+			/>
 
 			<LazyStarsBg />
 		</UPageCTA>

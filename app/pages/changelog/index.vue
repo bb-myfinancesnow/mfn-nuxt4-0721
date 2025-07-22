@@ -1,4 +1,7 @@
 <script setup lang="ts">
+definePageMeta({
+	layout: 'saas'
+});
 const route = useRoute();
 
 const { data: page } = await useAsyncData('changelog', () =>

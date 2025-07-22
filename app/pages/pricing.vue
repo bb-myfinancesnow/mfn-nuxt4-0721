@@ -1,5 +1,10 @@
 <script setup lang="ts">
-const { data: page } = await useAsyncData('pricing', () => queryCollection('pricing').first());
+definePageMeta({
+	layout: 'saas'
+});
+const { data: page } = await useAsyncData('pricing', () =>
+	queryCollection('pricing').first()
+);
 
 const title = page.value?.seo?.title || page.value?.title;
 const description = page.value?.seo?.description || page.value?.description;
@@ -29,7 +34,10 @@ const items = ref([
 
 <template>
 	<div v-if="page">
-		<UPageHero :title="page.title" :description="page.description">
+		<UPageHero
+			:title="page.title"
+			:description="page.description"
+		>
 			<template #links>
 				<UTabs
 					v-model="isYearly"
@@ -69,8 +77,15 @@ const items = ref([
 			</UPageLogos>
 		</UPageSection>
 
-		<UPageSection :title="page.faq.title" :description="page.faq.description">
-			<UPageAccordion :items="page.faq.items" multiple class="max-w-4xl mx-auto" />
+		<UPageSection
+			:title="page.faq.title"
+			:description="page.faq.description"
+		>
+			<UPageAccordion
+				:items="page.faq.items"
+				multiple
+				class="max-w-4xl mx-auto"
+			/>
 		</UPageSection>
 	</div>
 </template>
