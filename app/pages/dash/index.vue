@@ -1,6 +1,20 @@
 <script lang="ts" setup>
+import { gql, useQuery } from '@urql/vue';
+
 definePageMeta({
 	layout: 'dash'
+});
+
+const { data } = useQuery({
+	query: gql`
+		{
+			books {
+				id
+				name
+				system
+			}
+		}
+	`
 });
 </script>
 
