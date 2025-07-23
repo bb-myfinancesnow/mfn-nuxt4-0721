@@ -2888,17 +2888,17 @@ export type CreateBookMutationVariables = Exact<{
 	data: CreateBookInput;
 }>;
 
-export type CreateBookMutation = { createBook: { id: number; name: string; system: boolean } };
+export type CreateBookMutation = { createBook: BookInfoFragment };
 
 export type ListBookInfoQueryVariables = Exact<{ [key: string]: never }>;
 
-export type ListBookInfoQuery = { books: Array<{ id: number; name: string; system: boolean }> };
+export type ListBookInfoQuery = { books: Array<BookInfoFragment> };
 
 export type GetBookInfoQueryVariables = Exact<{
 	id: Scalars['Int']['input'];
 }>;
 
-export type GetBookInfoQuery = { book: { id: number; name: string; system: boolean } };
+export type GetBookInfoQuery = { book: BookInfoFragment };
 
 export type GetSetupValsQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -2947,7 +2947,6 @@ export const GetSetupValsDocument = gql`
 }
     `;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?: Record<string, string>) => Promise<T>, operationName: string, operationType?: string, variables?: any) => Promise<T>;
 
 const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationType, _variables) => action();

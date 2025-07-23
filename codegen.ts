@@ -13,12 +13,14 @@ const config: CodegenConfig = {
 				'typescript-graphql-request'
 			],
 			config: {
-
+				rawRequest: false,
+				inlineFragmentTypes: 'combine',
 				skipTypename: true,
 				useTypeImports: true,
 				exportFragmentSpreadSubTypes: true,
 				dedupeFragments: true,
 				preResolveTypes: true,
+				strictScalars: true,
 				scalars: {
 					DateTime: { input: 'Date', output: 'string' },
 					JSON: 'Record<string, unknown>'
