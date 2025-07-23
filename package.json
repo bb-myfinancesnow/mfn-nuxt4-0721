@@ -38,6 +38,9 @@
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.7",
+    "@graphql-codegen/typed-document-node": "^5.1.2",
+    "@graphql-codegen/typescript": "^4.1.6",
+    "@graphql-codegen/typescript-operations": "^4.6.1",
     "@parcel/watcher": "^2.5.1",
     "eslint": "^9.31.0",
     "prettier": "^3.6.2",
