@@ -47,6 +47,7 @@
     "@graphql-codegen/introspection": "^4.0.3",
     "@graphql-codegen/typed-document-node": "^5.1.2",
     "@graphql-codegen/typescript": "^4.1.6",
+    "@graphql-codegen/typescript-graphql-request": "^6.3.0",
     "@graphql-codegen/typescript-operations": "^4.6.1",
     "@graphql-codegen/typescript-urql": "^4.0.1",
     "@parcel/watcher": "^2.5.1",

@@ -10,14 +10,15 @@ const config: CodegenConfig = {
 			plugins: [
 				'typescript',
 				'typescript-operations',
-				'typescript-urql'
+				'typescript-graphql-request'
 			],
 			config: {
-				withHooks: false,
-				withComposition: false,
+
 				skipTypename: true,
 				useTypeImports: true,
-				urqlImportFrom: '@urql/vue',
+				exportFragmentSpreadSubTypes: true,
+				dedupeFragments: true,
+				preResolveTypes: true,
 				scalars: {
 					DateTime: { input: 'Date', output: 'string' },
 					JSON: 'Record<string, unknown>'

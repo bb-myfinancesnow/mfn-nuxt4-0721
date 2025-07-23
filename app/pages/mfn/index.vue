@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import {
+	ListBookInfoDocument,
+	type ListBookInfoQuery
+} from '~/generated/graphql';
+
 const { data: page } = await useAsyncData('index', () =>
 	queryCollection('index').first()
 );
@@ -21,6 +26,11 @@ console.log('Runtime config:', config.public.gqlClientUrl);
 if (import.meta.server) {
 	console.log(`Server URL: `, config.gqlServerUrl);
 }
+
+const { data: bookData, pending } = await useLazyAsyncData('booklist', () => {
+	const { request } = useGql();
+	return request<ListBookInfoQuery>(ListBookInfoDocument);
+});
 </script>
 
 <template>
@@ -40,8 +50,15 @@ if (import.meta.server) {
 
 			<PromotionalVideo />
 		</UPageHero>
+		<UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
+			<div>
+				data:
+				<pre>{{ bookData }}</pre>
+			</div>
+			<div>status: {{ String(pending) }}</div>
+		</UPageGrid>
 
-		<UPageSection
+		<!-- <UPageSection
 			v-for="(section, index) in page.sections"
 			:key="index"
 			:title="section.title"
@@ -51,9 +68,9 @@ if (import.meta.server) {
 			:features="section.features"
 		>
 			<ImagePlaceholder />
-		</UPageSection>
+		</UPageSection> -->
 
-		<UPageSection
+		<!-- <UPageSection
 			:title="page.features.title"
 			:description="page.features.description"
 		>
@@ -65,9 +82,9 @@ if (import.meta.server) {
 					spotlight
 				/>
 			</UPageGrid>
-		</UPageSection>
+		</UPageSection> -->
 
-		<UPageSection
+		<!-- <UPageSection
 			id="testimonials"
 			:headline="page.testimonials.headline"
 			:title="page.testimonials.title"
@@ -92,7 +109,7 @@ if (import.meta.server) {
 					</template>
 				</UPageCard>
 			</UPageColumns>
-		</UPageSection>
+		</UPageSection> -->
 
 		<USeparator />
 
