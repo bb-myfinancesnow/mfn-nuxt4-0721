@@ -1,0 +1,13 @@
+#import "./fragments/book.gql"
+
+query ListBookInfo {
+	books {
+		...BookInfo
+	}
+}
+
+query GetBookInfo($id: Int!) {
+	book(where: { id: $id }) {
+		...BookInfo
+	}
+}

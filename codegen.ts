@@ -10,11 +10,14 @@ const config: CodegenConfig = {
 			plugins: [
 				'typescript',
 				'typescript-operations',
-				'typed-document-node'
+				'typescript-urql'
 			],
 			config: {
+				withHooks: false,
+				withComposition: false,
 				skipTypename: true,
 				useTypeImports: true,
+				urqlImportFrom: '@urql/vue',
 				scalars: {
 					DateTime: { input: 'Date', output: 'string' },
 					JSON: 'Record<string, unknown>'

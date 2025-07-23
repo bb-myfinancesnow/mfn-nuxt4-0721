@@ -1,0 +1,5 @@
+fragment BookInfo on Book {
+	id
+	name
+	system
+}

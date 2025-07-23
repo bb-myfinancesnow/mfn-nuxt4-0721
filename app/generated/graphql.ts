@@ -1,4 +1,4 @@
-import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
+import gql from 'graphql-tag';
 
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -7,6 +7,7 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
 	ID: { input: string; output: string };
@@ -2880,8 +2881,67 @@ export enum Weekday {
 	Wednesday = 'WEDNESDAY'
 }
 
+export type BookInfoFragment = { id: number; name: string; system: boolean };
+
+export type CreateBookMutationVariables = Exact<{
+	data: CreateBookInput;
+}>;
+
+export type CreateBookMutation = { createBook: { id: number; name: string; system: boolean } };
+
+export type ListBookInfoQueryVariables = Exact<{ [key: string]: never }>;
+
+export type ListBookInfoQuery = { books: Array<{ id: number; name: string; system: boolean }> };
+
+export type GetBookInfoQueryVariables = Exact<{
+	id: Scalars['Int']['input'];
+}>;
+
+export type GetBookInfoQuery = { book: { id: number; name: string; system: boolean } };
+
 export type GetSetupValsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetSetupValsQuery = { users: Array<{ id: number; email: string; name: string }>; books: Array<{ id: number; name: string; system: boolean }> };
 
-export const GetSetupValsDocument = { kind: 'Document', definitions: [{ kind: 'OperationDefinition', operation: 'query', name: { kind: 'Name', value: 'GetSetupVals' }, selectionSet: { kind: 'SelectionSet', selections: [{ kind: 'Field', name: { kind: 'Name', value: 'users' }, selectionSet: { kind: 'SelectionSet', selections: [{ kind: 'Field', name: { kind: 'Name', value: 'id' } }, { kind: 'Field', name: { kind: 'Name', value: 'email' } }, { kind: 'Field', name: { kind: 'Name', value: 'name' } }] } }, { kind: 'Field', name: { kind: 'Name', value: 'books' }, selectionSet: { kind: 'SelectionSet', selections: [{ kind: 'Field', name: { kind: 'Name', value: 'id' } }, { kind: 'Field', name: { kind: 'Name', value: 'name' } }, { kind: 'Field', name: { kind: 'Name', value: 'system' } }] } }] } }] } as unknown as DocumentNode<GetSetupValsQuery, GetSetupValsQueryVariables>;
+export const BookInfoFragmentDoc = gql`
+    fragment BookInfo on Book {
+  id
+  name
+  system
+}
+    `;
+export const CreateBookDocument = gql`
+    mutation CreateBook($data: CreateBookInput!) {
+  createBook(data: $data) {
+    ...BookInfo
+  }
+}
+    ${BookInfoFragmentDoc}`;
+export const ListBookInfoDocument = gql`
+    query ListBookInfo {
+  books {
+    ...BookInfo
+  }
+}
+    ${BookInfoFragmentDoc}`;
+export const GetBookInfoDocument = gql`
+    query GetBookInfo($id: Int!) {
+  book(where: {id: $id}) {
+    ...BookInfo
+  }
+}
+    ${BookInfoFragmentDoc}`;
+export const GetSetupValsDocument = gql`
+    query GetSetupVals {
+  users {
+    id
+    email
+    name
+  }
+  books {
+    id
+    name
+    system
+  }
+}
+    `;
