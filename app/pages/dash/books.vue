@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import {
 	ListBookDataDocument,
-	type ListBookDataQuery
+	SortOrder,
+	type ListBookDataQuery,
+	type ListBookDataQueryVariables
 } from '~/generated/graphql';
 
 definePageMeta({
@@ -10,8 +12,22 @@ definePageMeta({
 
 const { request } = useGql();
 
-const { data: bookData, pending } = await useLazyAsyncData('bookdatalist', () =>
-	request<ListBookDataQuery>(ListBookDataDocument)
+const { data: bookData, pending } = await useLazyAsyncData(
+	'bookdatalist',
+	() =>
+		request<ListBookDataQuery, ListBookDataQueryVariables>(
+			ListBookDataDocument,
+			{
+				orderBy: [{ id: SortOrder.Asc }]
+			}
+		),
+	{
+		transform: (input): TBookRecordSchema[] => {
+			const arrSchema = BookRecordSchema.array();
+			const parsedData = arrSchema.parse(input.books);
+			return parsedData;
+		}
+	}
 );
 </script>
 
@@ -33,9 +49,9 @@ const { data: bookData, pending } = await useLazyAsyncData('bookdatalist', () =>
 		<template #body>
 			<div>
 				<UTable
-					:data="bookData?.books ?? []"
+					:data="bookData ?? []"
 					class="flex-1"
-					:loading="pending || !bookData?.books"
+					:loading="pending || !bookData"
 				/>
 			</div>
 
