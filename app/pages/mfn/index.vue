@@ -27,10 +27,13 @@ if (import.meta.server) {
 	console.log(`Server URL: `, config.gqlServerUrl);
 }
 
-const { data: bookData, pending } = await useLazyAsyncData('booklist', () => {
-	const { request } = useGql();
-	return request<ListBookInfoQuery>(ListBookInfoDocument);
-});
+const { data: bookData, pending } = await useLazyAsyncData(
+	'booklisttest',
+	() => {
+		const { request } = useGql();
+		return request<ListBookInfoQuery>(ListBookInfoDocument);
+	}
+);
 </script>
 
 <template>

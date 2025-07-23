@@ -67,7 +67,7 @@ const navLinks = ref<NavigationMenuItem[][]>([
 		{
 			label: 'Books',
 			icon: 'i-lucide-book-open',
-			// to: '/books',
+			to: '/dash/books',
 			description: 'Example Page Table for Books',
 			onSelect: () => {
 				open.value = false;
@@ -191,8 +191,7 @@ onMounted(async () => {
 	}
 
 	toast.add({
-		title:
-			'We use first-party cookies to enhance your experience on our website.',
+		title: 'We use first-party cookies to enhance your experience on our website.',
 		duration: 0,
 		close: false,
 		actions: [
