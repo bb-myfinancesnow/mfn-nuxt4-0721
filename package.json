@@ -12,7 +12,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "cleandep": "rm -rf node_modules && pnpm -r exec rm -rf node_modules",
-    "cleanfull": "rm -rf node_modules && rm -rf .nuxt && rm -rf .output"
+    "cleanfull": "rm -rf node_modules && rm -rf .nuxt && rm -rf .output",
+    "codegen": "graphql-codegen --config codegen.ts",
+    "codegen:watch": "graphql-codegen --config codegen.ts --watch"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.57",
@@ -24,6 +26,7 @@
     "@tailwindcss/vite": "^4.1.11",
     "@unovis/ts": "^1.5.2",
     "@unovis/vue": "^1.5.2",
+    "@urql/vue": "^1.4.3",
     "@vueuse/nuxt": "^13.5.0",
     "better-sqlite3": "^12.2.0",
     "date-fns": "^4.1.0",
