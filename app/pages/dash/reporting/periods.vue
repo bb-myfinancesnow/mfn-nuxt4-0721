@@ -12,8 +12,8 @@ const reportData = useReportData();
 
 const {
 	data: periodData,
-	pending
-	// refresh: refreshPeriodQuery
+	pending,
+	refresh: refreshPeriodQuery
 } = await reportData.searchPeriods();
 
 const columns: TableColumn<TReportPeriodSchema>[] = [
@@ -91,6 +91,15 @@ const pagination = ref({
 	<div>
 		<UPageCard title="Period Home">
 			<div class="flex items-center gap-2 px-4 py-3.5 overflow-x-auto">
+				<UTooltip text="Refresh Periods">
+					<UButton
+						icon="i-lucide-rotate-ccw-key"
+						class="rounded-full"
+						size="lg"
+						:loading="pending"
+						@click="refreshPeriodQuery()"
+					/>
+				</UTooltip>
 				<UDropdownMenu
 					:items="
 						table?.tableApi
