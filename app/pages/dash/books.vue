@@ -116,6 +116,9 @@ const columns: TableColumn<TBookRecordSchema>[] = [
 						@click="refresh()"
 					/>
 				</template>
+				<template #right>
+					<BooksAddModal @saved-new="refresh()" />
+				</template>
 			</UDashboardToolbar>
 		</template>
 		<template #body>
