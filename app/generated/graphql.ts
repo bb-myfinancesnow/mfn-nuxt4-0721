@@ -2893,6 +2893,10 @@ export type PeriodRecordFragment = (
   & PeriodInfoFragment
 );
 
+export type GlAccTypeInfoFragment = { id: string; name: string; sortOrder: number; class: AccountTypeClass };
+
+export type GlAccInfoFragment = { id: string; accountNumber: number; name: string; accountTypeName: string; system: boolean; accountType: GlAccTypeInfoFragment };
+
 export type CreateBookMutationVariables = Exact<{
 	data: CreateBookInput;
 }>;
@@ -2935,6 +2939,20 @@ export type SearchPeriodRecordsQueryVariables = Exact<{
 
 export type SearchPeriodRecordsQuery = { periods: Array<PeriodRecordFragment> };
 
+export type ListGlAccTypeInfoQueryVariables = Exact<{
+	where?: InputMaybe<GlAccountTypeWhereInput>;
+	orderBy?: InputMaybe<Array<GlAccountTypeOrderByWithRelationInput> | GlAccountTypeOrderByWithRelationInput>;
+}>;
+
+export type ListGlAccTypeInfoQuery = { glAccountTypes: Array<GlAccTypeInfoFragment> };
+
+export type ListGlAccInfoQueryVariables = Exact<{
+	where?: InputMaybe<GlAccountWhereInput>;
+	orderBy?: InputMaybe<Array<GlAccountOrderByWithRelationInput> | GlAccountOrderByWithRelationInput>;
+}>;
+
+export type ListGlAccInfoQuery = { glAccounts: Array<GlAccInfoFragment> };
+
 export type GetSetupValsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetSetupValsQuery = { users: Array<{ id: number; email: string; name: string }>; books: Array<{ id: number; name: string; system: boolean }> };
@@ -2975,6 +2993,26 @@ export const PeriodRecordFragmentDoc = gql`
   quarter
   _count {
     journals
+  }
+}
+    `;
+export const GlAccTypeInfoFragmentDoc = gql`
+    fragment GlAccTypeInfo on GlAccountType {
+  id
+  name
+  sortOrder
+  class
+}
+    `;
+export const GlAccInfoFragmentDoc = gql`
+    fragment GlAccInfo on GlAccount {
+  id
+  accountNumber
+  name
+  accountTypeName
+  system
+  accountType {
+    ...GlAccTypeInfo
   }
 }
     `;
@@ -3028,6 +3066,21 @@ export const SearchPeriodRecordsDocument = gql`
 }
     ${PeriodRecordFragmentDoc}
 ${PeriodInfoFragmentDoc}`;
+export const ListGlAccTypeInfoDocument = gql`
+    query ListGlAccTypeInfo($where: GlAccountTypeWhereInput, $orderBy: [GlAccountTypeOrderByWithRelationInput!]) {
+  glAccountTypes(where: $where, orderBy: $orderBy) {
+    ...GlAccTypeInfo
+  }
+}
+    ${GlAccTypeInfoFragmentDoc}`;
+export const ListGlAccInfoDocument = gql`
+    query ListGlAccInfo($where: GlAccountWhereInput, $orderBy: [GlAccountOrderByWithRelationInput!]) {
+  glAccounts(where: $where, orderBy: $orderBy) {
+    ...GlAccInfo
+  }
+}
+    ${GlAccInfoFragmentDoc}
+${GlAccTypeInfoFragmentDoc}`;
 export const GetSetupValsDocument = gql`
     query GetSetupVals {
   users {
@@ -3069,6 +3122,12 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
 		},
 		SearchPeriodRecords(variables?: SearchPeriodRecordsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchPeriodRecordsQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<SearchPeriodRecordsQuery>({ document: SearchPeriodRecordsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchPeriodRecords', 'query', variables);
+		},
+		ListGlAccTypeInfo(variables?: ListGlAccTypeInfoQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<ListGlAccTypeInfoQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<ListGlAccTypeInfoQuery>({ document: ListGlAccTypeInfoDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'ListGlAccTypeInfo', 'query', variables);
+		},
+		ListGlAccInfo(variables?: ListGlAccInfoQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<ListGlAccInfoQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<ListGlAccInfoQuery>({ document: ListGlAccInfoDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'ListGlAccInfo', 'query', variables);
 		},
 		GetSetupVals(variables?: GetSetupValsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<GetSetupValsQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<GetSetupValsQuery>({ document: GetSetupValsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'GetSetupVals', 'query', variables);
