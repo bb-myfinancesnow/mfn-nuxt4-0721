@@ -2884,21 +2884,43 @@ export enum Weekday {
 
 export type BookInfoFragment = { id: number; name: string; system: boolean };
 
+export type BookDataFragment = { id: number; name: string; system: boolean; createdAt: string; updatedAt: string; _count: { journals: number } };
+
 export type CreateBookMutationVariables = Exact<{
 	data: CreateBookInput;
 }>;
 
 export type CreateBookMutation = { createBook: BookInfoFragment };
 
+export type RemoveBookMutationVariables = Exact<{
+	id: Scalars['Int']['input'];
+}>;
+
+export type RemoveBookMutation = { removeBook: BookDataFragment };
+
+export type UpdateBookMutationVariables = Exact<{
+	data: UpdateBookInput;
+	id: Scalars['Int']['input'];
+}>;
+
+export type UpdateBookMutation = { updateBook: BookDataFragment };
+
 export type ListBookInfoQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ListBookInfoQuery = { books: Array<BookInfoFragment> };
 
-export type GetBookInfoQueryVariables = Exact<{
+export type GetBookDataQueryVariables = Exact<{
 	id: Scalars['Int']['input'];
 }>;
 
-export type GetBookInfoQuery = { book: BookInfoFragment };
+export type GetBookDataQuery = { book: BookDataFragment };
+
+export type ListBookDataQueryVariables = Exact<{
+	orderBy?: InputMaybe<Array<BookOrderByWithRelationInput> | BookOrderByWithRelationInput>;
+	where?: InputMaybe<BookWhereInput>;
+}>;
+
+export type ListBookDataQuery = { books: Array<BookDataFragment> };
 
 export type GetSetupValsQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -2911,6 +2933,18 @@ export const BookInfoFragmentDoc = gql`
   system
 }
     `;
+export const BookDataFragmentDoc = gql`
+    fragment BookData on Book {
+  id
+  name
+  system
+  createdAt
+  updatedAt
+  _count {
+    journals
+  }
+}
+    `;
 export const CreateBookDocument = gql`
     mutation CreateBook($data: CreateBookInput!) {
   createBook(data: $data) {
@@ -2918,6 +2952,20 @@ export const CreateBookDocument = gql`
   }
 }
     ${BookInfoFragmentDoc}`;
+export const RemoveBookDocument = gql`
+    mutation RemoveBook($id: Int!) {
+  removeBook(id: $id) {
+    ...BookData
+  }
+}
+    ${BookDataFragmentDoc}`;
+export const UpdateBookDocument = gql`
+    mutation UpdateBook($data: UpdateBookInput!, $id: Int!) {
+  updateBook(data: $data, where: {id: $id}) {
+    ...BookData
+  }
+}
+    ${BookDataFragmentDoc}`;
 export const ListBookInfoDocument = gql`
     query ListBookInfo {
   books {
@@ -2925,13 +2973,20 @@ export const ListBookInfoDocument = gql`
   }
 }
     ${BookInfoFragmentDoc}`;
-export const GetBookInfoDocument = gql`
-    query GetBookInfo($id: Int!) {
+export const GetBookDataDocument = gql`
+    query GetBookData($id: Int!) {
   book(where: {id: $id}) {
-    ...BookInfo
+    ...BookData
   }
 }
-    ${BookInfoFragmentDoc}`;
+    ${BookDataFragmentDoc}`;
+export const ListBookDataDocument = gql`
+    query ListBookData($orderBy: [BookOrderByWithRelationInput!], $where: BookWhereInput) {
+  books(orderBy: $orderBy, where: $where) {
+    ...BookData
+  }
+}
+    ${BookDataFragmentDoc}`;
 export const GetSetupValsDocument = gql`
     query GetSetupVals {
   users {
@@ -2956,11 +3011,20 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
 		CreateBook(variables: CreateBookMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<CreateBookMutation> {
 			return withWrapper((wrappedRequestHeaders) => client.request<CreateBookMutation>({ document: CreateBookDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'CreateBook', 'mutation', variables);
 		},
+		RemoveBook(variables: RemoveBookMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<RemoveBookMutation> {
+			return withWrapper((wrappedRequestHeaders) => client.request<RemoveBookMutation>({ document: RemoveBookDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'RemoveBook', 'mutation', variables);
+		},
+		UpdateBook(variables: UpdateBookMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<UpdateBookMutation> {
+			return withWrapper((wrappedRequestHeaders) => client.request<UpdateBookMutation>({ document: UpdateBookDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'UpdateBook', 'mutation', variables);
+		},
 		ListBookInfo(variables?: ListBookInfoQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<ListBookInfoQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<ListBookInfoQuery>({ document: ListBookInfoDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'ListBookInfo', 'query', variables);
 		},
-		GetBookInfo(variables: GetBookInfoQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<GetBookInfoQuery> {
-			return withWrapper((wrappedRequestHeaders) => client.request<GetBookInfoQuery>({ document: GetBookInfoDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'GetBookInfo', 'query', variables);
+		GetBookData(variables: GetBookDataQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<GetBookDataQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<GetBookDataQuery>({ document: GetBookDataDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'GetBookData', 'query', variables);
+		},
+		ListBookData(variables?: ListBookDataQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<ListBookDataQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<ListBookDataQuery>({ document: ListBookDataDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'ListBookData', 'query', variables);
 		},
 		GetSetupVals(variables?: GetSetupValsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<GetSetupValsQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<GetSetupValsQuery>({ document: GetSetupValsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'GetSetupVals', 'query', variables);

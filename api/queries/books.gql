@@ -6,8 +6,17 @@ query ListBookInfo {
 	}
 }
 
-query GetBookInfo($id: Int!) {
+query GetBookData($id: Int!) {
 	book(where: { id: $id }) {
-		...BookInfo
+		...BookData
+	}
+}
+
+query ListBookData(
+	$orderBy: [BookOrderByWithRelationInput!]
+	$where: BookWhereInput
+) {
+	books(orderBy: $orderBy, where: $where) {
+		...BookData
 	}
 }

@@ -5,3 +5,15 @@ mutation CreateBook($data: CreateBookInput!) {
 		...BookInfo
 	}
 }
+
+mutation RemoveBook($id: Int!) {
+	removeBook(id: $id) {
+		...BookData
+	}
+}
+
+mutation UpdateBook($data: UpdateBookInput!, $id: Int!) {
+	updateBook(data: $data, where: { id: $id }) {
+		...BookData
+	}
+}

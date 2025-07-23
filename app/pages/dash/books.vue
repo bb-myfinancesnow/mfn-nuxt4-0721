@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {
-	ListBookInfoDocument,
-	type ListBookInfoQuery
+	ListBookDataDocument,
+	type ListBookDataQuery
 } from '~/generated/graphql';
 
 definePageMeta({
@@ -10,8 +10,8 @@ definePageMeta({
 
 const { request } = useGql();
 
-const { data: bookData, pending } = await useLazyAsyncData('booklist', () =>
-	request<ListBookInfoQuery>(ListBookInfoDocument)
+const { data: bookData, pending } = await useLazyAsyncData('bookdatalist', () =>
+	request<ListBookDataQuery>(ListBookDataDocument)
 );
 </script>
 
@@ -31,6 +31,14 @@ const { data: bookData, pending } = await useLazyAsyncData('booklist', () =>
 			</UDashboardNavbar>
 		</template>
 		<template #body>
+			<div>
+				<UTable
+					:data="bookData?.books ?? []"
+					class="flex-1"
+					:loading="pending || !bookData?.books"
+				/>
+			</div>
+
 			<UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
 				<div>
 					data:
