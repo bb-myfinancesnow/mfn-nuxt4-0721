@@ -2886,6 +2886,13 @@ export type BookInfoFragment = { id: number; name: string; system: boolean };
 
 export type BookDataFragment = { id: number; name: string; system: boolean; createdAt: string; updatedAt: string; _count: { journals: number } };
 
+export type PeriodInfoFragment = { id: number; label: string; month: number; year: number; locked: boolean; endDate: string; startDate: string };
+
+export type PeriodRecordFragment = (
+  { quarter: number; _count: { journals: number } }
+  & PeriodInfoFragment
+);
+
 export type CreateBookMutationVariables = Exact<{
 	data: CreateBookInput;
 }>;
@@ -2922,6 +2929,12 @@ export type ListBookDataQueryVariables = Exact<{
 
 export type ListBookDataQuery = { books: Array<BookDataFragment> };
 
+export type SearchPeriodRecordsQueryVariables = Exact<{
+	where?: InputMaybe<PeriodWhereInput>;
+}>;
+
+export type SearchPeriodRecordsQuery = { periods: Array<PeriodRecordFragment> };
+
 export type GetSetupValsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetSetupValsQuery = { users: Array<{ id: number; email: string; name: string }>; books: Array<{ id: number; name: string; system: boolean }> };
@@ -2940,6 +2953,26 @@ export const BookDataFragmentDoc = gql`
   system
   createdAt
   updatedAt
+  _count {
+    journals
+  }
+}
+    `;
+export const PeriodInfoFragmentDoc = gql`
+    fragment PeriodInfo on Period {
+  id
+  label
+  month
+  year
+  locked
+  endDate
+  startDate
+}
+    `;
+export const PeriodRecordFragmentDoc = gql`
+    fragment PeriodRecord on Period {
+  ...PeriodInfo
+  quarter
   _count {
     journals
   }
@@ -2987,6 +3020,14 @@ export const ListBookDataDocument = gql`
   }
 }
     ${BookDataFragmentDoc}`;
+export const SearchPeriodRecordsDocument = gql`
+    query SearchPeriodRecords($where: PeriodWhereInput) {
+  periods(orderBy: [{year: asc}, {month: asc}], where: $where) {
+    ...PeriodRecord
+  }
+}
+    ${PeriodRecordFragmentDoc}
+${PeriodInfoFragmentDoc}`;
 export const GetSetupValsDocument = gql`
     query GetSetupVals {
   users {
@@ -3025,6 +3066,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
 		},
 		ListBookData(variables?: ListBookDataQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<ListBookDataQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<ListBookDataQuery>({ document: ListBookDataDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'ListBookData', 'query', variables);
+		},
+		SearchPeriodRecords(variables?: SearchPeriodRecordsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchPeriodRecordsQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<SearchPeriodRecordsQuery>({ document: SearchPeriodRecordsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchPeriodRecords', 'query', variables);
 		},
 		GetSetupVals(variables?: GetSetupValsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<GetSetupValsQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<GetSetupValsQuery>({ document: GetSetupValsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'GetSetupVals', 'query', variables);

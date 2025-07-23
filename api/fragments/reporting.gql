@@ -1,0 +1,17 @@
+fragment PeriodInfo on Period {
+	id
+	label
+	month
+	year
+	locked
+	endDate
+	startDate
+}
+
+fragment PeriodRecord on Period {
+	...PeriodInfo
+	quarter
+	_count {
+		journals
+	}
+}

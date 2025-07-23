@@ -11,8 +11,8 @@ const links = [
 		},
 		{
 			label: 'Periods',
-			icon: 'i-lucide-calendar-cog'
-			// to: '/settings/members'
+			icon: 'i-lucide-calendar-cog',
+			to: '/dash/reporting/periods'
 		},
 		{
 			label: 'Financials',
@@ -28,7 +28,8 @@ const links = [
 	[
 		{
 			label: 'Tester',
-			icon: 'i-lucide-pencil'
+			icon: 'i-lucide-pencil',
+			to: '/dash/reporting/tester'
 		},
 		{
 			label: 'Sample',

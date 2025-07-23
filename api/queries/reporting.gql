@@ -1,0 +1,7 @@
+#import "./fragments/reporting.gql"
+
+query SearchPeriodRecords($where: PeriodWhereInput) {
+	periods(orderBy: [{ year: asc }, { month: asc }], where: $where) {
+		...PeriodRecord
+	}
+}
