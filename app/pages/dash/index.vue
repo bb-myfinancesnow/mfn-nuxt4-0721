@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { gql, request } from 'graphql-request';
 
-definePageMeta({
-	layout: 'dash'
-});
+// definePageMeta({
+// 	layout: 'dash'
+// });
 
 const document = gql`
 	{

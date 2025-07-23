@@ -4,6 +4,10 @@ import {
 	type ListBookInfoQuery
 } from '~/generated/graphql';
 
+definePageMeta({
+	layout: 'saas'
+});
+
 const { data: page } = await useAsyncData('index', () =>
 	queryCollection('index').first()
 );

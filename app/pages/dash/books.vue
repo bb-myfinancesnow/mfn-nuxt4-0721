@@ -13,9 +13,9 @@ import {
 import type { Row } from '@tanstack/vue-table';
 import { useClipboard } from '@vueuse/core';
 
-definePageMeta({
-	layout: 'dash'
-});
+// definePageMeta({
+// 	layout: 'dash'
+// });
 
 const DisplayBoolBadge = resolveComponent('DisplayBoolBadge');
 const UButton = resolveComponent('UButton');
