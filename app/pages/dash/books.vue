@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { h, resolveComponent } from 'vue';
+import type { TableColumn } from '@nuxt/ui';
 import {
 	ListBookDataDocument,
 	SortOrder,
@@ -10,9 +12,15 @@ definePageMeta({
 	layout: 'dash'
 });
 
+const DisplayBoolBadge = resolveComponent('DisplayBoolBadge');
+
 const { request } = useGql();
 
-const { data: bookData, pending } = await useLazyAsyncData(
+const {
+	data: bookData,
+	pending,
+	refresh
+} = await useLazyAsyncData(
 	'bookdatalist',
 	() =>
 		request<ListBookDataQuery, ListBookDataQueryVariables>(
@@ -29,6 +37,58 @@ const { data: bookData, pending } = await useLazyAsyncData(
 		}
 	}
 );
+
+const columns: TableColumn<TBookRecordSchema>[] = [
+	{
+		accessorKey: 'id',
+		header: '#',
+		cell: ({ row }) => `#${row.getValue('id')}`
+	},
+	{
+		accessorKey: 'name',
+		header: 'Name'
+	},
+	{
+		accessorKey: 'system',
+		header: 'System',
+		cell: ({ row }) => {
+			const val = row.original.system;
+			return h(DisplayBoolBadge, { val });
+		}
+	},
+	{
+		accessorKey: '_count.journals',
+		header: 'Journal Count'
+	},
+	{
+		accessorKey: 'createdAt',
+		header: 'Created',
+		cell: ({ row }) => {
+			return row.original.createdAt.toLocaleString('en-US', {
+				day: 'numeric',
+				month: 'numeric',
+				year: 'numeric',
+				hour: '2-digit',
+				minute: '2-digit',
+				hour12: false
+			});
+		}
+	},
+	{
+		accessorKey: 'updatedAt',
+		header: 'Updated',
+		cell: ({ row }) => {
+			return formatDateTimeObjVal(row.original.updatedAt);
+		}
+	}
+	// {
+	// 	accessorKey: 'createdAt',
+	// 	header: 'Created',
+	// 	cell: ({ row }) => {
+	// 		return formatDateTimeObjVal(row.original.createdAt);
+	// 	}
+	// }
+];
 </script>
 
 <template>
@@ -45,13 +105,33 @@ const { data: bookData, pending } = await useLazyAsyncData(
 					<UColorModeSelect />
 				</template>
 			</UDashboardNavbar>
+			<UDashboardToolbar>
+				<template #left>
+					<UButton
+						label="Refresh Books"
+						leading-icon="i-lucide-refresh-ccw"
+						class="-ms-1"
+						variant="outline"
+						:loading="pending"
+						@click="refresh()"
+					/>
+				</template>
+			</UDashboardToolbar>
 		</template>
 		<template #body>
 			<div>
 				<UTable
 					:data="bookData ?? []"
-					class="flex-1"
+					:columns="columns"
+					class="shrink-0"
 					:loading="pending || !bookData"
+					:ui="{
+						base: 'table-fixed border-separate border-spacing-0',
+						thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
+						tbody: '[&>tr]:last:[&>td]:border-b-0',
+						th: 'first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
+						td: 'border-b border-default'
+					}"
 				/>
 			</div>
 
