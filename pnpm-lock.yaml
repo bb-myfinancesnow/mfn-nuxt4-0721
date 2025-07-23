@@ -38,6 +38,9 @@ importers:
       '@unovis/vue':
         specifier: ^1.5.2
         version: 1.5.2(@unovis/ts@1.5.2)(vue@3.5.17(typescript@5.8.3))
+      '@urql/core':
+        specifier: ^5.2.0
+        version: 5.2.0(graphql@16.11.0)
       '@urql/vue':
         specifier: ^1.4.3
         version: 1.4.3(@urql/core@5.2.0(graphql@16.11.0))(vue@3.5.17(typescript@5.8.3))

@@ -13,6 +13,14 @@ useSeoMeta({
 	description,
 	ogDescription: description
 });
+
+const config = useRuntimeConfig();
+
+console.log('Runtime config:', config.public.gqlClientUrl);
+
+if (import.meta.server) {
+	console.log(`Server URL: `, config.gqlServerUrl);
+}
 </script>
 
 <template>
