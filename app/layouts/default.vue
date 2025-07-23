@@ -120,7 +120,35 @@ const navLinks = ref<NavigationMenuItem[][]>([
 				}
 			]
 		},
-
+		{
+			label: 'Reporting',
+			icon: 'i-lucide-chart-area',
+			to: '/dash/reporting',
+			defaultOpen: true,
+			type: 'trigger',
+			children: [
+				{
+					label: 'Home',
+					to: '/dash/reporting',
+					exact: true,
+					onSelect: () => {
+						open.value = false;
+					}
+				},
+				{
+					label: 'Periods',
+					onSelect: () => {
+						open.value = false;
+					}
+				},
+				{
+					label: 'Financials',
+					onSelect: () => {
+						open.value = false;
+					}
+				}
+			]
+		},
 		{
 			label: 'Setup',
 			icon: 'i-lucide-settings',
