@@ -1,0 +1,34 @@
+#import "./fragments/reporting.gql"
+
+query SearchPeriodRecords($where: PeriodWhereInput) {
+	periods(orderBy: [{ year: asc }, { month: asc }], where: $where) {
+		...PeriodRecord
+	}
+}
+
+query ListGlAccTypeInfo(
+	$where: GlAccountTypeWhereInput
+	$orderBy: [GlAccountTypeOrderByWithRelationInput!]
+) {
+	glAccountTypes(where: $where, orderBy: $orderBy) {
+		...GlAccTypeInfo
+	}
+}
+
+query ListGlAccInfo(
+	$where: GlAccountWhereInput
+	$orderBy: [GlAccountOrderByWithRelationInput!]
+) {
+	glAccounts(where: $where, orderBy: $orderBy) {
+		...GlAccInfo
+	}
+}
+
+query SearchReportJournals(
+	$where: JournalWhereInput
+	$orderBy: [JournalOrderByWithRelationInput!]
+) {
+	journals(where: $where, orderBy: $orderBy) {
+		...ReportJournalData
+	}
+}

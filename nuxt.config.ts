@@ -18,6 +18,13 @@ export default defineNuxtConfig({
 		}
 	},
 
+	runtimeConfig: {
+		gqlServerUrl: '',
+		public: {
+			gqlClientUrl: ''
+		}
+	},
+
 	routeRules: {
 		'/docs': { redirect: '/docs/getting-started', prerender: false }
 	},
@@ -28,8 +35,7 @@ export default defineNuxtConfig({
 		prerender: {
 			routes: [
 				'/'
-			],
-			crawlLinks: true
+			]
 		}
 	},
 

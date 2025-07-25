@@ -1,0 +1,12 @@
+query GetSetupVals {
+	users {
+		id
+		email
+		name
+	}
+	books {
+		id
+		name
+		system
+	}
+}
