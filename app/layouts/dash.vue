@@ -59,7 +59,7 @@ const navLinks = ref<NavigationMenuItem[][]>([
 		{
 			label: 'Home',
 			icon: 'i-lucide-house',
-			to: '/dashboard',
+			to: '/dash',
 			onSelect: () => {
 				open.value = false;
 			}
@@ -67,7 +67,7 @@ const navLinks = ref<NavigationMenuItem[][]>([
 		{
 			label: 'Books',
 			icon: 'i-lucide-book-open',
-			to: '/books',
+			to: '/dash/books',
 			description: 'Example Page Table for Books',
 			onSelect: () => {
 				open.value = false;
@@ -106,8 +106,8 @@ const navLinks = ref<NavigationMenuItem[][]>([
 			icon: 'i-lucide-list',
 			children: [
 				{
-					label: 'Entities',
-					to: '/app/lists/entities'
+					label: 'Entities'
+					// to: '/app/lists/entities'
 				},
 				{
 					label: 'Assets'
@@ -191,8 +191,7 @@ onMounted(async () => {
 	}
 
 	toast.add({
-		title:
-			'We use first-party cookies to enhance your experience on our website.',
+		title: 'We use first-party cookies to enhance your experience on our website.',
 		duration: 0,
 		close: false,
 		actions: [

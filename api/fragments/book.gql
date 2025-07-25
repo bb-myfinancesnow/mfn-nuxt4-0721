@@ -1,0 +1,16 @@
+fragment BookInfo on Book {
+	id
+	name
+	system
+}
+
+fragment BookData on Book {
+	id
+	name
+	system
+	createdAt
+	updatedAt
+	_count {
+		journals
+	}
+}

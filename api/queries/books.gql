@@ -1,0 +1,22 @@
+#import "./fragments/book.gql"
+
+query ListBookInfo {
+	books {
+		...BookInfo
+	}
+}
+
+query GetBookData($id: Int!) {
+	book(where: { id: $id }) {
+		...BookData
+	}
+}
+
+query ListBookData(
+	$orderBy: [BookOrderByWithRelationInput!]
+	$where: BookWhereInput
+) {
+	books(orderBy: $orderBy, where: $where) {
+		...BookData
+	}
+}

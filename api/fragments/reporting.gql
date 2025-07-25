@@ -1,0 +1,52 @@
+fragment PeriodInfo on Period {
+	id
+	label
+	month
+	year
+	locked
+	endDate
+	startDate
+}
+
+fragment PeriodRecord on Period {
+	...PeriodInfo
+	quarter
+	_count {
+		journals
+	}
+}
+
+fragment GlAccTypeInfo on GlAccountType {
+	id
+	name
+	sortOrder
+	class
+}
+
+fragment GlAccInfo on GlAccount {
+	id
+	accountNumber
+	name
+	accountTypeName
+	system
+	accountType {
+		...GlAccTypeInfo
+	}
+}
+
+fragment ReportEntryData on JournalEntry {
+	id
+	amount
+	glAccountNumber
+	isDebit
+}
+
+fragment ReportJournalData on Journal {
+	id
+	tranDate
+	tranNumber
+	bookId
+	entries {
+		...ReportEntryData
+	}
+}

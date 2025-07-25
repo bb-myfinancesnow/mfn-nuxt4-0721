@@ -42,12 +42,12 @@ const items = computed<DropdownMenuItem[][]>(() => {
 			{
 				label: 'Go to App',
 				icon: 'i-lucide-eye',
-				to: '/app'
+				to: '/mfn'
 			},
 			{
-				label: 'Go to Reporting',
+				label: 'Go to Dashboard',
 				icon: 'i-lucide-scan-eye',
-				to: '/reporting'
+				to: '/dash'
 			},
 			{
 				label: 'Manage teams',

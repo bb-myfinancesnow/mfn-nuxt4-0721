@@ -1,7 +1,26 @@
 <script lang="ts" setup>
-definePageMeta({
-	layout: 'dash'
-});
+import { gql, request } from 'graphql-request';
+
+// definePageMeta({
+// 	layout: 'dash'
+// });
+
+const document = gql`
+	{
+		books {
+			id
+			name
+			system
+		}
+	}
+`;
+const config = useRuntimeConfig();
+
+const { data, status } = await useAsyncData('testbooks', () =>
+	request(config.public.gqlClientUrl, document)
+);
+// const res = await request(config.public.gqlClientUrl, document);
+console.log('res: ', data.value);
 </script>
 
 <template>
@@ -21,8 +40,11 @@ definePageMeta({
 		</template>
 		<template #body>
 			<UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
-				<div>tester:</div>
-				<div>res:</div>
+				<div>
+					data:
+					<pre>{{ data }}</pre>
+				</div>
+				<div>status: {{ status }}</div>
 			</UPageGrid>
 		</template>
 	</UDashboardPanel>

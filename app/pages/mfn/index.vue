@@ -1,4 +1,13 @@
 <script setup lang="ts">
+import {
+	ListBookInfoDocument,
+	type ListBookInfoQuery
+} from '~/generated/graphql';
+
+definePageMeta({
+	layout: 'saas'
+});
+
 const { data: page } = await useAsyncData('index', () =>
 	queryCollection('index').first()
 );
@@ -13,6 +22,22 @@ useSeoMeta({
 	description,
 	ogDescription: description
 });
+
+const config = useRuntimeConfig();
+
+console.log('Runtime config:', config.public.gqlClientUrl);
+
+if (import.meta.server) {
+	console.log(`Server URL: `, config.gqlServerUrl);
+}
+
+const { data: bookData, pending } = await useLazyAsyncData(
+	'booklisttest',
+	() => {
+		const { request } = useGql();
+		return request<ListBookInfoQuery>(ListBookInfoDocument);
+	}
+);
 </script>
 
 <template>
@@ -32,8 +57,15 @@ useSeoMeta({
 
 			<PromotionalVideo />
 		</UPageHero>
+		<UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
+			<div>
+				data:
+				<pre>{{ bookData }}</pre>
+			</div>
+			<div>status: {{ String(pending) }}</div>
+		</UPageGrid>
 
-		<UPageSection
+		<!-- <UPageSection
 			v-for="(section, index) in page.sections"
 			:key="index"
 			:title="section.title"
@@ -43,9 +75,9 @@ useSeoMeta({
 			:features="section.features"
 		>
 			<ImagePlaceholder />
-		</UPageSection>
+		</UPageSection> -->
 
-		<UPageSection
+		<!-- <UPageSection
 			:title="page.features.title"
 			:description="page.features.description"
 		>
@@ -57,9 +89,9 @@ useSeoMeta({
 					spotlight
 				/>
 			</UPageGrid>
-		</UPageSection>
+		</UPageSection> -->
 
-		<UPageSection
+		<!-- <UPageSection
 			id="testimonials"
 			:headline="page.testimonials.headline"
 			:title="page.testimonials.title"
@@ -84,7 +116,7 @@ useSeoMeta({
 					</template>
 				</UPageCard>
 			</UPageColumns>
-		</UPageSection>
+		</UPageSection> -->
 
 		<USeparator />
 
