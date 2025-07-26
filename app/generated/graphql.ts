@@ -2903,7 +2903,7 @@ export type ReportJournalDataFragment = { id: string; tranDate: string; tranNumb
 
 export type TillerCatRecordFragment = { id: number; createdAt: string; updatedAt: string; name: string; type: TillerCategoryType; group: string; glAccountNumber?: number | null; _count: { tillerTrans: number }; glAccount?: GlAccInfoFragment | null };
 
-export type TillerAccountRecordFragment = { id: number; createdAt: string; updatedAt: string; name: string; accountId: string; glAccountNumber: number; group: string; institution: string; _count: { tillerTrans: number } };
+export type TillerAccountRecordFragment = { id: number; createdAt: string; updatedAt: string; name: string; accountId: string; glAccountNumber: number; group: string; institution: string; _count: { tillerTrans: number }; glAccount: GlAccInfoFragment };
 
 export type TillerTranBaseFragment = { id: number; createdAt: string; updatedAt: string; date: string; dateAdded: string; description: string; reconciled: boolean; transactionId: string; excluded: boolean; category: string; amount: number; account: string; generatedJournal?: { id: string; tranNumber: number } | null };
 
@@ -3103,6 +3103,9 @@ export const TillerAccountRecordFragmentDoc = gql`
   _count {
     tillerTrans
   }
+  glAccount {
+    ...GlAccInfo
+  }
 }
     `;
 export const TillerTranBaseFragmentDoc = gql`
@@ -3227,7 +3230,9 @@ export const SearchTillerAccRecordsDocument = gql`
     ...TillerAccountRecord
   }
 }
-    ${TillerAccountRecordFragmentDoc}`;
+    ${TillerAccountRecordFragmentDoc}
+${GlAccInfoFragmentDoc}
+${GlAccTypeInfoFragmentDoc}`;
 export const SearchBaseTillerTransDocument = gql`
     query SearchBaseTillerTrans($where: TillerTranWhereInput, $orderBy: [TillerTranOrderByWithRelationInput!]) {
   tillerTrans(where: $where, orderBy: $orderBy) {

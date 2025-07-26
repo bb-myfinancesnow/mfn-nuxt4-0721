@@ -26,6 +26,9 @@ fragment TillerAccountRecord on TillerAccount {
 	_count {
 		tillerTrans
 	}
+	glAccount {
+		...GlAccInfo
+	}
 }
 
 fragment TillerTranBase on TillerTran {
