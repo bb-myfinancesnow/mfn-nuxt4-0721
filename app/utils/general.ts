@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { TObjAny } from '~/types';
 
 // Function to group items by a property
 export function groupByProperty<
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	T extends Record<string, any>,
 	K extends keyof T
 >(array: T[], key: K): Record<string, T[]> {
@@ -160,9 +160,12 @@ export function removeElementByIndex<T>(array: T[], index: number): T[] {
 
 // Function to transform the object keys based on the mapping array
 export function transformObjectKeys(
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	obj: { [key: string]: any },
 	mappings: { oldKey: string; newKey: string }[]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): { [key: string]: any } {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const transformedObject: { [key: string]: any } = {};
 
 	for (const { oldKey, newKey } of mappings) {
@@ -182,7 +185,7 @@ export function transformObjectKeys(
 }
 
 export function deduplicateArray<T>(array: T[], key: keyof T): T[] {
-	const uniqueObjects = new Map<any, T>();
+	const uniqueObjects = new Map<T[keyof T], T>();
 
 	for (const item of array) {
 		// Use the value of the specified key as the map's unique key
@@ -234,9 +237,12 @@ export function transformObjectValues<T extends object, U>(
 export type KeyIndexMap = Record<string, number>;
 
 export function getDifferences(
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	obj1: Record<string, any>,
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	obj2: Record<string, any>
 ) {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const diffs: Record<string, { from: any; to: any }> = {};
 
 	const keys = new Set([...Object.keys(obj1), ...Object.keys(obj2)]);
@@ -250,6 +256,7 @@ export function getDifferences(
 	return diffs;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getChangedProps<T extends Record<string, any>>(
 	a: T,
 	b: T
@@ -284,4 +291,12 @@ export function getMaxByNumber<T>(arr: T[], key: keyof T): T | undefined {
 	return arr.reduce((max, curr) =>
 		(curr[key] as number) > (max[key] as number) ? curr : max
 	);
+}
+
+export function getNestedValue<T, R = unknown>(obj: T, path: string): R | undefined {
+	return path
+		.replace(/\[(\w+)\]/g, '.$1')
+		.split('.')
+		.filter(Boolean)
+		.reduce((acc: any, key) => acc?.[key], obj);
 }
