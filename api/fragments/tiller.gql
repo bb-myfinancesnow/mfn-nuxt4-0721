@@ -1,0 +1,48 @@
+fragment TillerCatRecord on TillerCategory {
+	id
+	createdAt
+	updatedAt
+	name
+	type
+	group
+	glAccountNumber
+	_count {
+		tillerTrans
+	}
+	glAccount {
+		...GlAccInfo
+	}
+}
+
+fragment TillerAccountRecord on TillerAccount {
+	id
+	createdAt
+	updatedAt
+	name
+	accountId
+	glAccountNumber
+	group
+	institution
+	_count {
+		tillerTrans
+	}
+}
+
+fragment TillerTranBase on TillerTran {
+	id
+	createdAt
+	updatedAt
+	date
+	dateAdded
+	description
+	reconciled
+	transactionId
+	excluded
+	category
+	amount
+	account
+	generatedJournal {
+		id
+		tranNumber
+	}
+}

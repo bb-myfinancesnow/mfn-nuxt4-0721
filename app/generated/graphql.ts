@@ -2897,6 +2897,16 @@ export type GlAccTypeInfoFragment = { id: string; name: string; sortOrder: numbe
 
 export type GlAccInfoFragment = { id: string; accountNumber: number; name: string; accountTypeName: string; system: boolean; accountType: GlAccTypeInfoFragment };
 
+export type ReportEntryDataFragment = { id: number; amount: number; glAccountNumber: number; isDebit: boolean };
+
+export type ReportJournalDataFragment = { id: string; tranDate: string; tranNumber: number; bookId?: number | null; entries?: Array<ReportEntryDataFragment> | null };
+
+export type TillerCatRecordFragment = { id: number; createdAt: string; updatedAt: string; name: string; type: TillerCategoryType; group: string; glAccountNumber?: number | null; _count: { tillerTrans: number }; glAccount?: GlAccInfoFragment | null };
+
+export type TillerAccountRecordFragment = { id: number; createdAt: string; updatedAt: string; name: string; accountId: string; glAccountNumber: number; group: string; institution: string; _count: { tillerTrans: number } };
+
+export type TillerTranBaseFragment = { id: number; createdAt: string; updatedAt: string; date: string; dateAdded: string; description: string; reconciled: boolean; transactionId: string; excluded: boolean; category: string; amount: number; account: string; generatedJournal?: { id: string; tranNumber: number } | null };
+
 export type CreateBookMutationVariables = Exact<{
 	data: CreateBookInput;
 }>;
@@ -2953,9 +2963,37 @@ export type ListGlAccInfoQueryVariables = Exact<{
 
 export type ListGlAccInfoQuery = { glAccounts: Array<GlAccInfoFragment> };
 
+export type SearchReportJournalsQueryVariables = Exact<{
+	where?: InputMaybe<JournalWhereInput>;
+	orderBy?: InputMaybe<Array<JournalOrderByWithRelationInput> | JournalOrderByWithRelationInput>;
+}>;
+
+export type SearchReportJournalsQuery = { journals: Array<ReportJournalDataFragment> };
+
 export type GetSetupValsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetSetupValsQuery = { users: Array<{ id: number; email: string; name: string }>; books: Array<{ id: number; name: string; system: boolean }> };
+
+export type SearchTillerCatRecordsQueryVariables = Exact<{
+	where?: InputMaybe<TillerCategoryWhereInput>;
+	orderBy?: InputMaybe<Array<TillerCategoryOrderByWithRelationInput> | TillerCategoryOrderByWithRelationInput>;
+}>;
+
+export type SearchTillerCatRecordsQuery = { tillerCategories: Array<TillerCatRecordFragment> };
+
+export type SearchTillerAccRecordsQueryVariables = Exact<{
+	where?: InputMaybe<TillerAccountWhereInput>;
+	orderBy?: InputMaybe<Array<TillerAccountOrderByWithRelationInput> | TillerAccountOrderByWithRelationInput>;
+}>;
+
+export type SearchTillerAccRecordsQuery = { tillerAccounts: Array<TillerAccountRecordFragment> };
+
+export type SearchBaseTillerTransQueryVariables = Exact<{
+	where?: InputMaybe<TillerTranWhereInput>;
+	orderBy?: InputMaybe<Array<TillerTranOrderByWithRelationInput> | TillerTranOrderByWithRelationInput>;
+}>;
+
+export type SearchBaseTillerTransQuery = { tillerTrans: Array<TillerTranBaseFragment> };
 
 export const BookInfoFragmentDoc = gql`
     fragment BookInfo on Book {
@@ -2996,6 +3034,25 @@ export const PeriodRecordFragmentDoc = gql`
   }
 }
     `;
+export const ReportEntryDataFragmentDoc = gql`
+    fragment ReportEntryData on JournalEntry {
+  id
+  amount
+  glAccountNumber
+  isDebit
+}
+    `;
+export const ReportJournalDataFragmentDoc = gql`
+    fragment ReportJournalData on Journal {
+  id
+  tranDate
+  tranNumber
+  bookId
+  entries {
+    ...ReportEntryData
+  }
+}
+    `;
 export const GlAccTypeInfoFragmentDoc = gql`
     fragment GlAccTypeInfo on GlAccountType {
   id
@@ -3013,6 +3070,58 @@ export const GlAccInfoFragmentDoc = gql`
   system
   accountType {
     ...GlAccTypeInfo
+  }
+}
+    `;
+export const TillerCatRecordFragmentDoc = gql`
+    fragment TillerCatRecord on TillerCategory {
+  id
+  createdAt
+  updatedAt
+  name
+  type
+  group
+  glAccountNumber
+  _count {
+    tillerTrans
+  }
+  glAccount {
+    ...GlAccInfo
+  }
+}
+    `;
+export const TillerAccountRecordFragmentDoc = gql`
+    fragment TillerAccountRecord on TillerAccount {
+  id
+  createdAt
+  updatedAt
+  name
+  accountId
+  glAccountNumber
+  group
+  institution
+  _count {
+    tillerTrans
+  }
+}
+    `;
+export const TillerTranBaseFragmentDoc = gql`
+    fragment TillerTranBase on TillerTran {
+  id
+  createdAt
+  updatedAt
+  date
+  dateAdded
+  description
+  reconciled
+  transactionId
+  excluded
+  category
+  amount
+  account
+  generatedJournal {
+    id
+    tranNumber
   }
 }
     `;
@@ -3081,6 +3190,14 @@ export const ListGlAccInfoDocument = gql`
 }
     ${GlAccInfoFragmentDoc}
 ${GlAccTypeInfoFragmentDoc}`;
+export const SearchReportJournalsDocument = gql`
+    query SearchReportJournals($where: JournalWhereInput, $orderBy: [JournalOrderByWithRelationInput!]) {
+  journals(where: $where, orderBy: $orderBy) {
+    ...ReportJournalData
+  }
+}
+    ${ReportJournalDataFragmentDoc}
+${ReportEntryDataFragmentDoc}`;
 export const GetSetupValsDocument = gql`
     query GetSetupVals {
   users {
@@ -3095,6 +3212,29 @@ export const GetSetupValsDocument = gql`
   }
 }
     `;
+export const SearchTillerCatRecordsDocument = gql`
+    query SearchTillerCatRecords($where: TillerCategoryWhereInput, $orderBy: [TillerCategoryOrderByWithRelationInput!]) {
+  tillerCategories(where: $where, orderBy: $orderBy) {
+    ...TillerCatRecord
+  }
+}
+    ${TillerCatRecordFragmentDoc}
+${GlAccInfoFragmentDoc}
+${GlAccTypeInfoFragmentDoc}`;
+export const SearchTillerAccRecordsDocument = gql`
+    query SearchTillerAccRecords($where: TillerAccountWhereInput, $orderBy: [TillerAccountOrderByWithRelationInput!]) {
+  tillerAccounts(where: $where, orderBy: $orderBy) {
+    ...TillerAccountRecord
+  }
+}
+    ${TillerAccountRecordFragmentDoc}`;
+export const SearchBaseTillerTransDocument = gql`
+    query SearchBaseTillerTrans($where: TillerTranWhereInput, $orderBy: [TillerTranOrderByWithRelationInput!]) {
+  tillerTrans(where: $where, orderBy: $orderBy) {
+    ...TillerTranBase
+  }
+}
+    ${TillerTranBaseFragmentDoc}`;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?: Record<string, string>) => Promise<T>, operationName: string, operationType?: string, variables?: any) => Promise<T>;
 
@@ -3129,8 +3269,20 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
 		ListGlAccInfo(variables?: ListGlAccInfoQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<ListGlAccInfoQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<ListGlAccInfoQuery>({ document: ListGlAccInfoDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'ListGlAccInfo', 'query', variables);
 		},
+		SearchReportJournals(variables?: SearchReportJournalsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchReportJournalsQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<SearchReportJournalsQuery>({ document: SearchReportJournalsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchReportJournals', 'query', variables);
+		},
 		GetSetupVals(variables?: GetSetupValsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<GetSetupValsQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<GetSetupValsQuery>({ document: GetSetupValsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'GetSetupVals', 'query', variables);
+		},
+		SearchTillerCatRecords(variables?: SearchTillerCatRecordsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchTillerCatRecordsQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<SearchTillerCatRecordsQuery>({ document: SearchTillerCatRecordsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchTillerCatRecords', 'query', variables);
+		},
+		SearchTillerAccRecords(variables?: SearchTillerAccRecordsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchTillerAccRecordsQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<SearchTillerAccRecordsQuery>({ document: SearchTillerAccRecordsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchTillerAccRecords', 'query', variables);
+		},
+		SearchBaseTillerTrans(variables?: SearchBaseTillerTransQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchBaseTillerTransQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<SearchBaseTillerTransQuery>({ document: SearchBaseTillerTransDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchBaseTillerTrans', 'query', variables);
 		}
 	};
 }
