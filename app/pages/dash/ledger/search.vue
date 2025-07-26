@@ -6,7 +6,7 @@ const ledgerData = useLedger();
 const {
 	data: jeData,
 	pending
-} = await ledgerData.searchJournalRecs({
+} = await ledgerData.searchJournalFormattedRecs({
 	orderBy: [{ tranDate: SortOrder.Asc }, { tranNumber: SortOrder.Asc }]
 });
 </script>
