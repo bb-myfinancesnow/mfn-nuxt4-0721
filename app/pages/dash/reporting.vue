@@ -21,8 +21,8 @@ const links = [
 		},
 		{
 			label: 'Data View',
-			icon: 'i-lucide-list'
-			// to: '/settings/security'
+			icon: 'i-lucide-list',
+			to: '/dash/reporting/data-view'
 		}
 	],
 	[
@@ -33,7 +33,8 @@ const links = [
 		},
 		{
 			label: 'Sample',
-			icon: 'i-lucide-test-tube-diagonal'
+			icon: 'i-lucide-test-tube-diagonal',
+			to: '/dash/reporting/sample'
 		}
 	]
 ] satisfies NavigationMenuItem[][];

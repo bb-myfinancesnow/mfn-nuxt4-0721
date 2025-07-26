@@ -1,7 +1,10 @@
 import {
 	SearchPeriodRecordsDocument,
+	SearchReportJournalsDocument,
 	type SearchPeriodRecordsQuery,
-	type SearchPeriodRecordsQueryVariables
+	type SearchPeriodRecordsQueryVariables,
+	type SearchReportJournalsQuery,
+	type SearchReportJournalsQueryVariables
 } from '~/generated/graphql';
 
 export const useReportData = () => {
@@ -26,7 +29,15 @@ export const useReportData = () => {
 		);
 	};
 
+	const searchReportJournals = (variables?: SearchReportJournalsQueryVariables) => {
+		return useLazyAsyncData(
+			`searchReportJournals-${JSON.stringify(variables)}`,
+			() => request<SearchReportJournalsQuery, SearchReportJournalsQueryVariables>(SearchReportJournalsDocument, variables)
+		);
+	};
+
 	return {
-		searchPeriods
+		searchPeriods,
+		searchReportJournals
 	};
 };
