@@ -4,7 +4,11 @@ import { SortOrder } from '~/generated/graphql';
 
 const ledgerData = useLedger();
 
-const { data: jeData, pending, refresh: refreshJournalQuery } = await ledgerData.searchJournalFormattedRecs({
+const {
+	data: jeData,
+	pending,
+	refresh: refreshJournalQuery
+} = await ledgerData.searchJournalFormattedRecs({
 	orderBy: [{ tranDate: SortOrder.Asc }, { tranNumber: SortOrder.Asc }]
 });
 
@@ -98,8 +102,10 @@ const columns: PrimeColumnProps[] = [
 							Loading data. Please wait.
 						</template>
 						<template #header>
-							<div class="flex flex-wrap items-center justify-between gap-2">
-								<span class="text-xl font-bold">Accounts</span>
+							<div
+								class="flex flex-wrap items-center justify-between gap-2"
+							>
+								<span class="text-xl font-bold">Search Journals</span>
 								<PButton
 									icon="pi pi-refresh"
 									rounded
@@ -123,9 +129,22 @@ const columns: PrimeColumnProps[] = [
 								#body="{ data }"
 							>
 								<!-- {{ formatUSDate(data[col.colId]) }} -->
-								{{ formatUSDate(getNestedValue<TJournalRecSchema, Date>(data, col.colId)??new Date()) }}
+								<!-- <div>
+									{{ formatUSDate(getNestedValue<TJournalRecSchema, Date>(data, col.colId)??new Date()) }}
+								</div> -->
+								<TableDateCol
+									:input="
+										getNestedValue<TJournalRecSchema, Date>(
+											data,
+											col.colId
+										)
+									"
+								/>
 							</template>
-							<template v-else-if="col.dataType==='boolean'" #body="{ data }">
+							<template
+								v-else-if="col.dataType === 'boolean'"
+								#body="{ data }"
+							>
 								<!-- {{ getNestedValue<TJournalRecSchema, boolean>(data, col.colId) }} -->
 								<!-- <i
 									class="pi"
@@ -134,7 +153,14 @@ const columns: PrimeColumnProps[] = [
 										'pi-times-circle text-red-500': !getNestedValue<TJournalRecSchema, boolean>(data, col.colId)
 									}"
 								/> -->
-								<TableBoolCol :input="getNestedValue<TJournalRecSchema, boolean>(data, col.colId)" />
+								<TableBoolCol
+									:input="
+										getNestedValue<
+											TJournalRecSchema,
+											boolean
+											>(data, col.colId)
+									"
+								/>
 							</template>
 						</PColumn>
 					</PDataTable>
