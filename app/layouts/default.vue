@@ -102,6 +102,28 @@ const navLinks = ref<NavigationMenuItem[][]>([
 			]
 		},
 		{
+			label: 'Tiller',
+			icon: 'i-lucide-chevrons-left-right-ellipsis',
+			to: '/dash/tiller'
+		},
+		// {
+		// 	label: 'Tiller',
+		// 	icon: 'i-lucide-chevrons-left-right-ellipsis',
+		// 	to: '/dash/tiller',
+		// 	type: 'trigger',
+		// 	defaultOpen: true,
+		// 	children: [
+		// 		{
+		// 			label: 'Home',
+		// 			to: '/dash/tiller',
+		// 			exact: true,
+		// 			onSelect: () => {
+		// 				open.value = false;
+		// 			}
+		// 		}
+		// 	]
+		// },
+		{
 			label: 'Lists',
 			icon: 'i-lucide-list',
 			children: [
@@ -149,6 +171,7 @@ const navLinks = ref<NavigationMenuItem[][]>([
 				}
 			]
 		},
+
 		{
 			label: 'Setup',
 			icon: 'i-lucide-settings',

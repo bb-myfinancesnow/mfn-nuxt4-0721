@@ -27,7 +27,7 @@ console.log('res: ', data.value);
 	<UDashboardPanel id="dashhome">
 		<template #header>
 			<UDashboardNavbar
-				title="Reporting Home"
+				title="Dashboard Home"
 				:ui="{ right: 'gap-3' }"
 			>
 				<template #leading>
