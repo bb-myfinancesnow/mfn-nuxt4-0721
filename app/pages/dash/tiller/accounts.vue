@@ -8,9 +8,10 @@ import {
 	type SearchTillerAccRecordsQuery
 } from '~/generated/graphql';
 import { upperFirst } from 'scule';
-import { getPaginationRowModel } from '@tanstack/vue-table';
+import { getPaginationRowModel, type Column } from '@tanstack/vue-table';
 
 const UButton = resolveComponent('UButton');
+const UDropdownMenu = resolveComponent('UDropdownMenu');
 
 const { request } = useGql();
 
@@ -81,20 +82,30 @@ const columns: TableColumn<TTillerAccRecordSchema>[] = [
 	},
 	{
 		accessorKey: 'name',
-		header: 'Name',
-		enableHiding: false
+		// header: 'Name',
+		enableHiding: false,
+		header: ({ column }) => getHeader(column, 'Name')
 	},
 	{
 		accessorKey: 'group',
-		header: 'Group'
+		header: ({ column }) => getHeader(column, 'Group')
+		// header: 'Group'
 	},
 	{
 		accessorKey: 'institution',
-		header: 'Institution'
+		// header: 'Institution',
+		header: ({ column }) => getHeader(column, 'Institution')
+	},
+	{
+		id: 'glAcc',
+		accessorFn: (row) => row.glAccount.accountLabel,
+		header: ({ column }) => getHeader(column, 'GL Acc')
 	},
 	{
 		accessorKey: '_count.tillerTrans',
-		header: 'Tran Count'
+		header: ({ column }) => getHeader(column, 'Tran Count'),
+		enableGlobalFilter: false
+		// header: 'Tran Count'
 	},
 	{
 		accessorKey: 'accountId',
@@ -115,6 +126,61 @@ const columns: TableColumn<TTillerAccRecordSchema>[] = [
 		}
 	}
 ];
+
+function getHeader(column: Column<TTillerAccRecordSchema>, label: string) {
+	const isSorted = column.getIsSorted();
+
+	return h(
+		UDropdownMenu,
+		{
+			content: {
+				align: 'start'
+			},
+			'aria-label': 'Actions dropdown',
+			items: [
+				{
+					label: 'Asc',
+					type: 'checkbox',
+					icon: 'i-lucide-arrow-up-narrow-wide',
+					checked: isSorted === 'asc',
+					onSelect: () => {
+						if (isSorted === 'asc') {
+							column.clearSorting();
+						} else {
+							column.toggleSorting(false);
+						}
+					}
+				},
+				{
+					label: 'Desc',
+					icon: 'i-lucide-arrow-down-wide-narrow',
+					type: 'checkbox',
+					checked: isSorted === 'desc',
+					onSelect: () => {
+						if (isSorted === 'desc') {
+							column.clearSorting();
+						} else {
+							column.toggleSorting(true);
+						}
+					}
+				}
+			]
+		},
+		() =>
+			h(UButton, {
+				color: 'neutral',
+				variant: 'ghost',
+				label,
+				icon: isSorted
+					? isSorted === 'asc'
+						? 'i-lucide-arrow-up-narrow-wide'
+						: 'i-lucide-arrow-down-wide-narrow'
+					: 'i-lucide-arrow-up-down',
+				class: '-mx-2.5 data-[state=open]:bg-elevated',
+				'aria-label': `Sort by ${isSorted === 'asc' ? 'descending' : 'ascending'}`
+			})
+	);
+}
 
 const q = ref('');
 </script>
@@ -188,6 +254,7 @@ const q = ref('');
 		</UPageCard>
 		<UTable
 			ref="table"
+			v-model:global-filter="q"
 			v-model:column-visibility="columnVisibility"
 			v-model:pagination="pagination"
 			v-model:sorting="sorting"
