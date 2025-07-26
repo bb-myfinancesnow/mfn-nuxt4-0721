@@ -46,6 +46,7 @@ console.log('res: ', data.value);
 					<pre>{{ data }}</pre>
 				</div>
 				<div>status: {{ status }}</div>
+				<div><PButton label="Test" /></div>
 			</UPageGrid>
 		</template>
 	</UDashboardPanel>

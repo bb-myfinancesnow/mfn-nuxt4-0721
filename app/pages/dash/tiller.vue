@@ -27,7 +27,8 @@ const links = [
 		},
 		{
 			label: 'Tester',
-			icon: 'i-lucide-test-tube-diagonal'
+			icon: 'i-lucide-test-tube-diagonal',
+			to: '/dash/tiller/tester'
 		}
 
 	]
