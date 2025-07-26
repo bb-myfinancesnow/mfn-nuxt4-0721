@@ -1,11 +1,23 @@
 <script lang="ts" setup>
-import { SearchTillerAccRecordsDocument, SortOrder, type SearchTillerAccRecordsQuery, type SearchTillerAccRecordsQueryVariables } from '~/generated/graphql';
+import {
+	SearchTillerCatRecordsDocument,
+	SortOrder,
+	type SearchTillerCatRecordsQueryVariables,
+	type SearchTillerCatRecordsQuery
+} from '~/generated/graphql';
 
 const { request } = useGql();
 
-const { data: tillerData,	pending } = await useLazyAsyncData('hometillerdata', () => request<SearchTillerAccRecordsQuery, SearchTillerAccRecordsQueryVariables>(SearchTillerAccRecordsDocument, {
-	orderBy: [{ id: SortOrder.Asc }]
-}));
+const { data: tillerData, pending } = await useLazyAsyncData(
+	'hometillerdatac',
+	() =>
+		request<
+			SearchTillerCatRecordsQuery,
+			SearchTillerCatRecordsQueryVariables
+		>(SearchTillerCatRecordsDocument, {
+			orderBy: [{ id: SortOrder.Asc }]
+		})
+);
 </script>
 
 <template>
