@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import type { DataTableFilterMeta } from 'primevue/datatable';
+import { FilterMatchMode, FilterOperator } from '@primevue/core/api';
 import type { ColumnProps } from 'primevue/column';
 import { SortOrder } from '~/generated/graphql';
 
@@ -14,54 +16,87 @@ const {
 
 interface PrimeColumnProps extends ColumnProps {
 	colId: string;
+	filterable: boolean;
 }
 
 const columns: PrimeColumnProps[] = [
 	{
 		colId: 'tranNumber',
+		filterable: true,
 		field: 'tranNumber',
 		dataType: 'numeric',
 		sortable: true,
 		frozen: true,
 		header: '#'
+
 	},
 	{
 		colId: 'tranDate',
+		filterable: true,
 		field: 'tranDate',
 		dataType: 'date',
 		sortable: true,
 		header: 'Tran Date',
 		style: 'min-width: 200px'
 	},
-	{
-		colId: 'description',
-		field: 'description',
-		dataType: 'text',
-		header: 'Description'
-	},
-	{
-		colId: 'id',
-		field: 'id',
-		dataType: 'text',
-		sortable: true,
-		header: 'ID'
-	},
 
 	{
 		colId: 'postingPeriod.label',
 		field: 'postingPeriod.label',
+		filterable: false,
 		dataType: 'text',
 		sortField: 'postingPeriod.id',
 		header: 'Period',
 		sortable: true
 	},
 	{
+		colId: 'description',
+		filterable: true,
+		field: 'description',
+		dataType: 'text',
+		header: 'Description'
+	},
+	{
 		colId: 'postingPeriod.locked',
+		filterable: false,
 		field: 'postingPeriod.locked',
 		dataType: 'boolean',
 		header: 'Locked'
+	},
+	{
+		colId: 'id',
+		filterable: true,
+		field: 'id',
+		dataType: 'text',
+		sortable: true,
+		header: 'ID'
 	}
 ];
+
+const filters = ref();
+
+const initFilters = () => {
+	const defaultFilters: DataTableFilterMeta = {
+		global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+		id: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+		tranNumber: {
+			operator: FilterOperator.AND,
+			constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }]
+		},
+		tranDate: {
+			operator: FilterOperator.AND,
+			constraints: [{ value: null, matchMode: FilterMatchMode.DATE_AFTER }]
+		},
+		description: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
+	};
+	filters.value = defaultFilters;
+};
+
+initFilters();
+
+const clearFilter = () => {
+	initFilters();
+};
 </script>
 
 <template>
@@ -83,6 +118,7 @@ const columns: PrimeColumnProps[] = [
 			<div>
 				<ClientOnly>
 					<PDataTable
+						v-model:filters="filters"
 						:value="jeData"
 						data-key="id"
 						:loading="pending"
@@ -94,6 +130,8 @@ const columns: PrimeColumnProps[] = [
 						paginator
 						:rows="10"
 						:rows-per-page-options="[5, 10, 25, 50, 100]"
+						filter-display="menu"
+						:global-filter-fields="['id', 'description', 'tranNumber']"
 					>
 						<template #empty>
 							No data found.
@@ -106,11 +144,27 @@ const columns: PrimeColumnProps[] = [
 								class="flex flex-wrap items-center justify-between gap-2"
 							>
 								<span class="text-xl font-bold">Search Journals</span>
+								<DisplayCountto prefix="Total Journals: " :end-value="jeData.length" />
 								<PButton
 									icon="pi pi-refresh"
 									rounded
 									raised
 									@click="refreshJournalQuery()"
+								/>
+							</div>
+							<USeparator class="py-2" />
+							<div class="flex flex-wrap items-center justify-between gap-2">
+								<UInput
+									v-model="filters['global'].value"
+									placeholder="Keyword Search"
+									icon="i-lucide-search"
+								/>
+								<PButton
+									type="button"
+									icon="pi pi-filter-slash"
+									label="Clear"
+									outlined
+									@click="clearFilter()"
 								/>
 							</div>
 						</template>
@@ -124,6 +178,7 @@ const columns: PrimeColumnProps[] = [
 							:frozen="col.frozen"
 							:sort-field="col.sortField"
 						>
+							<!-- Body Templates -->
 							<template
 								v-if="col.dataType === 'date'"
 								#body="{ data }"
@@ -161,6 +216,11 @@ const columns: PrimeColumnProps[] = [
 											>(data, col.colId)
 									"
 								/>
+							</template>
+
+							<!-- Filter Templates -->
+							<template v-if="col.dataType ==='text' && col.filterable" #filter="{ filterModel }">
+								<PInputText v-model="filterModel.value" type="text" placeholder="Search..." />
 							</template>
 						</PColumn>
 					</PDataTable>
