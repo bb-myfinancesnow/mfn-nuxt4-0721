@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { TabsItem } from '@nuxt/ui';
 // const toast = useToast();
 
 const reportData = useReportData();
@@ -8,6 +9,19 @@ const {
 	pending,
 	refresh: refreshPeriodQuery
 } = await reportData.searchPeriods();
+
+const items: TabsItem[] = [
+	{
+		label: 'Flat',
+		icon: 'i-lucide-rows-3',
+		slot: 'flat' as const
+	},
+	{
+		label: 'Tree',
+		icon: 'i-lucide-folder-tree',
+		slot: 'tree' as const
+	}
+];
 </script>
 
 <template>
@@ -24,7 +38,14 @@ const {
 					/>
 				</UTooltip>
 			</div>
-			<PeriodsTreeView :is-loading="pending" :period-data="periodData" />
+			<UTabs :items="items" class="w-full">
+				<template #flat>
+					<PeriodsFlatTable :is-loading="pending" :period-data="periodData" />
+				</template>
+				<template #tree>
+					<PeriodsTreeView :is-loading="pending" :period-data="periodData" />
+				</template>
+			</UTabs>
 		</UPageCard>
 		<UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
 			<div>
