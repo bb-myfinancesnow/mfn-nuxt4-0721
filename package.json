@@ -17,6 +17,7 @@
     "codegen:watch": "graphql-codegen --config codegen.ts --watch"
   },
   "dependencies": {
+    "@handsontable/vue3": "^16.0.1",
     "@iconify-json/lucide": "^1.2.57",
     "@iconify-json/simple-icons": "^1.2.44",
     "@nuxt/content": "^3.6.3",
@@ -35,6 +36,7 @@
     "date-fns": "^4.1.0",
     "graphql": "^16.11.0",
     "graphql-request": "^7.2.0",
+    "handsontable": "^16.0.1",
     "motion-v": "^1.5.0",
     "nuxt": "^4.0.1",
     "nuxt-og-image": "^5.1.9",
