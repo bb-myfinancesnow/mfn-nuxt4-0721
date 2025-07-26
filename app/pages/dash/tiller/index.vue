@@ -22,6 +22,11 @@ const { data: tillerData, pending } = await useLazyAsyncData(
 
 <template>
 	<div>
+		<DisplaySpinner
+			:size="60"
+			variant="pulse"
+			text="Loading..."
+		/>
 		<UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
 			<div>
 				data:

@@ -40,6 +40,7 @@ console.log('res: ', data.value);
 		</template>
 		<template #body>
 			<UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
+				<DisplaySpinner />
 				<div>
 					data:
 					<pre>{{ data }}</pre>
