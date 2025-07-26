@@ -1,5 +1,14 @@
 <script lang="ts" setup>
+import { SortOrder } from '~/generated/graphql';
 
+const ledgerData = useLedger();
+
+const {
+	data: jeData,
+	pending
+} = await ledgerData.searchJournalRecs({
+	orderBy: [{ tranDate: SortOrder.Asc }, { tranNumber: SortOrder.Asc }]
+});
 </script>
 
 <template>
@@ -19,13 +28,11 @@
 		</template>
 		<template #body>
 			<UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
-				<DisplaySpinner />
-				<!-- <div>
+				<div>
 					data:
-					<pre>{{ data }}</pre>
+					<pre>{{ jeData }}</pre>
 				</div>
-				<div>status: {{ status }}</div>
-				<div><PButton label="Test" /></div> -->
+				<div>status: {{ String(pending) }}</div>
 			</UPageGrid>
 		</template>
 	</UDashboardPanel>
