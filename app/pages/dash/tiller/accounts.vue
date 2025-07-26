@@ -290,12 +290,12 @@ const q = ref('');
 				"
 			/>
 		</div>
-		<!-- <UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
+		<UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
 			<div>
 				data:
+				<div>status: {{ String(pending) }}</div>
 				<pre>{{ tillerData }}</pre>
 			</div>
-			<div>status: {{ String(pending) }}</div>
-		</UPageGrid> -->
+		</UPageGrid>
 	</div>
 </template>
