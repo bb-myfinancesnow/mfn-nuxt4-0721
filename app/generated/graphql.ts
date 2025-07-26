@@ -2886,6 +2886,15 @@ export type BookInfoFragment = { id: number; name: string; system: boolean };
 
 export type BookDataFragment = { id: number; name: string; system: boolean; createdAt: string; updatedAt: string; _count: { journals: number } };
 
+export type JournalEntryLineRecordFragment = { id: number; amount: number; glAccountNumber: number; isDebit: boolean; entrySource: SourceType; entityId?: number | null; memo: string; glAccount: GlAccInfoFragment };
+
+export type JournalEntryHeaderRecordFragment = { id: string; createdAt: string; updatedAt: string; tranDate: string; tranNumber: number; bookId?: number | null; description: string; tranSource: SourceType; reversalDate?: string | null; externalId?: string | null; createdFromTillerTranId?: number | null; postingPeriod: { id: number; label: string; locked: boolean } };
+
+export type JournalEntryRecordFragment = (
+  { entries?: Array<JournalEntryLineRecordFragment> | null; _count: { entries: number; migrationLoanChanges: number; templateForTranSchedules: number } }
+  & JournalEntryHeaderRecordFragment
+);
+
 export type PeriodInfoFragment = { id: number; label: string; month: number; year: number; locked: boolean; endDate: string; startDate: string };
 
 export type PeriodRecordFragment = (
@@ -2942,6 +2951,16 @@ export type ListBookDataQueryVariables = Exact<{
 }>;
 
 export type ListBookDataQuery = { books: Array<BookDataFragment> };
+
+export type SearchJournalRecordsQueryVariables = Exact<{
+	where?: InputMaybe<JournalWhereInput>;
+	orderBy?: InputMaybe<Array<JournalOrderByWithRelationInput> | JournalOrderByWithRelationInput>;
+	skip?: InputMaybe<Scalars['Int']['input']>;
+	take?: InputMaybe<Scalars['Int']['input']>;
+	cursor?: InputMaybe<JournalWhereUniqueInput>;
+}>;
+
+export type SearchJournalRecordsQuery = { journals: Array<JournalEntryRecordFragment> };
 
 export type SearchPeriodRecordsQueryVariables = Exact<{
 	where?: InputMaybe<PeriodWhereInput>;
@@ -3014,6 +3033,73 @@ export const BookDataFragmentDoc = gql`
   }
 }
     `;
+export const JournalEntryHeaderRecordFragmentDoc = gql`
+    fragment JournalEntryHeaderRecord on Journal {
+  id
+  createdAt
+  updatedAt
+  tranDate
+  tranNumber
+  bookId
+  description
+  tranSource
+  reversalDate
+  externalId
+  createdFromTillerTranId
+  postingPeriod {
+    id
+    label
+    locked
+  }
+}
+    `;
+export const GlAccTypeInfoFragmentDoc = gql`
+    fragment GlAccTypeInfo on GlAccountType {
+  id
+  name
+  sortOrder
+  class
+}
+    `;
+export const GlAccInfoFragmentDoc = gql`
+    fragment GlAccInfo on GlAccount {
+  id
+  accountNumber
+  name
+  accountTypeName
+  system
+  accountType {
+    ...GlAccTypeInfo
+  }
+}
+    `;
+export const JournalEntryLineRecordFragmentDoc = gql`
+    fragment JournalEntryLineRecord on JournalEntry {
+  id
+  amount
+  glAccountNumber
+  isDebit
+  entrySource
+  entityId
+  memo
+  glAccount {
+    ...GlAccInfo
+  }
+}
+    `;
+export const JournalEntryRecordFragmentDoc = gql`
+    fragment JournalEntryRecord on Journal {
+  ...JournalEntryHeaderRecord
+  entries {
+    ...JournalEntryLineRecord
+  }
+  _count {
+    entries
+    migrationLoanChanges
+    templateForTranSchedules
+  }
+}
+    `;
 export const PeriodInfoFragmentDoc = gql`
     fragment PeriodInfo on Period {
   id
@@ -3050,26 +3136,6 @@ export const ReportJournalDataFragmentDoc = gql`
   bookId
   entries {
     ...ReportEntryData
-  }
-}
-    `;
-export const GlAccTypeInfoFragmentDoc = gql`
-    fragment GlAccTypeInfo on GlAccountType {
-  id
-  name
-  sortOrder
-  class
-}
-    `;
-export const GlAccInfoFragmentDoc = gql`
-    fragment GlAccInfo on GlAccount {
-  id
-  accountNumber
-  name
-  accountTypeName
-  system
-  accountType {
-    ...GlAccTypeInfo
   }
 }
     `;
@@ -3170,6 +3236,23 @@ export const ListBookDataDocument = gql`
   }
 }
     ${BookDataFragmentDoc}`;
+export const SearchJournalRecordsDocument = gql`
+    query SearchJournalRecords($where: JournalWhereInput, $orderBy: [JournalOrderByWithRelationInput!], $skip: Int, $take: Int, $cursor: JournalWhereUniqueInput) {
+  journals(
+    where: $where
+    orderBy: $orderBy
+    skip: $skip
+    take: $take
+    cursor: $cursor
+  ) {
+    ...JournalEntryRecord
+  }
+}
+    ${JournalEntryRecordFragmentDoc}
+${JournalEntryHeaderRecordFragmentDoc}
+${JournalEntryLineRecordFragmentDoc}
+${GlAccInfoFragmentDoc}
+${GlAccTypeInfoFragmentDoc}`;
 export const SearchPeriodRecordsDocument = gql`
     query SearchPeriodRecords($where: PeriodWhereInput) {
   periods(orderBy: [{year: asc}, {month: asc}], where: $where) {
@@ -3264,6 +3347,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
 		},
 		ListBookData(variables?: ListBookDataQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<ListBookDataQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<ListBookDataQuery>({ document: ListBookDataDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'ListBookData', 'query', variables);
+		},
+		SearchJournalRecords(variables?: SearchJournalRecordsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchJournalRecordsQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<SearchJournalRecordsQuery>({ document: SearchJournalRecordsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchJournalRecords', 'query', variables);
 		},
 		SearchPeriodRecords(variables?: SearchPeriodRecordsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchPeriodRecordsQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<SearchPeriodRecordsQuery>({ document: SearchPeriodRecordsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchPeriodRecords', 'query', variables);

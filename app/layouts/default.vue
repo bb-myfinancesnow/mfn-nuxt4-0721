@@ -106,23 +106,30 @@ const navLinks = ref<NavigationMenuItem[][]>([
 			icon: 'i-lucide-chevrons-left-right-ellipsis',
 			to: '/dash/tiller'
 		},
-		// {
-		// 	label: 'Tiller',
-		// 	icon: 'i-lucide-chevrons-left-right-ellipsis',
-		// 	to: '/dash/tiller',
-		// 	type: 'trigger',
-		// 	defaultOpen: true,
-		// 	children: [
-		// 		{
-		// 			label: 'Home',
-		// 			to: '/dash/tiller',
-		// 			exact: true,
-		// 			onSelect: () => {
-		// 				open.value = false;
-		// 			}
-		// 		}
-		// 	]
-		// },
+		{
+			label: 'Ledger',
+			icon: 'i-lucide-receipt',
+			to: '/dash/ledger',
+			type: 'trigger',
+			defaultOpen: true,
+			children: [
+				{
+					label: 'Home',
+					to: '/dash/ledger',
+					exact: true,
+					onSelect: () => {
+						open.value = false;
+					}
+				},
+				{
+					label: 'Search',
+					to: '/dash/ledger/search',
+					onSelect: () => {
+						open.value = false;
+					}
+				}
+			]
+		},
 		{
 			label: 'Lists',
 			icon: 'i-lucide-list',

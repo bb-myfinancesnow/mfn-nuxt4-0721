@@ -1,0 +1,17 @@
+query SearchJournalRecords(
+	$where: JournalWhereInput
+	$orderBy: [JournalOrderByWithRelationInput!]
+	$skip: Int
+	$take: Int
+	$cursor: JournalWhereUniqueInput
+) {
+	journals(
+		where: $where
+		orderBy: $orderBy
+		skip: $skip
+		take: $take
+		cursor: $cursor
+	) {
+		...JournalEntryRecord
+	}
+}
