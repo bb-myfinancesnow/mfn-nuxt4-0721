@@ -65,6 +65,14 @@ const navLinks = ref<NavigationMenuItem[][]>([
 			}
 		},
 		{
+			label: 'Testing',
+			icon: 'i-lucide-test-tube-diagonal',
+			to: '/dash/testing',
+			onSelect: () => {
+				open.value = false;
+			}
+		},
+		{
 			label: 'Books',
 			icon: 'i-lucide-book-open',
 			to: '/dash/books',

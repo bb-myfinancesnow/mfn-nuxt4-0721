@@ -109,7 +109,15 @@ export default defineNuxtConfig({
 				'InputIcon',
 				'Select',
 				'Row',
-				'ColumnGroup'
+				'ColumnGroup',
+				'PickList',
+				'Stepper',
+				'StepList',
+				'StepPanels',
+				'StepItem',
+				'Step',
+				'StepPanel',
+				'ProgressSpinner'
 			],
 			prefix: 'P'
 		},

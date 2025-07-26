@@ -18,7 +18,9 @@ export const JournalHeaderRecSchema = z.object({
 	bookId: z.number().nullable(),
 	description: z.string(),
 	tranSource: z.nativeEnum(SourceType),
-	postingPeriod: z.lazy(() => LedgerPeriodInfoSchema)
+	postingPeriod: z.lazy(() => LedgerPeriodInfoSchema),
+	externalId: z.string().nullable(),
+	reversalDate: z.coerce.date().nullable()
 });
 
 export type TJournalHeaderRecSchema = z.infer<typeof JournalHeaderRecSchema>;
@@ -37,7 +39,12 @@ export const JournalLineRecSchema = z.object({
 export type TJournalLineRecSchema = z.infer<typeof JournalLineRecSchema>;
 
 export const JournalRecSchema = JournalHeaderRecSchema.extend({
-	entries: z.array(z.lazy(() => JournalLineRecSchema))
+	entries: z.array(z.lazy(() => JournalLineRecSchema)),
+	_count: z.object({
+		entries: z.number(),
+		migrationLoanChanges: z.number(),
+		templateForTranSchedules: z.number()
+	})
 });
 
 export type TJournalRecSchema = z.infer<typeof JournalRecSchema>;
