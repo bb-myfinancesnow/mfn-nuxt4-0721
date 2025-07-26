@@ -4,7 +4,7 @@ import { SortOrder } from '~/generated/graphql';
 
 const ledgerData = useLedger();
 
-const { data: jeData, pending } = await ledgerData.searchJournalFormattedRecs({
+const { data: jeData, pending, refresh: refreshJournalQuery } = await ledgerData.searchJournalFormattedRecs({
 	orderBy: [{ tranDate: SortOrder.Asc }, { tranNumber: SortOrder.Asc }]
 });
 
@@ -22,11 +22,12 @@ const columns: PrimeColumnProps[] = [
 		header: '#'
 	},
 	{
-		colId: 'id',
-		field: 'id',
-		dataType: 'text',
+		colId: 'tranDate',
+		field: 'tranDate',
+		dataType: 'date',
 		sortable: true,
-		header: 'ID'
+		header: 'Tran Date',
+		style: 'min-width: 200px'
 	},
 	{
 		colId: 'description',
@@ -35,13 +36,13 @@ const columns: PrimeColumnProps[] = [
 		header: 'Description'
 	},
 	{
-		colId: 'tranDate',
-		field: 'tranDate',
-		dataType: 'date',
+		colId: 'id',
+		field: 'id',
+		dataType: 'text',
 		sortable: true,
-		header: 'Tran Date',
-		style: 'min-width: 200px'
+		header: 'ID'
 	},
+
 	{
 		colId: 'postingPeriod.label',
 		field: 'postingPeriod.label',
@@ -96,6 +97,17 @@ const columns: PrimeColumnProps[] = [
 						<template #loading>
 							Loading data. Please wait.
 						</template>
+						<template #header>
+							<div class="flex flex-wrap items-center justify-between gap-2">
+								<span class="text-xl font-bold">Accounts</span>
+								<PButton
+									icon="pi pi-refresh"
+									rounded
+									raised
+									@click="refreshJournalQuery()"
+								/>
+							</div>
+						</template>
 						<PColumn
 							v-for="col of columns"
 							:key="col.colId"
@@ -115,13 +127,14 @@ const columns: PrimeColumnProps[] = [
 							</template>
 							<template v-else-if="col.dataType==='boolean'" #body="{ data }">
 								<!-- {{ getNestedValue<TJournalRecSchema, boolean>(data, col.colId) }} -->
-								<i
+								<!-- <i
 									class="pi"
 									:class="{
 										'pi-check-circle text-green-500 ': getNestedValue<TJournalRecSchema, boolean>(data, col.colId),
 										'pi-times-circle text-red-500': !getNestedValue<TJournalRecSchema, boolean>(data, col.colId)
 									}"
-								/>
+								/> -->
+								<TableBoolCol :input="getNestedValue<TJournalRecSchema, boolean>(data, col.colId)" />
 							</template>
 						</PColumn>
 					</PDataTable>
