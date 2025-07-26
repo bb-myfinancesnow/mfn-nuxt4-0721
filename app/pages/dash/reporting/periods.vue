@@ -24,7 +24,7 @@ const {
 					/>
 				</UTooltip>
 			</div>
-			<PeriodsFlatTable :is-loading="pending" :period-data="periodData" />
+			<PeriodsTreeView :is-loading="pending" :period-data="periodData" />
 		</UPageCard>
 		<UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
 			<div>
