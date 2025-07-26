@@ -35,7 +35,8 @@ export const useLedger = () => {
 					const arrSchema = JournalRecSchema.array();
 					const parsedData = arrSchema.parse(input.journals);
 					return parsedData;
-				}
+				},
+				default: () => [] as TJournalRecSchema[]
 			}
 		);
 	};
