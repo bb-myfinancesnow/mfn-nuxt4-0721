@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { h, resolveComponent } from 'vue';
 import type { TableColumn } from '@nuxt/ui';
 import {
 	SearchTillerAccRecordsDocument,
@@ -8,6 +9,8 @@ import {
 } from '~/generated/graphql';
 import { upperFirst } from 'scule';
 import { getPaginationRowModel } from '@tanstack/vue-table';
+
+const UButton = resolveComponent('UButton');
 
 const { request } = useGql();
 
@@ -37,7 +40,8 @@ const {
 const table = useTemplateRef('table');
 const columnVisibility = ref({
 	createdAt: false,
-	updatedAt: false
+	updatedAt: false,
+	accountId: false
 });
 
 const pagination = ref({
@@ -45,15 +49,40 @@ const pagination = ref({
 	pageSize: 10
 });
 
+const sorting = ref([
+	{
+		id: 'id',
+		desc: false
+	}
+]);
+
 const columns: TableColumn<TTillerAccRecordSchema>[] = [
 	{
 		accessorKey: 'id',
-		header: '#',
-		cell: ({ row }) => `#${row.getValue('id')}`
+		// header: '#',
+		cell: ({ row }) => `#${row.getValue('id')}`,
+		enableHiding: false,
+		header: ({ column }) => {
+			const isSorted = column.getIsSorted();
+
+			return h(UButton, {
+				color: 'neutral',
+				variant: 'ghost',
+				label: '#',
+				icon: isSorted
+					? isSorted === 'asc'
+						? 'i-lucide-arrow-up-narrow-wide'
+						: 'i-lucide-arrow-down-wide-narrow'
+					: 'i-lucide-arrow-up-down',
+				class: '-mx-2.5',
+				onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+			});
+		}
 	},
 	{
 		accessorKey: 'name',
-		header: 'Name'
+		header: 'Name',
+		enableHiding: false
 	},
 	{
 		accessorKey: 'group',
@@ -62,6 +91,14 @@ const columns: TableColumn<TTillerAccRecordSchema>[] = [
 	{
 		accessorKey: 'institution',
 		header: 'Institution'
+	},
+	{
+		accessorKey: '_count.tillerTrans',
+		header: 'Tran Count'
+	},
+	{
+		accessorKey: 'accountId',
+		header: 'Acc ID'
 	},
 	{
 		accessorKey: 'createdAt',
@@ -153,6 +190,7 @@ const q = ref('');
 			ref="table"
 			v-model:column-visibility="columnVisibility"
 			v-model:pagination="pagination"
+			v-model:sorting="sorting"
 			:data="tillerData"
 			:loading="pending"
 			:columns="columns"
