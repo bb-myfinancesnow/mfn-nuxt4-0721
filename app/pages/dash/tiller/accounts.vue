@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { h, resolveComponent } from 'vue';
-import type { TableColumn } from '@nuxt/ui';
+import type { TableColumn, TableRow } from '@nuxt/ui';
 import {
 	SearchTillerAccRecordsDocument,
 	SortOrder,
@@ -78,6 +78,21 @@ const columns: TableColumn<TTillerAccRecordSchema>[] = [
 				class: '-mx-2.5',
 				onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
 			});
+		},
+		footer: ({ column }) => {
+			const total = column
+				.getFacetedRowModel()
+				.rows.reduce(
+					(acc: number, row: TableRow<TTillerAccRecordSchema>) => acc + Number.parseFloat(row.getValue('id')),
+					0
+				);
+
+			const formatted = new Intl.NumberFormat('en-US', {
+				style: 'currency',
+				currency: 'EUR'
+			}).format(total);
+
+			return h('div', { class: 'text-left font-medium' }, `Total: ${formatted}`);
 		}
 	},
 	{
@@ -88,7 +103,8 @@ const columns: TableColumn<TTillerAccRecordSchema>[] = [
 	},
 	{
 		accessorKey: 'group',
-		header: ({ column }) => getHeader(column, 'Group')
+		header: ({ column }) => getHeader(column, 'Group'),
+		footer: (props) => props.column.id
 		// header: 'Group'
 	},
 	{
@@ -264,14 +280,7 @@ const q = ref('');
 			:pagination-options="{
 				getPaginationRowModel: getPaginationRowModel()
 			}"
-			class="w-full"
-			:ui="{
-				base: 'table-fixed border-separate border-spacing-0',
-				thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
-				tbody: '[&>tr]:last:[&>td]:border-b-0',
-				th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
-				td: 'border-b border-default'
-			}"
+			class="flex-1"
 		/>
 		<div class="flex justify-center border-t border-default pt-4">
 			<UPagination
