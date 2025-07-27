@@ -126,6 +126,15 @@ const columnOptions = ref<IPrimeColumnProps[]>([
 		displayLabel: 'Period Locked'
 	},
 	{
+		colId: '_count.entries',
+		field: '_count.entries',
+		dataType: 'numeric',
+		header: 'Entry Count',
+		displayLabel: 'Entry Count',
+		sortable: true,
+		filterable: true
+	},
+	{
 		colId: 'id',
 		filterable: true,
 		field: 'id',
@@ -160,7 +169,11 @@ const initFilters = () => {
 			operator: FilterOperator.AND,
 			constraints: [{ value: null, matchMode: FilterMatchMode.DATE_AFTER }]
 		},
-		description: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
+		description: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+		'_count.entries': {
+			operator: FilterOperator.AND,
+			constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }]
+		}
 	};
 	filters.value = defaultFilters;
 };
@@ -224,6 +237,7 @@ const updateVisCols = (cols: IPrimeColumnProps[]) => {
 						resizable-columns
 						removable-sort
 						paginator
+						sort-mode="multiple"
 						:rows="10"
 						:rows-per-page-options="[5, 10, 25, 50, 100]"
 						filter-display="menu"

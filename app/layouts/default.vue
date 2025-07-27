@@ -174,6 +174,7 @@ const navLinks = ref<NavigationMenuItem[][]>([
 				},
 				{
 					label: 'Periods',
+					to: '/dash/reporting/periods',
 					onSelect: () => {
 						open.value = false;
 					}
