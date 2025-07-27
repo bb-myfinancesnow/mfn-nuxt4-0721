@@ -230,6 +230,9 @@ const clearFilter = () => {
 									:use-grouping="false"
 								/>
 							</template>
+							<template v-else-if="col.dataType ==='date' && col.filterable" #filter="{ filterModel }">
+								<PDatePicker v-model="filterModel.value" date-format="mm/dd/yy" placeholder="mm/dd/yyyy" />
+							</template>
 						</PColumn>
 					</PDataTable>
 				</ClientOnly>
