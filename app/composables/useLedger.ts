@@ -1,6 +1,7 @@
 import {
 	SearchJeLineRecordsDocument,
 	SearchJournalRecordsDocument,
+	type SearchJeLineRecordsQuery,
 	type SearchJeLineRecordsQueryVariables,
 	type SearchJournalRecordsQuery,
 	type SearchJournalRecordsQueryVariables
@@ -54,13 +55,49 @@ export const useLedger = () => {
 	const searchEntryRecs = (variables?: SearchJeLineRecordsQueryVariables) => {
 		return useLazyAsyncData(
 			`searchEntryRecs-${JSON.stringify(variables)}`,
-			() => request<SearchJournalRecordsQuery, SearchJeLineRecordsQueryVariables>(SearchJeLineRecordsDocument, variables)
+			() => request<SearchJeLineRecordsQuery, SearchJeLineRecordsQueryVariables>(SearchJeLineRecordsDocument, variables),
+			{
+				transform: (input): TJournalEntryLedgerRecSchema[] => {
+					const arrSchema = JournalEntryLedgerRecSchema.array();
+					const safeRes = arrSchema.safeParse(input.journalEntries);
+					if (safeRes.success) {
+						return safeRes.data;
+					} else {
+						const stringErr = zodErrorToStringArray(safeRes.error);
+						console.log(`parse err`, stringErr);
+						return [] as TJournalEntryLedgerRecSchema[];
+					}
+				},
+				default: () => [] as TJournalEntryLedgerRecSchema[]
+			}
+		);
+	};
+
+	const searchGlEntryRecs = (variables?: SearchJeLineRecordsQueryVariables) => {
+		return useLazyAsyncData(
+			`searchGlEntryRecs-${JSON.stringify(variables)}`,
+			() => request<SearchJeLineRecordsQuery, SearchJeLineRecordsQueryVariables>(SearchJeLineRecordsDocument, variables),
+			{
+				transform: (input): TFlatJournalEntryLedgerRecSchema[] => {
+					const arrSchema = FlatJournalEntryLedgerRecSchema.array();
+					const safeRes = arrSchema.safeParse(input.journalEntries);
+					if (safeRes.success) {
+						return safeRes.data;
+					} else {
+						const stringErr = zodErrorToStringArray(safeRes.error);
+						console.log(`parse err`, stringErr);
+						return [] as TFlatJournalEntryLedgerRecSchema[];
+					}
+				},
+				default: () => [] as TFlatJournalEntryLedgerRecSchema[]
+			}
 		);
 	};
 
 	return {
 		searchJournalRecs,
 		searchJournalFormattedRecs,
-		searchEntryRecs
+		searchEntryRecs,
+		searchGlEntryRecs
 	};
 };

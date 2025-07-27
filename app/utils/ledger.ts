@@ -63,3 +63,17 @@ export const JournalEntryLedgerRecSchema = JournalLineRecSchema.extend({
 });
 
 export type TJournalEntryLedgerRecSchema = z.infer<typeof JournalEntryLedgerRecSchema>;
+
+export const FlatJournalEntryLedgerRecSchema = JournalEntryLedgerRecSchema.transform((data) => {
+	return {
+		periodId: data.journal.postingPeriod.id,
+		periodLabel: data.journal.postingPeriod.label,
+		periodLocked: data.journal.postingPeriod.locked,
+		postingDate: data.journal.tranDate,
+		journalNumber: data.journal.tranNumber,
+		glAccountLabel: data.glAccount.accountLabel,
+		...data
+	};
+});
+
+export type TFlatJournalEntryLedgerRecSchema = z.infer<typeof FlatJournalEntryLedgerRecSchema>;

@@ -143,6 +143,13 @@ const navLinks = ref<NavigationMenuItem[][]>([
 					onSelect: () => {
 						open.value = false;
 					}
+				},
+				{
+					label: 'Lines Search',
+					to: '/dash/ledger/lines',
+					onSelect: () => {
+						open.value = false;
+					}
 				}
 			]
 		},

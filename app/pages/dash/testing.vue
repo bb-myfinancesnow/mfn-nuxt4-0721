@@ -9,8 +9,8 @@ const {
 	data: jeData,
 	pending
 	// refresh: refreshJournalQuery
-} = await ledgerData.searchJournalFormattedRecs({
-	orderBy: [{ tranDate: SortOrder.Asc }, { tranNumber: SortOrder.Asc }]
+} = await ledgerData.searchGlEntryRecs({
+	orderBy: [{ journal: { tranNumber: SortOrder.Asc } }, { id: SortOrder.Asc }]
 });
 
 const dataSourceSettings = {
