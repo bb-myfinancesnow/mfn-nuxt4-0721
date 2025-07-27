@@ -2886,13 +2886,25 @@ export type BookInfoFragment = { id: number; name: string; system: boolean };
 
 export type BookDataFragment = { id: number; name: string; system: boolean; createdAt: string; updatedAt: string; _count: { journals: number } };
 
+export type EntityInfoFragment = { id: number; name: string; system: boolean; entityType: EntityType; description: string; defaultAccountNumber?: number | null };
+
 export type JournalEntryLineRecordFragment = { id: number; amount: number; glAccountNumber: number; isDebit: boolean; entrySource: SourceType; entityId?: number | null; memo: string; glAccount: GlAccInfoFragment };
 
-export type JournalEntryHeaderRecordFragment = { id: string; createdAt: string; updatedAt: string; tranDate: string; tranNumber: number; bookId?: number | null; description: string; tranSource: SourceType; reversalDate?: string | null; externalId?: string | null; createdFromTillerTranId?: number | null; postingPeriod: { id: number; label: string; locked: boolean } };
+export type JournalHeaderInfoFragment = { id: string; tranNumber: number; tranDate: string; bookId?: number | null; description: string; tranSource: SourceType; reversalDate?: string | null; externalId?: string | null; createdFromTillerTranId?: number | null; idReversalOf?: string | null; postingPeriod: { id: number; locked: boolean; label: string } };
+
+export type JournalEntryHeaderRecordFragment = (
+  { createdAt: string; updatedAt: string }
+  & JournalHeaderInfoFragment
+);
 
 export type JournalEntryRecordFragment = (
   { entries?: Array<JournalEntryLineRecordFragment> | null; _count: { entries: number; migrationLoanChanges: number; templateForTranSchedules: number } }
   & JournalEntryHeaderRecordFragment
+);
+
+export type JournalEntryLedgerRecordFragment = (
+  { journalId: string; journal: JournalHeaderInfoFragment; entity?: EntityInfoFragment | null }
+  & JournalEntryLineRecordFragment
 );
 
 export type PeriodInfoFragment = { id: number; label: string; month: number; year: number; locked: boolean; endDate: string; startDate: string };
@@ -2961,6 +2973,16 @@ export type SearchJournalRecordsQueryVariables = Exact<{
 }>;
 
 export type SearchJournalRecordsQuery = { journals: Array<JournalEntryRecordFragment> };
+
+export type SearchJeLineRecordsQueryVariables = Exact<{
+	where?: InputMaybe<JournalEntryWhereInput>;
+	orderBy?: InputMaybe<Array<JournalEntryOrderByWithRelationInput> | JournalEntryOrderByWithRelationInput>;
+	skip?: InputMaybe<Scalars['Int']['input']>;
+	take?: InputMaybe<Scalars['Int']['input']>;
+	cursor?: InputMaybe<JournalEntryWhereUniqueInput>;
+}>;
+
+export type SearchJeLineRecordsQuery = { journalEntries: Array<JournalEntryLedgerRecordFragment> };
 
 export type SearchPeriodRecordsQueryVariables = Exact<{
 	where?: InputMaybe<PeriodWhereInput>;
@@ -3033,24 +3055,30 @@ export const BookDataFragmentDoc = gql`
   }
 }
     `;
-export const JournalEntryHeaderRecordFragmentDoc = gql`
-    fragment JournalEntryHeaderRecord on Journal {
+export const JournalHeaderInfoFragmentDoc = gql`
+    fragment JournalHeaderInfo on Journal {
   id
-  createdAt
-  updatedAt
-  tranDate
   tranNumber
+  tranDate
   bookId
   description
   tranSource
   reversalDate
   externalId
   createdFromTillerTranId
+  idReversalOf
   postingPeriod {
     id
-    label
     locked
+    label
   }
+}
+    `;
+export const JournalEntryHeaderRecordFragmentDoc = gql`
+    fragment JournalEntryHeaderRecord on Journal {
+  ...JournalHeaderInfo
+  createdAt
+  updatedAt
 }
     `;
 export const GlAccTypeInfoFragmentDoc = gql`
@@ -3097,6 +3125,28 @@ export const JournalEntryRecordFragmentDoc = gql`
     entries
     migrationLoanChanges
     templateForTranSchedules
+  }
+}
+    `;
+export const EntityInfoFragmentDoc = gql`
+    fragment EntityInfo on Entity {
+  id
+  name
+  system
+  entityType
+  description
+  defaultAccountNumber
+}
+    `;
+export const JournalEntryLedgerRecordFragmentDoc = gql`
+    fragment JournalEntryLedgerRecord on JournalEntry {
+  journalId
+  ...JournalEntryLineRecord
+  journal {
+    ...JournalHeaderInfo
+  }
+  entity {
+    ...EntityInfo
   }
 }
     `;
@@ -3250,9 +3300,28 @@ export const SearchJournalRecordsDocument = gql`
 }
     ${JournalEntryRecordFragmentDoc}
 ${JournalEntryHeaderRecordFragmentDoc}
+${JournalHeaderInfoFragmentDoc}
 ${JournalEntryLineRecordFragmentDoc}
 ${GlAccInfoFragmentDoc}
 ${GlAccTypeInfoFragmentDoc}`;
+export const SearchJeLineRecordsDocument = gql`
+    query SearchJeLineRecords($where: JournalEntryWhereInput, $orderBy: [JournalEntryOrderByWithRelationInput!], $skip: Int, $take: Int, $cursor: JournalEntryWhereUniqueInput) {
+  journalEntries(
+    where: $where
+    orderBy: $orderBy
+    skip: $skip
+    take: $take
+    cursor: $cursor
+  ) {
+    ...JournalEntryLedgerRecord
+  }
+}
+    ${JournalEntryLedgerRecordFragmentDoc}
+${JournalEntryLineRecordFragmentDoc}
+${GlAccInfoFragmentDoc}
+${GlAccTypeInfoFragmentDoc}
+${JournalHeaderInfoFragmentDoc}
+${EntityInfoFragmentDoc}`;
 export const SearchPeriodRecordsDocument = gql`
     query SearchPeriodRecords($where: PeriodWhereInput) {
   periods(orderBy: [{year: asc}, {month: asc}], where: $where) {
@@ -3350,6 +3419,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
 		},
 		SearchJournalRecords(variables?: SearchJournalRecordsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchJournalRecordsQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<SearchJournalRecordsQuery>({ document: SearchJournalRecordsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchJournalRecords', 'query', variables);
+		},
+		SearchJeLineRecords(variables?: SearchJeLineRecordsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchJeLineRecordsQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<SearchJeLineRecordsQuery>({ document: SearchJeLineRecordsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchJeLineRecords', 'query', variables);
 		},
 		SearchPeriodRecords(variables?: SearchPeriodRecordsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchPeriodRecordsQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<SearchPeriodRecordsQuery>({ document: SearchPeriodRecordsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchPeriodRecords', 'query', variables);

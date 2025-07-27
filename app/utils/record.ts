@@ -1,5 +1,5 @@
 import z from 'zod';
-import { AccountTypeClass } from '~/generated/graphql';
+import { AccountTypeClass, EntityType } from '~/generated/graphql';
 
 export const BaseIntIdDatesSchema = z.object({
 	id: z.number().int(),
@@ -52,3 +52,14 @@ export const GlAccInfoSchema = z.object({
 }));
 
 export type TGlAccInfoSchema = z.infer<typeof GlAccInfoSchema>;
+
+export const EntityInfoRecord = z.object({
+	id: z.number().int(),
+	name: z.string(),
+	system: z.boolean(),
+	entityType: z.nativeEnum(EntityType),
+	description: z.string(),
+	defaultAccountNumber: z.coerce.number().int().min(10000).max(99999).nullable()
+});
+
+export type TEntityInfoRecord = z.infer<typeof EntityInfoRecord>;

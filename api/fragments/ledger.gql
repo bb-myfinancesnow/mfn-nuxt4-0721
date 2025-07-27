@@ -1,3 +1,12 @@
+fragment EntityInfo on Entity {
+	id
+	name
+	system
+	entityType
+	description
+	defaultAccountNumber
+}
+
 fragment JournalEntryLineRecord on JournalEntry {
 	id
 	amount
@@ -11,23 +20,27 @@ fragment JournalEntryLineRecord on JournalEntry {
 	}
 }
 
-fragment JournalEntryHeaderRecord on Journal {
+fragment JournalHeaderInfo on Journal {
 	id
-	createdAt
-	updatedAt
-	tranDate
 	tranNumber
+	tranDate
 	bookId
 	description
 	tranSource
 	reversalDate
 	externalId
 	createdFromTillerTranId
+	idReversalOf
 	postingPeriod {
 		id
-		label
 		locked
+		label
 	}
+}
+fragment JournalEntryHeaderRecord on Journal {
+	...JournalHeaderInfo
+	createdAt
+	updatedAt
 }
 
 fragment JournalEntryRecord on Journal {
@@ -39,5 +52,16 @@ fragment JournalEntryRecord on Journal {
 		entries
 		migrationLoanChanges
 		templateForTranSchedules
+	}
+}
+
+fragment JournalEntryLedgerRecord on JournalEntry {
+	journalId
+	...JournalEntryLineRecord
+	journal {
+		...JournalHeaderInfo
+	}
+	entity {
+		...EntityInfo
 	}
 }

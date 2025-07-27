@@ -15,3 +15,21 @@ query SearchJournalRecords(
 		...JournalEntryRecord
 	}
 }
+
+query SearchJeLineRecords(
+	$where: JournalEntryWhereInput
+	$orderBy: [JournalEntryOrderByWithRelationInput!]
+	$skip: Int
+	$take: Int
+	$cursor: JournalEntryWhereUniqueInput
+) {
+	journalEntries(
+		where: $where
+		orderBy: $orderBy
+		skip: $skip
+		take: $take
+		cursor: $cursor
+	) {
+		...JournalEntryLedgerRecord
+	}
+}

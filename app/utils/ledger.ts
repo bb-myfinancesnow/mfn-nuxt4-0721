@@ -9,10 +9,8 @@ export const LedgerPeriodInfoSchema = z.object({
 
 export type TLedgerPeriodInfoSchema = z.infer<typeof LedgerPeriodInfoSchema>;
 
-export const JournalHeaderRecSchema = z.object({
+export const JournalHeaderInfoSchema = z.object({
 	id: z.string(),
-	createdAt: z.coerce.date(),
-	updatedAt: z.coerce.date(),
 	tranDate: z.coerce.date(),
 	tranNumber: z.coerce.number().int(),
 	bookId: z.number().nullable(),
@@ -20,7 +18,15 @@ export const JournalHeaderRecSchema = z.object({
 	tranSource: z.nativeEnum(SourceType),
 	postingPeriod: z.lazy(() => LedgerPeriodInfoSchema),
 	externalId: z.string().nullable(),
-	reversalDate: z.coerce.date().nullable()
+	reversalDate: z.coerce.date().nullable(),
+	idReversalOf: z.string().nullable()
+});
+
+export type TJournalHeaderInfoSchema = z.infer<typeof JournalHeaderInfoSchema>;
+
+export const JournalHeaderRecSchema = JournalHeaderInfoSchema.extend({
+	createdAt: z.coerce.date(),
+	updatedAt: z.coerce.date()
 });
 
 export type TJournalHeaderRecSchema = z.infer<typeof JournalHeaderRecSchema>;
