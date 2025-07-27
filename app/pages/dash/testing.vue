@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { DataTableFilterMeta } from 'primevue/datatable';
+import type { DataTableFilterMeta, DataTablePageEvent } from 'primevue/datatable';
 import { FilterMatchMode, FilterOperator } from '@primevue/core/api';
 import type { ColumnProps } from 'primevue/column';
 import { SortOrder } from '~/generated/graphql';
@@ -74,6 +74,7 @@ const columns: PrimeColumnProps[] = [
 ];
 
 const filters = ref();
+const expandedRows = ref({});
 
 const initFilters = () => {
 	const defaultFilters: DataTableFilterMeta = {
@@ -97,6 +98,15 @@ initFilters();
 const clearFilter = () => {
 	initFilters();
 };
+
+const collapseAll = () => {
+	expandedRows.value = {};
+};
+
+const pageEmit = (event: DataTablePageEvent) => {
+	console.log(`pageemit`, event);
+	collapseAll();
+};
 </script>
 
 <template>
@@ -119,6 +129,7 @@ const clearFilter = () => {
 				<ClientOnly>
 					<PDataTable
 						v-model:filters="filters"
+						v-model:expanded-rows="expandedRows"
 						:value="jeData"
 						data-key="id"
 						:loading="pending"
@@ -132,6 +143,7 @@ const clearFilter = () => {
 						:rows-per-page-options="[5, 10, 25, 50, 100]"
 						filter-display="menu"
 						:global-filter-fields="['id', 'description', 'tranNumber']"
+						@page="pageEmit"
 					>
 						<template #empty>
 							No data found.
@@ -154,20 +166,33 @@ const clearFilter = () => {
 							</div>
 							<USeparator class="py-2" />
 							<div class="flex flex-wrap items-center justify-between gap-2">
-								<UInput
-									v-model="filters['global'].value"
-									placeholder="Keyword Search"
-									icon="i-lucide-search"
-								/>
-								<PButton
-									type="button"
-									icon="pi pi-filter-slash"
-									label="Clear"
-									outlined
-									@click="clearFilter()"
-								/>
+								<div class="flex flex-wrap justify-start gap-2">
+									<UInput
+										v-model="filters['global'].value"
+										placeholder="Keyword Search"
+										icon="i-lucide-search"
+									/>
+									<PButton
+										type="button"
+										icon="pi pi-filter-slash"
+										label="Clear"
+										outlined
+										@click="clearFilter()"
+									/>
+								</div>
+
+								<div class="flex flex-wrap justify-end gap-2">
+									<!-- <PButton text icon="pi pi-plus" label="Expand All" /> -->
+									<PButton
+										text
+										icon="pi pi-minus"
+										label="Collapse All"
+										@click="collapseAll"
+									/>
+								</div>
 							</div>
 						</template>
+						<PColumn expander style="width: 5rem" />
 						<PColumn
 							v-for="col of columns"
 							:key="col.colId"
@@ -234,6 +259,60 @@ const clearFilter = () => {
 								<PDatePicker v-model="filterModel.value" date-format="mm/dd/yy" placeholder="mm/dd/yyyy" />
 							</template>
 						</PColumn>
+						<template #expansion="slotProps">
+							<div class="p-4">
+								<h5>Journal #{{ slotProps.data.tranNumber }} Line Items </h5>
+								<PDataTable
+									:value="slotProps.data.entries"
+									scrollable
+									scroll-height="flex"
+									resizable-columns
+								>
+									<PColumn
+										field="id"
+										header="ID"
+										data-type="numeric"
+										style="width: 5rem"
+									/>
+									<PColumn
+										field="glAccount.accountLabel"
+										header="GL Account"
+										data-type="text"
+										style="width: 15rem"
+									/>
+									<PColumn
+										field="amount"
+										header="Amount"
+										data-type="numeric"
+										style="width: 10%; min-width: 8rem; text-align:center"
+										body-style="text-align:center"
+									>
+										<template #body="{ data }">
+											<TableCurrencyCol
+												:input="data.amount"
+												:negative-multi="!data.isDebit"
+											/>
+										</template>
+									</PColumn>
+									<PColumn
+										field="isDebit"
+										header="Debit"
+										data-type="boolean"
+										style="width: 5rem; text-align:center"
+									>
+										<template #body="{ data }">
+											<TableBoolCol :input="data.isDebit" />
+										</template>
+									</PColumn>
+									<PColumn
+										field="memo"
+										header="Memo"
+										data-type="text"
+										style="min-width: 200px"
+									/>
+								</PDataTable>
+							</div>
+						</template>
 					</PDataTable>
 				</ClientOnly>
 			</div>
@@ -243,6 +322,10 @@ const clearFilter = () => {
 					<pre>{{ jeData }}</pre>
 				</div>
 				<div>status: {{ String(pending) }}</div>
+				<div>
+					expandedRows:
+					<pre>{{ expandedRows }}</pre>
+				</div>
 			</UPageGrid>
 		</template>
 	</UDashboardPanel>
