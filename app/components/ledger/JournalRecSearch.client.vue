@@ -1,6 +1,9 @@
 <script lang="ts" setup>
-import { LedgerSubJournalEntryTable } from '#components';
-import type { DataTablePageEvent } from 'primevue/datatable';
+import { FilterMatchMode, FilterOperator } from '@primevue/core/api';
+import type {
+	DataTableFilterMeta,
+	DataTablePageEvent
+} from 'primevue/datatable';
 
 interface Props {
 	jeRecs: TJournalRecSchema[];
@@ -80,9 +83,45 @@ const columnDefs: IPrimeColumnDef<TJournalRecSchema>[] = [
 	}
 ];
 
-const { columnOptions, visibleColumns, defaultRows, resetVisibleColumns, updateVisCols } = usePrimeTable({ columnDefs });
+const defaultFilters: DataTableFilterMeta = {
+	global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+	id: {
+		operator: FilterOperator.AND,
+		constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }]
+	},
+	tranNumber: {
+		operator: FilterOperator.AND,
+		constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }]
+	},
+	tranDate: {
+		operator: FilterOperator.AND,
+		constraints: [{ value: null, matchMode: FilterMatchMode.DATE_AFTER }]
+	},
+	description: {
+		operator: FilterOperator.AND,
+		constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }]
+	},
+	'_count.entries': {
+		operator: FilterOperator.AND,
+		constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }]
+	},
+	'postingPeriod.locked': { value: null, matchMode: FilterMatchMode.EQUALS }
+};
+
+const {
+	columnOptions,
+	visibleColumns,
+	defaultRows,
+	filters,
+	globalFilterFieldKeys,
+	initFilters,
+	clearFilter,
+	resetVisibleColumns,
+	updateVisCols
+} = usePrimeTable({ columnDefs, defaultFilters });
 
 resetVisibleColumns();
+initFilters();
 
 const expandedRows = ref({});
 
@@ -98,6 +137,7 @@ const pageEmit = (event: DataTablePageEvent) => {
 
 <template>
 	<PDataTable
+		v-model:filters="filters"
 		v-model:expanded-rows="expandedRows"
 		:value="jeRecs"
 		data-key="id"
@@ -111,6 +151,8 @@ const pageEmit = (event: DataTablePageEvent) => {
 		sort-mode="multiple"
 		:rows="defaultRows"
 		:rows-per-page-options="[5, 10, 25, 50, 100]"
+		filter-display="menu"
+		:global-filter-fields="globalFilterFieldKeys"
 		@page="pageEmit"
 	>
 		<template #empty>
@@ -121,16 +163,52 @@ const pageEmit = (event: DataTablePageEvent) => {
 		</template>
 		<template #header>
 			<div class="flex flex-wrap items-center justify-between gap-2">
+				<div class="flex flex-wrap justify-start gap-2">
+					<UInput
+						v-model="filters['global'].value"
+						placeholder="Keyword Search"
+						icon="i-lucide-search"
+					/>
+					<PButton
+						type="button"
+						icon="pi pi-filter-slash"
+						label="Clear"
+						outlined
+						@click="clearFilter()"
+					/>
+				</div>
 				<TableColPickPrime
 					:col-options="columnOptions"
 					:visible-cols="visibleColumns"
 					:loading="isLoading"
 					:disabled="isLoading"
-					@update-cols="(cols) => updateVisCols(cols as IPrimeColumnConfig<TJournalRecSchema>[])"
+					@update-cols="
+						(cols) =>
+							updateVisCols(
+								cols as IPrimeColumnConfig<TJournalRecSchema>[]
+							)
+					"
 				/>
 			</div>
+			<USeparator class="py-2" />
+			<div class="flex flex-wrap items-center justify-between gap-2">
+				<div class="flex flex-wrap justify-end gap-2">
+					<!-- <PButton text icon="pi pi-plus" label="Expand All" /> -->
+					<PButton
+						:disabled="!expandedRows||Object.keys(expandedRows).length===0"
+						text
+						icon="pi pi-minus"
+						label="Collapse All"
+						@click="collapseAll"
+					/>
+				</div>
+			</div>
 		</template>
-		<PColumn expander style="width: 5rem" frozen />
+		<PColumn
+			expander
+			style="width: 5rem"
+			frozen
+		/>
 		<PColumn
 			v-for="col of visibleColumns"
 			:key="col.colId"
@@ -148,10 +226,7 @@ const pageEmit = (event: DataTablePageEvent) => {
 			>
 				<TableDateCol
 					:input="
-						getNestedValue<TJournalRecSchema, Date>(
-							data,
-							col.colId
-						)
+						getNestedValue<TJournalRecSchema, Date>(data, col.colId)
 					"
 				/>
 			</template>
@@ -161,37 +236,61 @@ const pageEmit = (event: DataTablePageEvent) => {
 			>
 				<TableBoolCol
 					:input="
-						getNestedValue<
-											TJournalRecSchema,
-											boolean
-							>(data, col.colId)
+						getNestedValue<TJournalRecSchema, boolean>(
+							data,
+							col.colId
+						)
 					"
 				/>
 			</template>
 
 			<!-- Filter Templates -->
-			<template v-if="col.dataType ==='text' && col.filterable" #filter="{ filterModel }">
-				<PInputText v-model="filterModel.value" type="text" placeholder="Search..." />
+			<template
+				v-if="col.dataType === 'text' && col.filterable"
+				#filter="{ filterModel }"
+			>
+				<PInputText
+					v-model="filterModel.value"
+					type="text"
+					placeholder="Search..."
+				/>
 			</template>
 
-			<template v-else-if="col.dataType ==='numeric' && col.filterable" #filter="{ filterModel }">
+			<template
+				v-else-if="col.dataType === 'numeric' && col.filterable"
+				#filter="{ filterModel }"
+			>
 				<PInputNumber
 					v-model="filterModel.value"
 					:min="0"
 					:use-grouping="false"
 				/>
 			</template>
-			<template v-else-if="col.dataType ==='date' && col.filterable" #filter="{ filterModel }">
-				<PDatePicker v-model="filterModel.value" date-format="mm/dd/yy" placeholder="mm/dd/yyyy" />
+			<template
+				v-else-if="col.dataType === 'date' && col.filterable"
+				#filter="{ filterModel }"
+			>
+				<PDatePicker
+					v-model="filterModel.value"
+					date-format="mm/dd/yy"
+					placeholder="mm/dd/yyyy"
+				/>
 			</template>
-			<template v-else-if="col.dataType ==='boolean' && col.filterable" #filter="{ filterModel }">
+			<template
+				v-else-if="col.dataType === 'boolean' && col.filterable"
+				#filter="{ filterModel }"
+			>
 				<label class="font-bold">{{ col.displayLabel }}</label>
-				<PCheckbox v-model="filterModel.value" :indeterminate="filterModel.value === null" binary />
+				<PCheckbox
+					v-model="filterModel.value"
+					:indeterminate="filterModel.value === null"
+					binary
+				/>
 			</template>
 		</PColumn>
 		<template #expansion="slotProps">
 			<div class="p-4">
-				<h5>Journal #{{ slotProps.data.tranNumber }} Line Items </h5>
+				<h5>Journal #{{ slotProps.data.tranNumber }} Line Items</h5>
 				<LedgerSubJournalEntryTable :entries="slotProps.data.entries" />
 			</div>
 		</template>
