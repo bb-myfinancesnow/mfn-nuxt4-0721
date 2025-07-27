@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { testPivotDataCountryState, type ITestPivotCountryState } from '~/example-data/pivot-example';
+
 interface Props {
 	entryData: TFlatJournalEntryLedgerRecSchema[];
 	isLoading: boolean;
@@ -6,81 +8,10 @@ interface Props {
 
 defineProps<Props>();
 
+const testPivotData = ref<ITestPivotCountryState[]>(testPivotDataCountryState);
+
 const dataSourceSettings = {
-	dataSource: [
-		{
-			Amount: 5100,
-			Country: 'Canada',
-			Date: 'FY 2006',
-			Product: 'Car',
-			Quantity: 21,
-			State: 'Alberta'
-		},
-		{
-			Amount: 1900,
-			Country: 'France',
-			Date: 'FY 2007',
-			Product: 'Car',
-			Quantity: 23,
-			State: 'Alberta'
-		},
-		{
-			Amount: 1000,
-			Country: 'Germany',
-			Date: 'FY 2008',
-			Product: 'Car',
-			Quantity: 29,
-			State: 'Alberta'
-		},
-		{
-			Amount: 2060,
-			Country: 'Canada',
-			Date: 'FY 2006',
-			Product: 'Car',
-			Quantity: 93,
-			State: 'British Columbia'
-		},
-		{
-			Amount: 6200,
-			Country: 'France',
-			Date: 'FY 2007',
-			Product: 'Car',
-			Quantity: 36,
-			State: 'British Columbia'
-		},
-		{
-			Amount: 2000,
-			Country: 'Germany',
-			Date: 'FY 2008',
-			Product: 'Car',
-			Quantity: 31,
-			State: 'British Columbia'
-		},
-		{
-			Amount: 1300,
-			Country: 'Canada',
-			Date: 'FY 2005',
-			Product: 'Car',
-			Quantity: 45,
-			State: 'Brunswick'
-		},
-		{
-			Amount: 3400,
-			Country: 'France',
-			Date: 'FY 2006',
-			Product: 'Car',
-			Quantity: 47,
-			State: 'Brunswick'
-		},
-		{
-			Amount: 2300,
-			Country: 'Germany',
-			Date: 'FY 2007',
-			Product: 'Car',
-			Quantity: 43,
-			State: 'Brunswick'
-		}
-	],
+	dataSource: testPivotData.value,
 	rows: [{ name: 'Country' }],
 	columns: [{ name: 'Date' }],
 	values: [{ name: 'Amount' }, { name: 'Total', type: 'CalculatedField' }],

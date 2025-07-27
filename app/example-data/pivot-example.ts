@@ -165,3 +165,87 @@ export const pivotData: ISamplePivotData[] = [
 	{ Sold: 45, Amount: 71797.5, Country: 'United Kingdom', Products: 'Touring Bikes', Year: 'FY 2018', Quarter: 'Q1' },
 	{ Sold: 80, Amount: 127640, Country: 'United States', Products: 'Touring Bikes', Year: 'FY 2018', Quarter: 'Q1' }
 ];
+
+export interface ITestPivotCountryState {
+	Amount: number;
+	Country: string;
+	Date: string;
+	Product: string;
+	Quantity: number;
+	State: string;
+}
+
+export const testPivotDataCountryState: ITestPivotCountryState[] = [
+	{
+		Amount: 5100,
+		Country: 'Canada',
+		Date: 'FY 2006',
+		Product: 'Car',
+		Quantity: 21,
+		State: 'Alberta'
+	},
+	{
+		Amount: 1900,
+		Country: 'France',
+		Date: 'FY 2007',
+		Product: 'Car',
+		Quantity: 23,
+		State: 'Alberta'
+	},
+	{
+		Amount: 1000,
+		Country: 'Germany',
+		Date: 'FY 2008',
+		Product: 'Car',
+		Quantity: 29,
+		State: 'Alberta'
+	},
+	{
+		Amount: 2060,
+		Country: 'Canada',
+		Date: 'FY 2006',
+		Product: 'Car',
+		Quantity: 93,
+		State: 'British Columbia'
+	},
+	{
+		Amount: 6200,
+		Country: 'France',
+		Date: 'FY 2007',
+		Product: 'Car',
+		Quantity: 36,
+		State: 'British Columbia'
+	},
+	{
+		Amount: 2000,
+		Country: 'Germany',
+		Date: 'FY 2008',
+		Product: 'Car',
+		Quantity: 31,
+		State: 'British Columbia'
+	},
+	{
+		Amount: 1300,
+		Country: 'Canada',
+		Date: 'FY 2005',
+		Product: 'Car',
+		Quantity: 45,
+		State: 'Brunswick'
+	},
+	{
+		Amount: 3400,
+		Country: 'France',
+		Date: 'FY 2006',
+		Product: 'Car',
+		Quantity: 47,
+		State: 'Brunswick'
+	},
+	{
+		Amount: 2300,
+		Country: 'Germany',
+		Date: 'FY 2007',
+		Product: 'Car',
+		Quantity: 43,
+		State: 'Brunswick'
+	}
+];
