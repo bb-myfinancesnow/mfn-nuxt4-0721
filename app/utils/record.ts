@@ -1,6 +1,14 @@
 import z from 'zod';
 import { AccountTypeClass, EntityType } from '~/generated/graphql';
 
+export const zodErrorToStringArray = (err: z.ZodError): string[] => {
+	return err.issues.map(({ path, message }) => {
+		const pathStr = path.length > 1 ? path.join(',') : path[0];
+
+		return `[${pathStr}]: ${message}`;
+	});
+};
+
 export const BaseIntIdDatesSchema = z.object({
 	id: z.number().int(),
 	createdAt: z.coerce.date(),
@@ -53,7 +61,7 @@ export const GlAccInfoSchema = z.object({
 
 export type TGlAccInfoSchema = z.infer<typeof GlAccInfoSchema>;
 
-export const EntityInfoRecord = z.object({
+export const EntityInfoRecordSchena = z.object({
 	id: z.number().int(),
 	name: z.string(),
 	system: z.boolean(),
@@ -62,4 +70,4 @@ export const EntityInfoRecord = z.object({
 	defaultAccountNumber: z.coerce.number().int().min(10000).max(99999).nullable()
 });
 
-export type TEntityInfoRecord = z.infer<typeof EntityInfoRecord>;
+export type TEntityInfoRecordSchena = z.infer<typeof EntityInfoRecordSchena>;
