@@ -384,12 +384,14 @@ const updateVisCols = (cols: IPrimeColumnProps[]) => {
 										header="ID"
 										data-type="numeric"
 										style="width: 5rem"
+										frozen
 									/>
 									<PColumn
 										field="glAccount.accountLabel"
 										header="GL Account"
 										data-type="text"
 										style="width: 15rem"
+										frozen
 									/>
 									<PColumn
 										field="amount"
@@ -397,6 +399,7 @@ const updateVisCols = (cols: IPrimeColumnProps[]) => {
 										data-type="numeric"
 										style="width: 10%; min-width: 8rem; text-align:center"
 										body-style="text-align:center"
+										frozen
 									>
 										<template #body="{ data }">
 											<TableCurrencyCol
