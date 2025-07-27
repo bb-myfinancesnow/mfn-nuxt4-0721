@@ -1,17 +1,18 @@
 <script lang="ts" setup>
-import { testPivotDataCountryState, type ITestPivotCountryState } from '~/example-data/pivot-example';
+import type { ITestPivotCountryState } from '~/example-data/pivot-example';
 
 interface Props {
 	entryData: TFlatJournalEntryLedgerRecSchema[];
 	isLoading: boolean;
+	countryStateExample: ITestPivotCountryState[];
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
-const testPivotData = ref<ITestPivotCountryState[]>(testPivotDataCountryState);
+// const testPivotData = ref<ITestPivotCountryState[]>(testPivotDataCountryState);
 
 const dataSourceSettings = {
-	dataSource: testPivotData.value,
+	dataSource: props.countryStateExample,
 	rows: [{ name: 'Country' }],
 	columns: [{ name: 'Date' }],
 	values: [{ name: 'Amount' }, { name: 'Total', type: 'CalculatedField' }],
