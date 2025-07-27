@@ -222,6 +222,14 @@ const clearFilter = () => {
 							<template v-if="col.dataType ==='text' && col.filterable" #filter="{ filterModel }">
 								<PInputText v-model="filterModel.value" type="text" placeholder="Search..." />
 							</template>
+
+							<template v-else-if="col.dataType ==='numeric' && col.filterable" #filter="{ filterModel }">
+								<PInputNumber
+									v-model="filterModel.value"
+									:min="0"
+									:use-grouping="false"
+								/>
+							</template>
 						</PColumn>
 					</PDataTable>
 				</ClientOnly>
