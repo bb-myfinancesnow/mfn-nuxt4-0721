@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { DataTableFilterMeta, DataTablePageEvent } from 'primevue/datatable';
+import type { DataTableFilterEvent, DataTableFilterMeta, DataTablePageEvent } from 'primevue/datatable';
 import { FilterMatchMode, FilterOperator } from '@primevue/core/api';
 import { SortOrder } from '~/generated/graphql';
 
@@ -141,6 +141,8 @@ const visibleColumns = ref<IPrimeColumnProps[]>([]);
 const filters = ref();
 const expandedRows = ref({});
 
+const filteredRowCount = ref<number>(jeData.value.length);
+
 const resetVisibleColumns = () => {
 	const cols = columnOptions.value.filter((col) => !col.defaultHidden);
 	visibleColumns.value = cols;
@@ -177,6 +179,14 @@ const collapseAll = () => {
 const pageEmit = (event: DataTablePageEvent) => {
 	console.log(`pageemit`, event);
 	collapseAll();
+};
+
+const filterEmit = (event: DataTableFilterEvent) => {
+	console.log(`filterEmit`, event);
+	const l = event.filteredValue.length;
+	console.log(`filtered length is ${l} with type ${typeof l}`);
+
+	if (l && typeof l === 'number') filteredRowCount.value = l;
 };
 
 const updateVisCols = (cols: IPrimeColumnProps[]) => {
@@ -219,6 +229,7 @@ const updateVisCols = (cols: IPrimeColumnProps[]) => {
 						filter-display="menu"
 						:global-filter-fields="['id', 'description', 'tranNumber']"
 						@page="pageEmit"
+						@filter="filterEmit"
 					>
 						<template #empty>
 							No data found.
@@ -231,7 +242,7 @@ const updateVisCols = (cols: IPrimeColumnProps[]) => {
 								class="flex flex-wrap items-center justify-between gap-2"
 							>
 								<span class="text-xl font-bold">Search Journals</span>
-								<DisplayCountto prefix="Total Journals: " :end-value="jeData.length" />
+								<!-- <DisplayCountto prefix="Total Journals: " :end-value="jeData.length" /> -->
 								<PButton
 									icon="pi pi-refresh"
 									rounded
@@ -271,6 +282,11 @@ const updateVisCols = (cols: IPrimeColumnProps[]) => {
 										@click="collapseAll"
 									/>
 								</div>
+							</div>
+							<USeparator class="py-2" />
+							<div class="flex items-center justify-between gap-2">
+								<DisplayCountto prefix="Total Journals: " :end-value="jeData.length" />
+								<DisplayCountto prefix="Filtered Journals: " :end-value="filteredRowCount" :duration="3000" />
 							</div>
 						</template>
 						<PColumn expander style="width: 5rem" frozen />
