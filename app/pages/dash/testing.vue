@@ -205,6 +205,21 @@ const filterEmit = (event: DataTableFilterEvent) => {
 const updateVisCols = (cols: IPrimeColumnProps[]) => {
 	visibleColumns.value = cols;
 };
+
+const getEntryValSum = (id: string): string => {
+	const je = jeData.value.find((j) => j.id === id);
+
+	if (je) {
+		const { entries } = je;
+		const formattedEntries = entries.map(({ amount, isDebit }) => isDebit ? amount : -1 * amount);
+
+		const summed = sumArray(formattedEntries);
+
+		return formatIntAccountingCurrency(summed);
+	} else {
+		return formatIntAccountingCurrency(0);
+	}
+};
 </script>
 
 <template>
@@ -406,6 +421,9 @@ const updateVisCols = (cols: IPrimeColumnProps[]) => {
 												:input="data.amount"
 												:negative-multi="!data.isDebit"
 											/>
+										</template>
+										<template #footer>
+											<span class="font-bold">Total: {{ getEntryValSum(slotProps.data.id) }}</span>
 										</template>
 									</PColumn>
 									<PColumn
