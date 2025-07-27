@@ -13,67 +13,67 @@ const {
 	orderBy: [{ tranDate: SortOrder.Asc }, { tranNumber: SortOrder.Asc }]
 });
 
-const columns: IPrimeColumnProps[] = [
-	{
-		colId: 'tranNumber',
-		filterable: true,
-		field: 'tranNumber',
-		dataType: 'numeric',
-		sortable: true,
-		frozen: true,
-		header: '#',
-		displayLabel: '#',
-		disableHide: true
-	},
-	{
-		colId: 'tranDate',
-		filterable: true,
-		field: 'tranDate',
-		dataType: 'date',
-		sortable: true,
-		header: 'Tran Date',
-		style: 'min-width: 200px',
-		displayLabel: 'Tran Date',
-		disableHide: true
-	},
+// const columns: IPrimeColumnProps[] = [
+// 	{
+// 		colId: 'tranNumber',
+// 		filterable: true,
+// 		field: 'tranNumber',
+// 		dataType: 'numeric',
+// 		sortable: true,
+// 		frozen: true,
+// 		header: '#',
+// 		displayLabel: '#',
+// 		disableHide: true
+// 	},
+// 	{
+// 		colId: 'tranDate',
+// 		filterable: true,
+// 		field: 'tranDate',
+// 		dataType: 'date',
+// 		sortable: true,
+// 		header: 'Tran Date',
+// 		style: 'min-width: 200px',
+// 		displayLabel: 'Tran Date',
+// 		disableHide: true
+// 	},
 
-	{
-		colId: 'postingPeriod.label',
-		field: 'postingPeriod.label',
-		filterable: false,
-		dataType: 'text',
-		sortField: 'postingPeriod.id',
-		header: 'Period',
-		sortable: true,
-		displayLabel: 'Period'
-	},
-	{
-		colId: 'description',
-		filterable: true,
-		field: 'description',
-		dataType: 'text',
-		header: 'Description',
-		displayLabel: 'Description'
-	},
-	{
-		colId: 'postingPeriod.locked',
-		filterable: false,
-		field: 'postingPeriod.locked',
-		dataType: 'boolean',
-		header: 'Locked',
-		displayLabel: 'Period Locked'
-	},
-	{
-		colId: 'id',
-		filterable: true,
-		field: 'id',
-		dataType: 'text',
-		sortable: true,
-		header: 'ID',
-		displayLabel: 'ID',
-		defaultHidden: true
-	}
-];
+// 	{
+// 		colId: 'postingPeriod.label',
+// 		field: 'postingPeriod.label',
+// 		filterable: false,
+// 		dataType: 'text',
+// 		sortField: 'postingPeriod.id',
+// 		header: 'Period',
+// 		sortable: true,
+// 		displayLabel: 'Period'
+// 	},
+// 	{
+// 		colId: 'description',
+// 		filterable: true,
+// 		field: 'description',
+// 		dataType: 'text',
+// 		header: 'Description',
+// 		displayLabel: 'Description'
+// 	},
+// 	{
+// 		colId: 'postingPeriod.locked',
+// 		filterable: false,
+// 		field: 'postingPeriod.locked',
+// 		dataType: 'boolean',
+// 		header: 'Locked',
+// 		displayLabel: 'Period Locked'
+// 	},
+// 	{
+// 		colId: 'id',
+// 		filterable: true,
+// 		field: 'id',
+// 		dataType: 'text',
+// 		sortable: true,
+// 		header: 'ID',
+// 		displayLabel: 'ID',
+// 		defaultHidden: true
+// 	}
+// ];
 
 const columnOptions = ref<IPrimeColumnProps[]>([
 	{
@@ -178,6 +178,10 @@ const pageEmit = (event: DataTablePageEvent) => {
 	console.log(`pageemit`, event);
 	collapseAll();
 };
+
+const updateVisCols = (cols: IPrimeColumnProps[]) => {
+	visibleColumns.value = cols;
+};
 </script>
 
 <template>
@@ -256,6 +260,7 @@ const pageEmit = (event: DataTablePageEvent) => {
 									:visible-cols="visibleColumns"
 									:loading="pending"
 									:disabled="pending"
+									@update-cols="updateVisCols"
 								/>
 								<div class="flex flex-wrap justify-end gap-2">
 									<!-- <PButton text icon="pi pi-plus" label="Expand All" /> -->
@@ -270,7 +275,7 @@ const pageEmit = (event: DataTablePageEvent) => {
 						</template>
 						<PColumn expander style="width: 5rem" frozen />
 						<PColumn
-							v-for="col of columns"
+							v-for="col of visibleColumns"
 							:key="col.colId"
 							:field="col.field"
 							:header="col.header"

@@ -11,6 +11,10 @@ const props = withDefaults(defineProps<Props>(), {
 	disabled: false
 });
 
+const emit = defineEmits<{
+	updateCols: [cols: IPrimeColumnProps[]];
+}>();
+
 const picklistModel = ref<[IPrimeColumnProps[], IPrimeColumnProps[]]>([[], []]);
 
 const open = ref(false);
@@ -26,6 +30,20 @@ const setPicklistModel = () => {
 	picklistModel.value = [leftSide, rightSide];
 };
 
+const saveColSelection = () => {
+	const res: IPrimeColumnProps[] = [];
+
+	const mustShowCols = props.visibleCols.filter((c) => !!c.disableHide);
+
+	res.push(...mustShowCols);
+	res.push(...picklistModel.value[1]);
+
+	console.log(`new cols`, res);
+
+	emit('updateCols', res);
+	open.value = false;
+};
+
 onMounted(() => {
 	setPicklistModel();
 });
@@ -37,6 +55,9 @@ onMounted(() => {
 		title="Edit Columns"
 		description="Choose Columns to display in table"
 		:dismissible="false"
+		:ui="{
+			body: 'w-full'
+		}"
 	>
 		<UButton
 			label="Edit Columns"
@@ -51,8 +72,10 @@ onMounted(() => {
 			<PPickList
 				v-model="picklistModel"
 				data-key="colId"
-				breakpoint="2000px"
-				scroll-height="120rem"
+				striped
+				:responsive="false"
+				scroll-height="50rem"
+				class="max-h-screen"
 			>
 				<!-- <template #option="{ option }">
 					{{ option.displayLabel }}
@@ -66,6 +89,17 @@ onMounted(() => {
 					</div>
 				</template>
 			</PPickList>
+			<USeparator class="py-5" />
+			<div class="flex justify-center">
+				<UButton
+					label="Save"
+					color="neutral"
+					variant="outline"
+					icon="i-lucide-pin"
+					size="xl"
+					@click="saveColSelection"
+				/>
+			</div>
 			<!-- <div class="flex flex-row justify-between px-4">
 				<div>
 					picklistModel 0:
