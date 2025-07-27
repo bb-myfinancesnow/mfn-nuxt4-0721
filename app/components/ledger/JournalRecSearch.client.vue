@@ -4,6 +4,7 @@ import type {
 	DataTableFilterMeta,
 	DataTablePageEvent
 } from 'primevue/datatable';
+import type { SourceType } from '~/generated/graphql';
 
 interface Props {
 	jeRecs: TJournalRecSchema[];
@@ -60,6 +61,14 @@ const columnDefs: IPrimeColumnDef<TJournalRecSchema>[] = [
 		colType: 'boolean',
 		header: 'Locked',
 		displayLabel: 'Period Locked'
+	},
+	{
+		colId: 'tranSource',
+		field: 'tranSource',
+		colType: 'tranSources',
+		header: 'Source',
+		displayLabel: 'Journal Source'
+
 	},
 	{
 		colId: '_count.entries',
@@ -242,6 +251,9 @@ const pageEmit = (event: DataTablePageEvent) => {
 						)
 					"
 				/>
+			</template>
+			<template v-else-if="col.colType === 'tranSources'" #body="{ data }">
+				<TableSourceTypeCol :input="getNestedValue<TJournalRecSchema, SourceType>(data, col.colId)" />
 			</template>
 
 			<!-- Filter Templates -->

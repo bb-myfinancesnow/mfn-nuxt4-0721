@@ -1,4 +1,5 @@
 import type { ColumnProps } from 'primevue/column';
+import { SourceType } from '~/generated/graphql';
 
 export const PrimePageLengthOptions = [5, 10, 25, 50, 100] as const;
 
@@ -113,4 +114,28 @@ export const configurePrimeColumn = <T>(
 		dataType: primeType,
 		...props
 	};
+};
+
+export const getSourceTypeColor = (
+	input: SourceType | undefined
+):
+	| 'error'
+	| 'primary'
+	| 'secondary'
+	| 'success'
+	| 'info'
+	| 'warning'
+	| 'neutral' => {
+	switch (input) {
+		case SourceType.Auto:
+			return 'info';
+		case SourceType.Tiller:
+			return 'success';
+		case SourceType.Import:
+			return 'secondary';
+		case SourceType.Ui:
+			return 'primary';
+		default:
+			return 'neutral';
+	}
 };
