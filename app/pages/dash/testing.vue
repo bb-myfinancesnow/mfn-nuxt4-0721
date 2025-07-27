@@ -1,7 +1,4 @@
 <script lang="ts" setup>
-import { PivotViewComponent as EjsPivotview, GroupingBar, FieldList, CalculatedField } from '@syncfusion/ej2-vue-pivotview';
-import { pivotData } from '~/example-data/pivot-example';
-
 import { SortOrder } from '~/generated/graphql';
 
 const ledgerData = useLedger();
@@ -14,23 +11,23 @@ const {
 	orderBy: [{ journal: { tranNumber: SortOrder.Asc } }, { id: SortOrder.Asc }]
 });
 
-const dataSourceSettings = {
-	dataSource: pivotData,
-	expandAll: false,
-	drilledMembers: [{ name: 'Country', items: ['France'] }],
-	columns: [{ name: 'Year', caption: 'Production Year' }, { name: 'Quarter' }],
-	values: [{ name: 'Sold', caption: 'Units Sold' }, { name: 'Amount', caption: 'Sold Amount' }],
-	rows: [{ name: 'Country' }, { name: 'Products' }],
-	formatSettings: [{ name: 'Amount', format: 'C0' }],
-	filters: []
-};
-const showFieldList = true;
-const showGroupingBar = true;
-const allowCalculatedField = true;
-const height = 1000;
-const width = '100%';
+// const dataSourceSettings = {
+// 	dataSource: jeData.value,
+// 	expandAll: false,
+// 	drilledMembers: [{ name: 'Country', items: ['France'] }],
+// 	columns: [{ name: 'Year', caption: 'Production Year' }, { name: 'Quarter' }],
+// 	values: [{ name: 'Sold', caption: 'Units Sold' }, { name: 'Amount', caption: 'Sold Amount' }],
+// 	rows: [{ name: 'Country' }, { name: 'Products' }],
+// 	formatSettings: [{ name: 'Amount', format: 'C0' }],
+// 	filters: []
+// };
+// const showFieldList = true;
+// const showGroupingBar = true;
+// const allowCalculatedField = true;
+// const height = 1000;
+// const width = '100%';
 
-provide('pivotview', [GroupingBar, FieldList, CalculatedField]);
+// provide('pivotview', [GroupingBar, FieldList, CalculatedField]);
 </script>
 
 <template>
@@ -49,48 +46,17 @@ provide('pivotview', [GroupingBar, FieldList, CalculatedField]);
 			</UDashboardNavbar>
 		</template>
 		<template #body>
-			<!-- <div>
-				<ClientOnly>
-					<ejs-grid :data-source="jeData" height="300px">
-						<e-columns>
-							<e-column field="id" header-text="ID" width="100" />
-							<e-column field="description" header-text="Description" width="200" />
-						</e-columns>
-					</ejs-grid>
-				</ClientOnly>
-			</div> -->
-			<div>
-				<ClientOnly>
-					<ejs-pivotview
-						:height="height"
-						:width="width"
-						:data-source-settings="dataSourceSettings"
-						:show-field-list="showFieldList"
-						:show-grouping-bar="showGroupingBar"
-						:allow-calculated-field="allowCalculatedField"
-					/>
-				</ClientOnly>
-			</div>
-			<UPageGrid class="lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-px">
-				<!-- <div>
-					columnOptions:
-					<pre>{{ columnOptions }}</pre>
-				</div> -->
-				<!-- <div>
-					visibleColumns:
-					<pre>{{ visibleColumns }}</pre>
-				</div> -->
-
+			<ClientOnly>
+				<FusionEntryBase :is-loading="pending" :entry-data="jeData" />
+			</ClientOnly>
+			<!-- <UPageGrid class="lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-px">
 				<div>status: {{ String(pending) }}</div>
-				<!-- <div>
-					expandedRows:
-					<pre>{{ expandedRows }}</pre>
-				</div> -->
+
 				<div>
 					data:
 					<pre>{{ jeData }}</pre>
 				</div>
-			</UPageGrid>
+			</UPageGrid> -->
 		</template>
 	</UDashboardPanel>
 </template>

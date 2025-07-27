@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { PivotViewComponent as EjsPivotview, GroupingBar, FieldList, CalculatedField } from '@syncfusion/ej2-vue-pivotview';
+// import { PivotViewComponent as EjsPivotview, GroupingBar, FieldList, CalculatedField } from '@syncfusion/ej2-vue-pivotview';
 import { pivotData } from '~/example-data/pivot-example';
 
 import { SortOrder } from '~/generated/graphql';
@@ -30,7 +30,7 @@ const allowCalculatedField = true;
 const height = 1000;
 const width = '100%';
 
-provide('pivotview', [GroupingBar, FieldList, CalculatedField]);
+// provide('pivotview', [GroupingBar, FieldList, CalculatedField]);
 </script>
 
 <template>

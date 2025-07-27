@@ -63,6 +63,9 @@ export default defineNuxtConfig({
 			syncFusionLicense: ''
 		}
 	},
+	build: {
+		transpile: [/@syncfusion/]
+	},
 
 	// Build configuration
 	// build: {
@@ -144,4 +147,5 @@ export default defineNuxtConfig({
 			exclude: ['useToast']
 		}
 	}
+
 });
