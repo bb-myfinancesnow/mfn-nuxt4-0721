@@ -13,68 +13,6 @@ const {
 	orderBy: [{ tranDate: SortOrder.Asc }, { tranNumber: SortOrder.Asc }]
 });
 
-// const columns: IPrimeColumnProps[] = [
-// 	{
-// 		colId: 'tranNumber',
-// 		filterable: true,
-// 		field: 'tranNumber',
-// 		dataType: 'numeric',
-// 		sortable: true,
-// 		frozen: true,
-// 		header: '#',
-// 		displayLabel: '#',
-// 		disableHide: true
-// 	},
-// 	{
-// 		colId: 'tranDate',
-// 		filterable: true,
-// 		field: 'tranDate',
-// 		dataType: 'date',
-// 		sortable: true,
-// 		header: 'Tran Date',
-// 		style: 'min-width: 200px',
-// 		displayLabel: 'Tran Date',
-// 		disableHide: true
-// 	},
-
-// 	{
-// 		colId: 'postingPeriod.label',
-// 		field: 'postingPeriod.label',
-// 		filterable: false,
-// 		dataType: 'text',
-// 		sortField: 'postingPeriod.id',
-// 		header: 'Period',
-// 		sortable: true,
-// 		displayLabel: 'Period'
-// 	},
-// 	{
-// 		colId: 'description',
-// 		filterable: true,
-// 		field: 'description',
-// 		dataType: 'text',
-// 		header: 'Description',
-// 		displayLabel: 'Description'
-// 	},
-// 	{
-// 		colId: 'postingPeriod.locked',
-// 		filterable: false,
-// 		field: 'postingPeriod.locked',
-// 		dataType: 'boolean',
-// 		header: 'Locked',
-// 		displayLabel: 'Period Locked'
-// 	},
-// 	{
-// 		colId: 'id',
-// 		filterable: true,
-// 		field: 'id',
-// 		dataType: 'text',
-// 		sortable: true,
-// 		header: 'ID',
-// 		displayLabel: 'ID',
-// 		defaultHidden: true
-// 	}
-// ];
-
 const columnOptions = ref<IPrimeColumnProps[]>([
 	{
 		colId: 'tranNumber',
@@ -119,7 +57,7 @@ const columnOptions = ref<IPrimeColumnProps[]>([
 	},
 	{
 		colId: 'postingPeriod.locked',
-		filterable: false,
+		filterable: true,
 		field: 'postingPeriod.locked',
 		dataType: 'boolean',
 		header: 'Locked',
@@ -173,7 +111,8 @@ const initFilters = () => {
 		'_count.entries': {
 			operator: FilterOperator.AND,
 			constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }]
-		}
+		},
+		'postingPeriod.locked': { value: null, matchMode: FilterMatchMode.EQUALS }
 	};
 	filters.value = defaultFilters;
 };
@@ -383,6 +322,10 @@ const getEntryValSum = (id: string): string => {
 							</template>
 							<template v-else-if="col.dataType ==='date' && col.filterable" #filter="{ filterModel }">
 								<PDatePicker v-model="filterModel.value" date-format="mm/dd/yy" placeholder="mm/dd/yyyy" />
+							</template>
+							<template v-else-if="col.dataType ==='boolean' && col.filterable" #filter="{ filterModel }">
+								<label class="font-bold">{{ col.displayLabel }}</label>
+								<PCheckbox v-model="filterModel.value" :indeterminate="filterModel.value === null" binary />
 							</template>
 						</PColumn>
 						<template #expansion="slotProps">

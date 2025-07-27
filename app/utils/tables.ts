@@ -30,3 +30,13 @@ export interface IPrimeColumnProps extends ColumnProps {
 	disableHide?: boolean;
 	defaultHidden?: boolean;
 }
+
+export const convertPrimeColType = (
+	val: TPrimeColumnType | undefined | string
+): TBasePrimeColumnType => {
+	if (val === 'boolean') return 'boolean';
+	else if (val === 'date' || val === 'datetime') return 'date';
+	else if (val && ['integer', 'currency', 'numeric'].includes(val))
+		return 'numeric';
+	else return 'text';
+};
