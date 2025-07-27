@@ -34,10 +34,10 @@ provide('pivotview', [GroupingBar, FieldList, CalculatedField]);
 </script>
 
 <template>
-	<UDashboardPanel id="testingpage">
+	<UDashboardPanel id="samplepage2">
 		<template #header>
 			<UDashboardNavbar
-				title="Testing Page"
+				title="Sample Page 2"
 				:ui="{ right: 'gap-3' }"
 			>
 				<template #leading>
