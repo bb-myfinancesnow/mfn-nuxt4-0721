@@ -27,6 +27,7 @@ const {
 			</UDashboardNavbar>
 		</template>
 		<template #body>
+			<LedgerJournalRecSearch :is-loading="pending" :je-recs="jeData" />
 			<UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
 				<div>
 					data:

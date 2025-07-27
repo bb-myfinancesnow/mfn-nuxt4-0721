@@ -16,6 +16,7 @@ declare module 'vue' {
     PInputNumber: typeof import('primevue/inputnumber')['default']
     PInputText: typeof import('primevue/inputtext')['default']
     PPickList: typeof import('primevue/picklist')['default']
+    PProgressSpinner: typeof import('primevue/progressspinner')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
