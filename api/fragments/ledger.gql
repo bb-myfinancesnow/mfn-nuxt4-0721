@@ -1,0 +1,43 @@
+fragment JournalEntryLineRecord on JournalEntry {
+	id
+	amount
+	glAccountNumber
+	isDebit
+	entrySource
+	entityId
+	memo
+	glAccount {
+		...GlAccInfo
+	}
+}
+
+fragment JournalEntryHeaderRecord on Journal {
+	id
+	createdAt
+	updatedAt
+	tranDate
+	tranNumber
+	bookId
+	description
+	tranSource
+	reversalDate
+	externalId
+	createdFromTillerTranId
+	postingPeriod {
+		id
+		label
+		locked
+	}
+}
+
+fragment JournalEntryRecord on Journal {
+	...JournalEntryHeaderRecord
+	entries {
+		...JournalEntryLineRecord
+	}
+	_count {
+		entries
+		migrationLoanChanges
+		templateForTranSchedules
+	}
+}

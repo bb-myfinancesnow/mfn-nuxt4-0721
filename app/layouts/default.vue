@@ -65,6 +65,14 @@ const navLinks = ref<NavigationMenuItem[][]>([
 			}
 		},
 		{
+			label: 'Testing',
+			icon: 'i-lucide-test-tube-diagonal',
+			to: '/dash/testing',
+			onSelect: () => {
+				open.value = false;
+			}
+		},
+		{
 			label: 'Books',
 			icon: 'i-lucide-book-open',
 			to: '/dash/books',
@@ -98,6 +106,35 @@ const navLinks = ref<NavigationMenuItem[][]>([
 				{
 					label: 'GL Accounts',
 					icon: 'i-lucide-notebook-tabs'
+				}
+			]
+		},
+		{
+			label: 'Tiller',
+			icon: 'i-lucide-chevrons-left-right-ellipsis',
+			to: '/dash/tiller'
+		},
+		{
+			label: 'Ledger',
+			icon: 'i-lucide-receipt',
+			to: '/dash/ledger',
+			type: 'trigger',
+			defaultOpen: true,
+			children: [
+				{
+					label: 'Home',
+					to: '/dash/ledger',
+					exact: true,
+					onSelect: () => {
+						open.value = false;
+					}
+				},
+				{
+					label: 'Search',
+					to: '/dash/ledger/search',
+					onSelect: () => {
+						open.value = false;
+					}
 				}
 			]
 		},
@@ -137,6 +174,7 @@ const navLinks = ref<NavigationMenuItem[][]>([
 				},
 				{
 					label: 'Periods',
+					to: '/dash/reporting/periods',
 					onSelect: () => {
 						open.value = false;
 					}
@@ -149,6 +187,7 @@ const navLinks = ref<NavigationMenuItem[][]>([
 				}
 			]
 		},
+
 		{
 			label: 'Setup',
 			icon: 'i-lucide-settings',

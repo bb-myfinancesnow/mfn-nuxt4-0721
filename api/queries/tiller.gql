@@ -1,0 +1,28 @@
+#import "./fragments/tiller.gql"
+
+query SearchTillerCatRecords(
+	$where: TillerCategoryWhereInput
+	$orderBy: [TillerCategoryOrderByWithRelationInput!]
+) {
+	tillerCategories(where: $where, orderBy: $orderBy) {
+		...TillerCatRecord
+	}
+}
+
+query SearchTillerAccRecords(
+	$where: TillerAccountWhereInput
+	$orderBy: [TillerAccountOrderByWithRelationInput!]
+) {
+	tillerAccounts(where: $where, orderBy: $orderBy) {
+		...TillerAccountRecord
+	}
+}
+
+query SearchBaseTillerTrans(
+	$where: TillerTranWhereInput
+	$orderBy: [TillerTranOrderByWithRelationInput!]
+) {
+	tillerTrans(where: $where, orderBy: $orderBy) {
+		...TillerTranBase
+	}
+}

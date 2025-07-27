@@ -6,47 +6,42 @@ const links = [
 		{
 			label: 'Home',
 			icon: 'i-lucide-house',
-			to: '/dash/reporting',
+			to: '/dash/tiller',
 			exact: true
 		},
 		{
-			label: 'Periods',
-			icon: 'i-lucide-calendar-cog',
-			to: '/dash/reporting/periods'
+			label: 'Accounts',
+			icon: 'i-lucide-notebook-tabs',
+			to: '/dash/tiller/accounts'
 		},
 		{
-			label: 'Financials',
-			icon: 'i-lucide-receipt'
-			// to: '/settings/notifications'
-		},
-		{
-			label: 'Data View',
+			label: 'Categories',
 			icon: 'i-lucide-list',
-			to: '/dash/reporting/data-view'
+			to: '/dash/tiller/categories'
 		}
 	],
 	[
 		{
-			label: 'Tester',
-			icon: 'i-lucide-pencil',
-			to: '/dash/reporting/tester'
+			label: 'Imports',
+			icon: 'i-lucide-file-down'
 		},
 		{
-			label: 'Sample',
+			label: 'Tester',
 			icon: 'i-lucide-test-tube-diagonal',
-			to: '/dash/reporting/sample'
+			to: '/dash/tiller/tester'
 		}
+
 	]
 ] satisfies NavigationMenuItem[][];
 </script>
 
 <template>
 	<UDashboardPanel
-		id="reporting"
+		id="tillerdash"
 		:ui="{ body: 'lg:py-12' }"
 	>
 		<template #header>
-			<UDashboardNavbar title="Settings">
+			<UDashboardNavbar title="Tiller App">
 				<template #leading>
 					<UDashboardSidebarCollapse />
 				</template>
