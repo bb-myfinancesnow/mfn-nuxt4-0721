@@ -34,7 +34,22 @@ export default defineNuxtConfig({
 
 	devtools: { enabled: true },
 
-	css: ['~/assets/css/main.css', 'primeicons/primeicons.css'],
+	css: [
+		'~/assets/css/main.css',
+		'primeicons/primeicons.css',
+		'@syncfusion/ej2-base/styles/tailwind.css',
+		'@syncfusion/ej2-vue-grids/styles/tailwind.css',
+		'@syncfusion/ej2-base/styles/material.css',
+		'@syncfusion/ej2-buttons/styles/material.css',
+		'@syncfusion/ej2-dropdowns/styles/material.css',
+		'@syncfusion/ej2-grids/styles/material.css',
+		'@syncfusion/ej2-inputs/styles/material.css',
+		'@syncfusion/ej2-navigations/styles/material.css',
+		'@syncfusion/ej2-popups/styles/material.css',
+		'@syncfusion/ej2-pivotview/styles/material.css',
+		'@syncfusion/ej2-vue-pivotview/styles/material.css'
+	],
+
 	content: {
 		preview: {
 			api: 'https://api.nuxt.studio'
@@ -44,9 +59,15 @@ export default defineNuxtConfig({
 	runtimeConfig: {
 		gqlServerUrl: '',
 		public: {
-			gqlClientUrl: ''
+			gqlClientUrl: '',
+			syncFusionLicense: ''
 		}
 	},
+
+	// Build configuration
+	// build: {
+	// 	transpile: ['@syncfusion']
+	// },
 
 	routeRules: {
 		'/docs': { redirect: '/docs/getting-started', prerender: false }
@@ -56,9 +77,7 @@ export default defineNuxtConfig({
 
 	nitro: {
 		prerender: {
-			routes: [
-				'/'
-			]
+			routes: ['/']
 		}
 	},
 	vite: {

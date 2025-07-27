@@ -87,7 +87,6 @@ provide('pivotview', [GroupingBar, FieldList, CalculatedField]);
 					visibleColumns:
 					<pre>{{ visibleColumns }}</pre>
 				</div> -->
-
 				<div>status: {{ String(pending) }}</div>
 				<!-- <div>
 					expandedRows:
