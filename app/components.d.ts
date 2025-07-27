@@ -15,6 +15,7 @@ declare module 'vue' {
     PDatePicker: typeof import('primevue/datepicker')['default']
     PInputNumber: typeof import('primevue/inputnumber')['default']
     PInputText: typeof import('primevue/inputtext')['default']
+    PMultiSelect: typeof import('primevue/multiselect')['default']
     PPickList: typeof import('primevue/picklist')['default']
     PProgressSpinner: typeof import('primevue/progressspinner')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

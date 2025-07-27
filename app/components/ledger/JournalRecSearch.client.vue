@@ -1,17 +1,20 @@
 <script lang="ts" setup>
 import { FilterMatchMode, FilterOperator } from '@primevue/core/api';
 import type {
+	DataTableFilterEvent,
 	DataTableFilterMeta,
 	DataTablePageEvent
 } from 'primevue/datatable';
-import type { SourceType } from '~/generated/graphql';
+import { SourceType } from '~/generated/graphql';
 
 interface Props {
 	jeRecs: TJournalRecSchema[];
 	isLoading: boolean;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
+
+const tranSourceVals = Object.values(SourceType);
 
 const columnDefs: IPrimeColumnDef<TJournalRecSchema>[] = [
 	{
@@ -67,8 +70,8 @@ const columnDefs: IPrimeColumnDef<TJournalRecSchema>[] = [
 		field: 'tranSource',
 		colType: 'tranSources',
 		header: 'Source',
-		displayLabel: 'Journal Source'
-
+		displayLabel: 'Journal Source',
+		filterable: true
 	},
 	{
 		colId: '_count.entries',
@@ -114,7 +117,8 @@ const defaultFilters: DataTableFilterMeta = {
 		operator: FilterOperator.AND,
 		constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }]
 	},
-	'postingPeriod.locked': { value: null, matchMode: FilterMatchMode.EQUALS }
+	'postingPeriod.locked': { value: null, matchMode: FilterMatchMode.EQUALS },
+	tranSource: { value: null, matchMode: FilterMatchMode.IN }
 };
 
 const {
@@ -134,6 +138,8 @@ initFilters();
 
 const expandedRows = ref({});
 
+const filteredRowCount = ref<number>(props.jeRecs.length);
+
 const collapseAll = () => {
 	expandedRows.value = {};
 };
@@ -141,6 +147,14 @@ const collapseAll = () => {
 const pageEmit = (event: DataTablePageEvent) => {
 	console.log(`pageemit`, event);
 	collapseAll();
+};
+
+const filterEmit = (event: DataTableFilterEvent) => {
+	console.log(`filterEmit`, event);
+	const l = event.filteredValue.length;
+	console.log(`filtered length is ${l} with type ${typeof l}`);
+
+	if (l && typeof l === 'number') filteredRowCount.value = l;
 };
 </script>
 
@@ -163,6 +177,7 @@ const pageEmit = (event: DataTablePageEvent) => {
 		filter-display="menu"
 		:global-filter-fields="globalFilterFieldKeys"
 		@page="pageEmit"
+		@filter="filterEmit"
 	>
 		<template #empty>
 			No data found.
@@ -200,6 +215,11 @@ const pageEmit = (event: DataTablePageEvent) => {
 				/>
 			</div>
 			<USeparator class="py-2" />
+			<div class="flex items-center justify-between gap-2">
+				<DisplayCountto prefix="Total Journals: " :end-value="jeRecs.length" />
+				<DisplayCountto prefix="Filtered Journals: " :end-value="filteredRowCount" :duration="3000" />
+			</div>
+			<USeparator class="py-2" />
 			<div class="flex flex-wrap items-center justify-between gap-2">
 				<div class="flex flex-wrap justify-end gap-2">
 					<!-- <PButton text icon="pi pi-plus" label="Expand All" /> -->
@@ -227,6 +247,7 @@ const pageEmit = (event: DataTablePageEvent) => {
 			:data-type="col.dataType"
 			:frozen="col.frozen"
 			:sort-field="col.sortField"
+			:show-filter-match-modes="col.showFilterMatchModes"
 		>
 			<!-- Body Templates -->
 			<template
@@ -258,7 +279,7 @@ const pageEmit = (event: DataTablePageEvent) => {
 
 			<!-- Filter Templates -->
 			<template
-				v-if="col.dataType === 'text' && col.filterable"
+				v-if="(col.colType === 'text'||col.colType==='stringToUpper') && col.filterable"
 				#filter="{ filterModel }"
 			>
 				<PInputText
@@ -298,6 +319,12 @@ const pageEmit = (event: DataTablePageEvent) => {
 					:indeterminate="filterModel.value === null"
 					binary
 				/>
+			</template>
+			<template
+				v-else-if="col.colType === 'tranSources' && col.filterable"
+				#filter="{ filterModel }"
+			>
+				<PMultiSelect v-model="filterModel.value" :options="tranSourceVals" placeholder="Any" />
 			</template>
 		</PColumn>
 		<template #expansion="slotProps">
