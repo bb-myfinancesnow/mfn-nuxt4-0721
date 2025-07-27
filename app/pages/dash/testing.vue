@@ -251,7 +251,12 @@ const pageEmit = (event: DataTablePageEvent) => {
 										@click="clearFilter()"
 									/>
 								</div>
-
+								<TablePrimeColPicklist
+									:col-options="columnOptions"
+									:visible-cols="visibleColumns"
+									:loading="pending"
+									:disabled="pending"
+								/>
 								<div class="flex flex-wrap justify-end gap-2">
 									<!-- <PButton text icon="pi pi-plus" label="Expand All" /> -->
 									<PButton
@@ -396,12 +401,7 @@ const pageEmit = (event: DataTablePageEvent) => {
 					visibleColumns:
 					<pre>{{ visibleColumns }}</pre>
 				</div>
-				<TablePrimeColPicklist
-					:col-options="columnOptions"
-					:visible-cols="visibleColumns"
-					:loading="pending"
-					:disabled="pending"
-				/>
+
 				<div>status: {{ String(pending) }}</div>
 				<div>
 					expandedRows:
