@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import type { DataTableFilterMeta, DataTablePageEvent } from 'primevue/datatable';
 import { FilterMatchMode, FilterOperator } from '@primevue/core/api';
-import type { ColumnProps } from 'primevue/column';
 import { SortOrder } from '~/generated/graphql';
 
 const ledgerData = useLedger();
@@ -14,12 +13,7 @@ const {
 	orderBy: [{ tranDate: SortOrder.Asc }, { tranNumber: SortOrder.Asc }]
 });
 
-interface PrimeColumnProps extends ColumnProps {
-	colId: string;
-	filterable: boolean;
-}
-
-const columns: PrimeColumnProps[] = [
+const columns: IPrimeColumnProps[] = [
 	{
 		colId: 'tranNumber',
 		filterable: true,
@@ -27,8 +21,9 @@ const columns: PrimeColumnProps[] = [
 		dataType: 'numeric',
 		sortable: true,
 		frozen: true,
-		header: '#'
-
+		header: '#',
+		displayLabel: '#',
+		disableHide: true
 	},
 	{
 		colId: 'tranDate',
@@ -37,7 +32,9 @@ const columns: PrimeColumnProps[] = [
 		dataType: 'date',
 		sortable: true,
 		header: 'Tran Date',
-		style: 'min-width: 200px'
+		style: 'min-width: 200px',
+		displayLabel: 'Tran Date',
+		disableHide: true
 	},
 
 	{
@@ -47,21 +44,24 @@ const columns: PrimeColumnProps[] = [
 		dataType: 'text',
 		sortField: 'postingPeriod.id',
 		header: 'Period',
-		sortable: true
+		sortable: true,
+		displayLabel: 'Period'
 	},
 	{
 		colId: 'description',
 		filterable: true,
 		field: 'description',
 		dataType: 'text',
-		header: 'Description'
+		header: 'Description',
+		displayLabel: 'Description'
 	},
 	{
 		colId: 'postingPeriod.locked',
 		filterable: false,
 		field: 'postingPeriod.locked',
 		dataType: 'boolean',
-		header: 'Locked'
+		header: 'Locked',
+		displayLabel: 'Period Locked'
 	},
 	{
 		colId: 'id',
@@ -69,12 +69,82 @@ const columns: PrimeColumnProps[] = [
 		field: 'id',
 		dataType: 'text',
 		sortable: true,
-		header: 'ID'
+		header: 'ID',
+		displayLabel: 'ID',
+		defaultHidden: true
 	}
 ];
 
+const columnOptions = ref<IPrimeColumnProps[]>([
+	{
+		colId: 'tranNumber',
+		filterable: true,
+		field: 'tranNumber',
+		dataType: 'numeric',
+		sortable: true,
+		frozen: true,
+		header: '#',
+		displayLabel: '#',
+		disableHide: true
+	},
+	{
+		colId: 'tranDate',
+		filterable: true,
+		field: 'tranDate',
+		dataType: 'date',
+		sortable: true,
+		header: 'Tran Date',
+		style: 'min-width: 200px',
+		displayLabel: 'Tran Date',
+		disableHide: true
+	},
+
+	{
+		colId: 'postingPeriod.label',
+		field: 'postingPeriod.label',
+		filterable: false,
+		dataType: 'text',
+		sortField: 'postingPeriod.id',
+		header: 'Period',
+		sortable: true,
+		displayLabel: 'Period'
+	},
+	{
+		colId: 'description',
+		filterable: true,
+		field: 'description',
+		dataType: 'text',
+		header: 'Description',
+		displayLabel: 'Description'
+	},
+	{
+		colId: 'postingPeriod.locked',
+		filterable: false,
+		field: 'postingPeriod.locked',
+		dataType: 'boolean',
+		header: 'Locked',
+		displayLabel: 'Period Locked'
+	},
+	{
+		colId: 'id',
+		filterable: true,
+		field: 'id',
+		dataType: 'text',
+		sortable: true,
+		header: 'ID',
+		displayLabel: 'ID',
+		defaultHidden: true
+	}
+]);
+const visibleColumns = ref<IPrimeColumnProps[]>([]);
+
 const filters = ref();
 const expandedRows = ref({});
+
+const resetVisibleColumns = () => {
+	const cols = columnOptions.value.filter((col) => !col.defaultHidden);
+	visibleColumns.value = cols;
+};
 
 const initFilters = () => {
 	const defaultFilters: DataTableFilterMeta = {
@@ -93,6 +163,7 @@ const initFilters = () => {
 	filters.value = defaultFilters;
 };
 
+resetVisibleColumns();
 initFilters();
 
 const clearFilter = () => {
@@ -192,7 +263,7 @@ const pageEmit = (event: DataTablePageEvent) => {
 								</div>
 							</div>
 						</template>
-						<PColumn expander style="width: 5rem" />
+						<PColumn expander style="width: 5rem" frozen />
 						<PColumn
 							v-for="col of columns"
 							:key="col.colId"
@@ -316,15 +387,29 @@ const pageEmit = (event: DataTablePageEvent) => {
 					</PDataTable>
 				</ClientOnly>
 			</div>
-			<UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
+			<UPageGrid class="lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-px">
 				<div>
-					data:
-					<pre>{{ jeData }}</pre>
+					columnOptions:
+					<pre>{{ columnOptions }}</pre>
 				</div>
+				<div>
+					visibleColumns:
+					<pre>{{ visibleColumns }}</pre>
+				</div>
+				<TablePrimeColPicklist
+					:col-options="columnOptions"
+					:visible-cols="visibleColumns"
+					:loading="pending"
+					:disabled="pending"
+				/>
 				<div>status: {{ String(pending) }}</div>
 				<div>
 					expandedRows:
 					<pre>{{ expandedRows }}</pre>
+				</div>
+				<div>
+					data:
+					<pre>{{ jeData }}</pre>
 				</div>
 			</UPageGrid>
 		</template>

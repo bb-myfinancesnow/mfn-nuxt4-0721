@@ -1,3 +1,5 @@
+import type { ColumnProps } from 'primevue/column';
+
 export const PrimePageLengthOptions = [5, 10, 25, 50, 100] as const;
 
 export type TPrimePageLengthOption = (typeof PrimePageLengthOptions)[number];
@@ -20,3 +22,11 @@ export type TPrimeColumnType
 		| 'entityTypes'
 		| 'accountTypeCategories'
 		| 'tranSources';
+
+export interface IPrimeColumnProps extends ColumnProps {
+	colId: string;
+	filterable: boolean;
+	displayLabel: string;
+	disableHide?: boolean;
+	defaultHidden?: boolean;
+}
