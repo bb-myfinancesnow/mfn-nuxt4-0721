@@ -8,9 +8,7 @@ const {
 	pending
 	// refresh: refreshJournalQuery
 } = await ledgerData.searchGlEntryRecs({
-	orderBy: [{ journal: { tranNumber: SortOrder.Asc } }, { id: SortOrder.Asc }],
-	take: 10,
-	skip: 10
+	orderBy: [{ journal: { tranNumber: SortOrder.Asc } }, { id: SortOrder.Asc }]
 });
 
 // const dataSourceSettings = {

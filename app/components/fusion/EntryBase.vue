@@ -20,7 +20,7 @@ const getPivotDataVals = (): IDataSet[] => {
 const dataSourceSettings: DataSourceSettingsModel = {
 	dataSource: getPivotDataVals(),
 	expandAll: false,
-	rows: [{ name: 'glAccountLabel', caption: 'Account' }],
+	rows: [{ name: 'accountClass', caption: 'Class' }, { name: 'glAccountLabel', caption: 'Account' }],
 	columns: [{ name: 'periodLabel', caption: 'Period' }],
 	values: [{ name: 'entryAmount', caption: 'Amounts' }],
 	formatSettings: [{ name: 'entryAmount', format: 'C0' }],
@@ -47,28 +47,35 @@ const pivotviewbase = ref();
 
 <template>
 	<div>
-		<UButton label="Refresh" @click="refreshDataSource" />
-		<ejs-pivotview
-			id="pivotviewbase"
-			ref="pivotviewbase"
-			:height="height"
-			:width="width"
-			:data-source-settings="dataSourceSettings"
-			:show-field-list="showFieldList"
-			:show-grouping-bar="showGroupingBar"
-			:allow-calculated-field="allowCalculatedField"
-		/>
+		<div class="flex-1">
+			<UButton label="Refresh" @click="refreshDataSource" />
+			<ejs-pivotview
+				id="pivotviewbase"
+				ref="pivotviewbase"
+				:height="height"
+				:width="width"
+				:data-source-settings="dataSourceSettings"
+				:show-field-list="showFieldList"
+				:show-grouping-bar="showGroupingBar"
+				:allow-calculated-field="allowCalculatedField"
+			/>
+		</div>
+
 		<!-- <span>{{ dataSourceSettings.dataSource.length }}</span> -->
 		<span>{{ entryData.length }}</span>
-		<!-- <div class="flex justify-between">
+		<div class="flex justify-between">
 			<div>
 				entryData:
 				<pre>{{ entryData }}</pre>
 			</div>
 			<div>
-				entryData:
-				<pre>{{ dataSourceSettings.dataSource }}</pre>
+				dataSourceSettings:
+				<pre>{{ dataSourceSettings }}</pre>
 			</div>
-		</div> -->
+			<!-- <div>
+				dataSourceSettings:
+				<pre>{{ pivotviewbase. }}</pre>
+			</div> -->
+		</div>
 	</div>
 </template>
