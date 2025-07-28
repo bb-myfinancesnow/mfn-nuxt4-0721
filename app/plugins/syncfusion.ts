@@ -20,15 +20,17 @@ import {
 	ColumnChooser,
 	Group,
 	ForeignKey,
-	Freeze
+	Freeze,
+	Toolbar as GridToolbar
 } from '@syncfusion/ej2-vue-grids';
 import { ChartPlugin, LineSeries } from '@syncfusion/ej2-vue-charts';
 
-export default defineNuxtPlugin((nuxtApp) => {
+export default defineNuxtPlugin(async (nuxtApp) => {
 	const config = useRuntimeConfig();
 	const licenseKey = config.public.syncFusionLicense;
 
 	registerLicense(licenseKey);
+
 	nuxtApp.vueApp.use(PivotViewPlugin);
 	nuxtApp.vueApp.use(GridPlugin);
 	nuxtApp.vueApp.use(ChartPlugin);
@@ -54,6 +56,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 		ColumnChooser,
 		Group,
 		ForeignKey,
-		Freeze
+		Freeze,
+		GridToolbar
 	]);
 });
