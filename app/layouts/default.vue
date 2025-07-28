@@ -210,7 +210,12 @@ const navLinks = ref<NavigationMenuItem[][]>([
 				}
 			]
 		},
-
+		{
+			label: 'Fusion',
+			icon: 'i-lucide-view',
+			to: '/dash/fusion',
+			exact: true
+		},
 		{
 			label: 'Setup',
 			icon: 'i-lucide-settings',

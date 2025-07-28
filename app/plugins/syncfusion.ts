@@ -26,7 +26,16 @@ import {
 	Reorder,
 	Aggregate
 } from '@syncfusion/ej2-vue-grids';
-import { ChartPlugin, LineSeries } from '@syncfusion/ej2-vue-charts';
+import {
+	ChartPlugin,
+	AccumulationChartPlugin,
+	LineSeries,
+	Legend,
+	Category,
+	AccumulationLegend,
+	PieSeries,
+	AccumulationTooltip
+} from '@syncfusion/ej2-vue-charts';
 
 export default defineNuxtPlugin(async (nuxtApp) => {
 	const config = useRuntimeConfig();
@@ -37,6 +46,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
 	nuxtApp.vueApp.use(PivotViewPlugin);
 	nuxtApp.vueApp.use(GridPlugin);
 	nuxtApp.vueApp.use(ChartPlugin);
+	nuxtApp.vueApp.use(AccumulationChartPlugin);
 
 	nuxtApp.vueApp.provide('pivotview', [
 		GroupingBar,
@@ -47,8 +57,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
 		ExcelExport,
 		ConditionalFormatting,
 		NumberFormatting,
-		PivotChart,
-		LineSeries
+		PivotChart
 	]);
 
 	nuxtApp.vueApp.provide('grid', [
@@ -64,5 +73,13 @@ export default defineNuxtPlugin(async (nuxtApp) => {
 		GridExcelExport,
 		Reorder,
 		Aggregate
+	]);
+
+	nuxtApp.vueApp.provide('chart', [LineSeries, Legend, Category]);
+
+	nuxtApp.vueApp.provide('accumulationchart', [
+		PieSeries,
+		AccumulationLegend,
+		AccumulationTooltip
 	]);
 });
