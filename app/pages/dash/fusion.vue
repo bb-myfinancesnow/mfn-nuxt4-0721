@@ -13,12 +13,12 @@ const links = [
 			label: 'Grid',
 			icon: 'i-lucide-grid-3x3',
 			to: '/dash/fusion/grid'
+		},
+		{
+			label: 'Entry Pivot',
+			icon: 'i-lucide-receipt',
+			to: '/dash/fusion/entry-pivot'
 		}
-		// {
-		// 	label: 'Financials',
-		// 	icon: 'i-lucide-receipt',
-		// 	to: '/settings/notifications'
-		// },
 		// {
 		// 	label: 'Data View',
 		// 	icon: 'i-lucide-list',
