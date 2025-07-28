@@ -21,7 +21,8 @@ import {
 	Group,
 	ForeignKey,
 	Freeze,
-	Toolbar as GridToolbar
+	Toolbar as GridToolbar,
+	ExcelExport as GridExcelExport
 } from '@syncfusion/ej2-vue-grids';
 import { ChartPlugin, LineSeries } from '@syncfusion/ej2-vue-charts';
 
@@ -57,6 +58,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
 		Group,
 		ForeignKey,
 		Freeze,
-		GridToolbar
+		GridToolbar,
+		GridExcelExport
 	]);
 });

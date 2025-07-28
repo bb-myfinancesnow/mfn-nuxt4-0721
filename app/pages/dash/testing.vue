@@ -4,6 +4,8 @@ import type {
 	FilterSettingsModel,
 	PageSettingsModel
 } from '@syncfusion/ej2-grids';
+import type { GridComponent } from '@syncfusion/ej2-vue-grids';
+import type { ClickEventArgs } from '@syncfusion/ej2-vue-navigations';
 import { SortOrder } from '~/generated/graphql';
 
 const ledgerData = useLedger();
@@ -20,7 +22,9 @@ interface ISyncColModel extends ColumnModel {
 	colId: string;
 }
 
-const toolbarOptions = ['ColumnChooser'];
+const toolbarOptions = ['ExcelExport', 'CsvExport', 'ColumnChooser'];
+
+const grid = useTemplateRef<GridComponent>('grid');
 
 const getPeriodId = (label: string): number => {
 	const rec = jeData.value.find((e) => e.periodLabel === label);
@@ -119,6 +123,20 @@ const pageSettings = ref<PageSettingsModel>({
 const filterSettings = ref<FilterSettingsModel>({
 	type: 'Excel'
 });
+
+const toolbarClick = (args: ClickEventArgs) => {
+	console.log(`toolbarclick ${args.item.id}`);
+	switch (args.item.id) {
+		case 'DefaultExport_excelexport':
+			console.log('excel export');
+			grid.value?.excelExport();
+			break;
+		case 'DefaultExport_csvexport':
+			console.log('csv export');
+			grid.value?.csvExport();
+			break;
+	}
+};
 </script>
 
 <template>
@@ -140,6 +158,8 @@ const filterSettings = ref<FilterSettingsModel>({
 			<ClientOnly>
 				<!-- <FusionEntryBase :is-loading="pending" :entry-data="jeData" /> -->
 				<ejs-grid
+					id="DefaultExport"
+					ref="grid"
 					:data-source="jeData"
 					:allow-sorting="true"
 					:allow-paging="true"
@@ -148,7 +168,9 @@ const filterSettings = ref<FilterSettingsModel>({
 					:page-settings="pageSettings"
 					:filter-settings="filterSettings"
 					:show-column-chooser="true"
+					:allow-excel-export="true"
 					:toolbar="toolbarOptions"
+					:toolbar-click="toolbarClick"
 				>
 					<e-columns>
 						<e-column

@@ -104,6 +104,9 @@ importers:
       '@syncfusion/ej2-vue-grids':
         specifier: ^30.1.41
         version: 30.1.41
+      '@syncfusion/ej2-vue-navigations':
+        specifier: ^30.1.41
+        version: 30.1.41
       '@syncfusion/ej2-vue-pivotview':
         specifier: ^30.1.41
         version: 30.1.41
@@ -2490,6 +2493,9 @@ packages:
 
   '@syncfusion/ej2-vue-grids@30.1.41':
     resolution: {integrity: sha512-IC+zNC515P07zqhj7G7v2AcssqkBgu60qR8IXZdyUl0RzdcJr61ay4qJYekLc8abHxzWNHa6S5lXXst1d48PJw==}
+
+  '@syncfusion/ej2-vue-navigations@30.1.41':
+    resolution: {integrity: sha512-8rqC2IIPYfxwzFCIIjH1XzZm8d//N3atx/0HuaKpYbln7H22RXUY1awWIfNml86HzFfeV+aCnmvjOnwtbpt9ZQ==}
 
   '@syncfusion/ej2-vue-pivotview@30.1.41':
     resolution: {integrity: sha512-OnIx+UvIhvZ0GqewE/PvPRHV2bt3II4y24icTYDVrLNa8jrxnetOjipeD0zU4ZzqfgpIT8PFy6GAlHu8Cn0xtQ==}
@@ -11144,6 +11150,12 @@ snapshots:
     dependencies:
       '@syncfusion/ej2-base': 30.1.38
       '@syncfusion/ej2-grids': 30.1.41
+      '@syncfusion/ej2-vue-base': 30.1.37
+
+  '@syncfusion/ej2-vue-navigations@30.1.41':
+    dependencies:
+      '@syncfusion/ej2-base': 30.1.38
+      '@syncfusion/ej2-navigations': 30.1.41
       '@syncfusion/ej2-vue-base': 30.1.37
 
   '@syncfusion/ej2-vue-pivotview@30.1.41':
