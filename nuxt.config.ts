@@ -37,17 +37,18 @@ export default defineNuxtConfig({
 	css: [
 		'~/assets/css/main.css',
 		'primeicons/primeicons.css',
-		'@syncfusion/ej2-base/styles/tailwind.css',
-		'@syncfusion/ej2-vue-grids/styles/tailwind.css',
-		'@syncfusion/ej2-base/styles/material.css',
-		'@syncfusion/ej2-buttons/styles/material.css',
-		'@syncfusion/ej2-dropdowns/styles/material.css',
-		'@syncfusion/ej2-grids/styles/material.css',
-		'@syncfusion/ej2-inputs/styles/material.css',
-		'@syncfusion/ej2-navigations/styles/material.css',
-		'@syncfusion/ej2-popups/styles/material.css',
-		'@syncfusion/ej2-pivotview/styles/material.css',
-		'@syncfusion/ej2-vue-pivotview/styles/material.css'
+		'@syncfusion/ej2-base/styles/tailwind-dark.css',
+		'@syncfusion/ej2-buttons/styles/tailwind-dark.css',
+		'@syncfusion/ej2-calendars/styles/tailwind-dark.css',
+		'@syncfusion/ej2-dropdowns/styles/tailwind-dark.css',
+		'@syncfusion/ej2-grids/styles/tailwind-dark.css',
+		'@syncfusion/ej2-inputs/styles/tailwind-dark.css',
+		'@syncfusion/ej2-navigations/styles/tailwind-dark.css',
+		'@syncfusion/ej2-popups/styles/tailwind-dark.css',
+		'@syncfusion/ej2-splitbuttons/styles/tailwind-dark.css',
+		'@syncfusion/ej2-vue-grids/styles/tailwind-dark.css',
+		'@syncfusion/ej2-pivotview/styles/tailwind-dark.css',
+		'@syncfusion/ej2-vue-pivotview/styles/tailwind-dark.css'
 	],
 
 	content: {

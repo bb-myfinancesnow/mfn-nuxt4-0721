@@ -11,8 +11,18 @@ import {
 	NumberFormatting,
 	PivotChart
 } from '@syncfusion/ej2-vue-pivotview';
-import { GridPlugin } from '@syncfusion/ej2-vue-grids';
-import { ChartPlugin } from '@syncfusion/ej2-vue-charts';
+import {
+	GridPlugin,
+	Sort,
+	Page,
+	Filter,
+	Resize,
+	ColumnChooser,
+	Group,
+	ForeignKey,
+	Freeze
+} from '@syncfusion/ej2-vue-grids';
+import { ChartPlugin, LineSeries } from '@syncfusion/ej2-vue-charts';
 
 export default defineNuxtPlugin((nuxtApp) => {
 	const config = useRuntimeConfig();
@@ -32,6 +42,18 @@ export default defineNuxtPlugin((nuxtApp) => {
 		ExcelExport,
 		ConditionalFormatting,
 		NumberFormatting,
-		PivotChart
+		PivotChart,
+		LineSeries
+	]);
+
+	nuxtApp.vueApp.provide('grid', [
+		Sort,
+		Page,
+		Filter,
+		Resize,
+		ColumnChooser,
+		Group,
+		ForeignKey,
+		Freeze
 	]);
 });
