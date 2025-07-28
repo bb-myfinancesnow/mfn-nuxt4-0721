@@ -1,4 +1,6 @@
 <script setup lang="ts">
+// import { GroupingBar, FieldList, CalculatedField } from '@syncfusion/ej2-vue-pivotview';
+
 const colorMode = useColorMode();
 
 const color = computed(() =>
@@ -61,6 +63,7 @@ const links = [
 ];
 
 provide('navigation', navigation);
+// provide('pivotview', [GroupingBar, FieldList, CalculatedField]);
 </script>
 
 <template>

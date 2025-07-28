@@ -1,4 +1,6 @@
+import type { IDataSet } from '@syncfusion/ej2-pivotview';
 import z from 'zod';
+import type { AccountTypeClass } from '~/generated/graphql';
 import { SourceType } from '~/generated/graphql';
 
 export const LedgerPeriodInfoSchema = z.object({
@@ -65,6 +67,8 @@ export const JournalEntryLedgerRecSchema = JournalLineRecSchema.extend({
 export type TJournalEntryLedgerRecSchema = z.infer<typeof JournalEntryLedgerRecSchema>;
 
 export const FlatJournalEntryLedgerRecSchema = JournalEntryLedgerRecSchema.transform((data) => {
+	let entryAmount = data.amount / 100;
+	if (!data.isDebit) entryAmount *= -1;
 	return {
 		periodId: data.journal.postingPeriod.id,
 		periodLabel: data.journal.postingPeriod.label,
@@ -72,8 +76,51 @@ export const FlatJournalEntryLedgerRecSchema = JournalEntryLedgerRecSchema.trans
 		postingDate: data.journal.tranDate,
 		journalNumber: data.journal.tranNumber,
 		glAccountLabel: data.glAccount.accountLabel,
+		entryAmount,
 		...data
 	};
 });
 
 export type TFlatJournalEntryLedgerRecSchema = z.infer<typeof FlatJournalEntryLedgerRecSchema>;
+
+export interface IPivotJournalEntryData extends IDataSet {
+	periodId: number;
+	periodLabel: string;
+	postingDate: Date;
+	glAccountLabel: string;
+	entryAmount: number;
+	journalNumber: number;
+	id: number;
+	glAccountType: string;
+	glAccountTypeSortOrder: number;
+	accountClass: AccountTypeClass;
+}
+
+export const formatEntryLedgerPivotData = (entryData: TFlatJournalEntryLedgerRecSchema[]): IPivotJournalEntryData[] => {
+	return entryData.map((e) => {
+		const {
+			periodId,
+			periodLabel,
+			postingDate,
+			glAccountLabel,
+			entryAmount,
+			journalNumber,
+			id,
+			glAccount
+		} = e;
+
+		return {
+			periodId,
+			periodLabel,
+			postingDate,
+			glAccountLabel,
+			entryAmount,
+			journalNumber,
+			id,
+			glAccountType: glAccount.accountTypeName,
+			glAccountTypeSortOrder: glAccount.accountType.sortOrder,
+			accountClass: glAccount.accountType.class
+
+		};
+	});
+};

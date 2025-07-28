@@ -1,35 +1,56 @@
 <script lang="ts" setup>
-import { testPivotDataCountryState, type ITestPivotCountryState } from '~/example-data/pivot-example';
+import { PivotViewComponent as EjsPivotview, type IDataSet } from '@syncfusion/ej2-vue-pivotview';
+import type { DataSourceSettingsModel } from '@syncfusion/ej2-pivotview/src/model/datasourcesettings-model';
 
 interface Props {
 	entryData: TFlatJournalEntryLedgerRecSchema[];
 	isLoading: boolean;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
-const testPivotData = ref<ITestPivotCountryState[]>(testPivotDataCountryState);
+const pivotDataVals = ref<IPivotJournalEntryData[]>([]);
 
-const dataSourceSettings = {
-	dataSource: testPivotData.value,
-	rows: [{ name: 'Country' }],
-	columns: [{ name: 'Date' }],
-	values: [{ name: 'Amount' }, { name: 'Total', type: 'CalculatedField' }],
-	formatSettings: [{ name: 'Amount', format: 'C1' }],
-	calculatedFieldSettings: [
-		{ name: 'Total', formula: '"Sum(Amount)"+"Sum(Quantity)"' }
-	]
+const getPivotDataVals = (): IDataSet[] => {
+	const res = formatEntryLedgerPivotData(props.entryData);
+	pivotDataVals.value = res;
+	return res;
+};
+
+const dataSourceSettings: DataSourceSettingsModel = {
+	dataSource: getPivotDataVals(),
+	expandAll: false,
+	rows: [{ name: 'glAccountLabel', caption: 'Account' }],
+	columns: [{ name: 'periodLabel', caption: 'Period' }],
+	values: [{ name: 'entryAmount', caption: 'Amounts' }],
+	formatSettings: [{ name: 'entryAmount', format: 'C0' }],
+	filters: []
 };
 const showFieldList = true;
 const showGroupingBar = true;
 const allowCalculatedField = true;
 const height = 1000;
 const width = '100%';
+
+const setPivotDataVals = () => {
+	const res = formatEntryLedgerPivotData(props.entryData);
+	pivotDataVals.value = res;
+};
+
+const refreshDataSource = () => {
+	setPivotDataVals();
+	pivotviewbase.value.refresh();
+};
+
+const pivotviewbase = ref();
 </script>
 
 <template>
 	<div>
+		<UButton label="Refresh" @click="refreshDataSource" />
 		<ejs-pivotview
+			id="pivotviewbase"
+			ref="pivotviewbase"
 			:height="height"
 			:width="width"
 			:data-source-settings="dataSourceSettings"
@@ -37,6 +58,8 @@ const width = '100%';
 			:show-grouping-bar="showGroupingBar"
 			:allow-calculated-field="allowCalculatedField"
 		/>
+		<!-- <span>{{ dataSourceSettings.dataSource.length }}</span> -->
+		<span>{{ entryData.length }}</span>
 		<!-- <div class="flex justify-between">
 			<div>
 				entryData:
