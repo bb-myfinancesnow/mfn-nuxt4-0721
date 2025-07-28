@@ -41,22 +41,61 @@ importers:
       '@syncfusion/ej2-base':
         specifier: ^30.1.38
         version: 30.1.38
+      '@syncfusion/ej2-buttons':
+        specifier: ^30.1.37
+        version: 30.1.37
+      '@syncfusion/ej2-calendars':
+        specifier: ^30.1.37
+        version: 30.1.37
+      '@syncfusion/ej2-charts':
+        specifier: ^30.1.41
+        version: 30.1.41
+      '@syncfusion/ej2-cldr-data':
+        specifier: ^30.1.37
+        version: 30.1.37
       '@syncfusion/ej2-compression':
         specifier: ^30.1.37
         version: 30.1.37
       '@syncfusion/ej2-data':
         specifier: ^30.1.40
         version: 30.1.40
+      '@syncfusion/ej2-dropdowns':
+        specifier: ^30.1.41
+        version: 30.1.41
       '@syncfusion/ej2-excel-export':
         specifier: ^30.1.37
         version: 30.1.37
       '@syncfusion/ej2-file-utils':
         specifier: ^30.1.37
         version: 30.1.37
+      '@syncfusion/ej2-grids':
+        specifier: ^30.1.41
+        version: 30.1.41
+      '@syncfusion/ej2-inputs':
+        specifier: ^30.1.40
+        version: 30.1.40
+      '@syncfusion/ej2-navigations':
+        specifier: ^30.1.41
+        version: 30.1.41
       '@syncfusion/ej2-pdf-export':
         specifier: ^30.1.41
         version: 30.1.41
       '@syncfusion/ej2-pivotview':
+        specifier: ^30.1.41
+        version: 30.1.41
+      '@syncfusion/ej2-popups':
+        specifier: ^30.1.40
+        version: 30.1.40
+      '@syncfusion/ej2-splitbuttons':
+        specifier: ^30.1.41
+        version: 30.1.41
+      '@syncfusion/ej2-vue-base':
+        specifier: ^30.1.37
+        version: 30.1.37
+      '@syncfusion/ej2-vue-buttons':
+        specifier: ^30.1.37
+        version: 30.1.37
+      '@syncfusion/ej2-vue-dropdowns':
         specifier: ^30.1.41
         version: 30.1.41
       '@syncfusion/ej2-vue-grids':
@@ -2383,6 +2422,9 @@ packages:
   '@syncfusion/ej2-charts@30.1.41':
     resolution: {integrity: sha512-dbTfuZBHCE7xLhgQniRmY5h0Nuq9ovKgBha0VuXUaDJOYKTS6wK8D7EFflos7Xh/7cxDSdL3DYbF8IAB6GZweA==}
 
+  '@syncfusion/ej2-cldr-data@30.1.37':
+    resolution: {integrity: sha512-RKc1Kg684BpqI6hzvZc/pR8TE4SaS4jGALHiX+9AFsINALYqW0m07KDuuI69OFg8ftEIIlWWvGQZ5IebK/YurA==}
+
   '@syncfusion/ej2-compression@30.1.37':
     resolution: {integrity: sha512-QA5oAJZDaAONO12zwVCc1IqYTmiwthSoWaMoE0jgQR+mpYR8XmlMi1VOvP8Jtu+HlfQMaEGcMQ++UM5UeZW4+g==}
 
@@ -2433,6 +2475,12 @@ packages:
 
   '@syncfusion/ej2-vue-base@30.1.37':
     resolution: {integrity: sha512-nXZkmgt+2zqGjBisLwOZfbOYaMfNi/RaYhL8mbdMk03dS7LjEFIBw01wgg/VUxVWTJDJTHlDY/F7KEDmH6GAmw==}
+
+  '@syncfusion/ej2-vue-buttons@30.1.37':
+    resolution: {integrity: sha512-xm5X8djl6Am6EE8NLakCj72tVCdBiTS2rNgSQz6bSQCjkXY8zsC/rxVxBZ68drrvS5ZD7Qh7kFAtJhrsIyjm/Q==}
+
+  '@syncfusion/ej2-vue-dropdowns@30.1.41':
+    resolution: {integrity: sha512-PYYaIIYmQOCLJs23gv23bEJEzpe00emG5Al/2JLSug+CwpgR47pjmcglBR7dTVxWOxuLcrC2HVqCwPZnQHBELg==}
 
   '@syncfusion/ej2-vue-grids@30.1.41':
     resolution: {integrity: sha512-IC+zNC515P07zqhj7G7v2AcssqkBgu60qR8IXZdyUl0RzdcJr61ay4qJYekLc8abHxzWNHa6S5lXXst1d48PJw==}
@@ -10950,6 +10998,8 @@ snapshots:
       '@syncfusion/ej2-pdf-export': 30.1.41
       '@syncfusion/ej2-svg-base': 30.1.37
 
+  '@syncfusion/ej2-cldr-data@30.1.37': {}
+
   '@syncfusion/ej2-compression@30.1.37':
     dependencies:
       '@syncfusion/ej2-file-utils': 30.1.37
@@ -11065,6 +11115,18 @@ snapshots:
   '@syncfusion/ej2-vue-base@30.1.37':
     dependencies:
       '@syncfusion/ej2-base': 30.1.38
+
+  '@syncfusion/ej2-vue-buttons@30.1.37':
+    dependencies:
+      '@syncfusion/ej2-base': 30.1.38
+      '@syncfusion/ej2-buttons': 30.1.37
+      '@syncfusion/ej2-vue-base': 30.1.37
+
+  '@syncfusion/ej2-vue-dropdowns@30.1.41':
+    dependencies:
+      '@syncfusion/ej2-base': 30.1.38
+      '@syncfusion/ej2-dropdowns': 30.1.41
+      '@syncfusion/ej2-vue-base': 30.1.37
 
   '@syncfusion/ej2-vue-grids@30.1.41':
     dependencies:
