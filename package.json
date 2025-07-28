@@ -45,6 +45,7 @@
     "@syncfusion/ej2-splitbuttons": "^30.1.41",
     "@syncfusion/ej2-vue-base": "^30.1.37",
     "@syncfusion/ej2-vue-buttons": "^30.1.37",
+    "@syncfusion/ej2-vue-charts": "^30.1.41",
     "@syncfusion/ej2-vue-dropdowns": "^30.1.41",
     "@syncfusion/ej2-vue-grids": "^30.1.41",
     "@syncfusion/ej2-vue-pivotview": "^30.1.41",

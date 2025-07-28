@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import {
 	PivotViewComponent as EjsPivotview,
+	type DisplayOptionModel,
 	type IDataSet,
 	type LoadEventArgs,
 	type ToolbarItems
@@ -9,6 +10,7 @@ import type {
 	DataSourceSettingsModel,
 	FieldOptionsModel
 } from '@syncfusion/ej2-pivotview/src/model/datasourcesettings-model';
+import type { ChartSettingsModel } from '@syncfusion/ej2-pivotview/src/pivotview/model/chartsettings-model';
 
 interface Props {
 	entryData: TFlatJournalEntryLedgerRecSchema[];
@@ -76,7 +78,7 @@ const dataSourceSettings = ref<DataSourceSettingsModel>({
 		{ name: 'glAccountLabel', caption: 'Account' }
 	],
 	columns: [{ name: 'periodLabel', caption: 'Period' }],
-	values: [{ name: 'entryAmount', caption: 'Amounts' }],
+	values: [{ name: 'entryAmount', caption: 'Amounts', type: 'Sum' }],
 	formatSettings: [
 		{ name: 'entryAmount', format: 'C2' },
 		{ name: 'postingDate', type: 'date', format: 'MM/dd/yyyy' }
@@ -84,16 +86,29 @@ const dataSourceSettings = ref<DataSourceSettingsModel>({
 	fieldMapping: pivotFieldMapping,
 	filters: []
 });
+
+const chartSettings = ref<ChartSettingsModel>({
+	legendSettings: { visible: false },
+	chartSeries: { type: 'Column' },
+	zoomSettings: {
+		enableScrollbar: false,
+		toolbarItems: [],
+		enableSelectionZooming: false
+	}
+});
 const showFieldList = true;
 const showGroupingBar = true;
 const allowCalculatedField = true;
-const height = ref(1000);
-const width = ref('100%');
+// const height = ref(1000);
+// const width = ref('100%');
+const displayOption = ref<DisplayOptionModel>({ view: 'Both' });
 
 const allowExcelExport = true;
 const allowPdfExport = true;
 const showToolbar = true;
 const toolbar: ToolbarItems[] = [
+	'Grid',
+	'Chart',
 	'Export',
 	'SubTotal',
 	'GrandTotal',
@@ -166,6 +181,10 @@ const load = (args: LoadEventArgs) => {
 	dataSourceSettings.value = dsSetting;
 
 	args.dataSourceSettings = dsSetting;
+
+	if (args.pivotview) {
+		args.pivotview.chartSettings = chartSettings.value;
+	}
 };
 </script>
 
@@ -179,8 +198,6 @@ const load = (args: LoadEventArgs) => {
 			<EjsPivotview
 				id="pivotviewbase"
 				ref="pivotviewbase"
-				:height="height"
-				:width="width"
 				:data-source-settings="dataSourceSettings"
 				:show-field-list="showFieldList"
 				:show-grouping-bar="showGroupingBar"
@@ -191,6 +208,8 @@ const load = (args: LoadEventArgs) => {
 				:allow-conditional-formatting="allowConditionalFormatting"
 				:show-toolbar="showToolbar"
 				:toolbar="toolbar"
+				:display-option="displayOption"
+				:chart-settings="chartSettings"
 				:data-bound="onDataBound"
 				:load="load"
 			/>

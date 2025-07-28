@@ -95,6 +95,9 @@ importers:
       '@syncfusion/ej2-vue-buttons':
         specifier: ^30.1.37
         version: 30.1.37
+      '@syncfusion/ej2-vue-charts':
+        specifier: ^30.1.41
+        version: 30.1.41
       '@syncfusion/ej2-vue-dropdowns':
         specifier: ^30.1.41
         version: 30.1.41
@@ -2478,6 +2481,9 @@ packages:
 
   '@syncfusion/ej2-vue-buttons@30.1.37':
     resolution: {integrity: sha512-xm5X8djl6Am6EE8NLakCj72tVCdBiTS2rNgSQz6bSQCjkXY8zsC/rxVxBZ68drrvS5ZD7Qh7kFAtJhrsIyjm/Q==}
+
+  '@syncfusion/ej2-vue-charts@30.1.41':
+    resolution: {integrity: sha512-2ypCBtkSMirP60D0xNyVX7ZP4aXC6qvK049++CMFq04ZhtHVUoNuK7/uEAGS3t5gHJms9LZHtivGTSk6qYJB0g==}
 
   '@syncfusion/ej2-vue-dropdowns@30.1.41':
     resolution: {integrity: sha512-PYYaIIYmQOCLJs23gv23bEJEzpe00emG5Al/2JLSug+CwpgR47pjmcglBR7dTVxWOxuLcrC2HVqCwPZnQHBELg==}
@@ -11120,6 +11126,12 @@ snapshots:
     dependencies:
       '@syncfusion/ej2-base': 30.1.38
       '@syncfusion/ej2-buttons': 30.1.37
+      '@syncfusion/ej2-vue-base': 30.1.37
+
+  '@syncfusion/ej2-vue-charts@30.1.41':
+    dependencies:
+      '@syncfusion/ej2-base': 30.1.38
+      '@syncfusion/ej2-charts': 30.1.41
       '@syncfusion/ej2-vue-base': 30.1.37
 
   '@syncfusion/ej2-vue-dropdowns@30.1.41':

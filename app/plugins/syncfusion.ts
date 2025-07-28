@@ -8,8 +8,11 @@ import {
 	PDFExport,
 	ExcelExport,
 	ConditionalFormatting,
-	NumberFormatting
+	NumberFormatting,
+	PivotChart
 } from '@syncfusion/ej2-vue-pivotview';
+import { GridPlugin } from '@syncfusion/ej2-vue-grids';
+import { ChartPlugin } from '@syncfusion/ej2-vue-charts';
 
 export default defineNuxtPlugin((nuxtApp) => {
 	const config = useRuntimeConfig();
@@ -17,6 +20,8 @@ export default defineNuxtPlugin((nuxtApp) => {
 
 	registerLicense(licenseKey);
 	nuxtApp.vueApp.use(PivotViewPlugin);
+	nuxtApp.vueApp.use(GridPlugin);
+	nuxtApp.vueApp.use(ChartPlugin);
 
 	nuxtApp.vueApp.provide('pivotview', [
 		GroupingBar,
@@ -26,6 +31,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 		PDFExport,
 		ExcelExport,
 		ConditionalFormatting,
-		NumberFormatting
+		NumberFormatting,
+		PivotChart
 	]);
 });
