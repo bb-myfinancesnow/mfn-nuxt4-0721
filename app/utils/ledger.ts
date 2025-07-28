@@ -1,7 +1,30 @@
 import type { IDataSet } from '@syncfusion/ej2-pivotview';
 import z from 'zod';
-import type { AccountTypeClass } from '~/generated/graphql';
-import { SourceType } from '~/generated/graphql';
+import { AccountTypeClass, SourceType } from '~/generated/graphql';
+
+export const getAccountTypeClassColor = (input: AccountTypeClass | string | undefined):
+	| 'error'
+	| 'primary'
+	| 'secondary'
+	| 'success'
+	| 'info'
+	| 'warning'
+	| 'neutral' => {
+	switch (input) {
+		case AccountTypeClass.Asset:
+			return 'success';
+		case AccountTypeClass.Liability:
+			return 'warning';
+		case AccountTypeClass.Equity:
+			return 'info';
+		case AccountTypeClass.Revenue:
+			return 'secondary';
+		case AccountTypeClass.Expense:
+			return 'error';
+		default:
+			return 'neutral';
+	}
+};
 
 export const LedgerPeriodInfoSchema = z.object({
 	id: z.number().int(),

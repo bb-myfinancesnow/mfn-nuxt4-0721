@@ -44,7 +44,7 @@ const gridCols = ref<ISyncColModel[]>([
 		allowSorting: true,
 		type: 'number',
 		autoFit: true,
-		showInColumnChooser: false
+		showInColumnChooser: true
 	},
 	{
 		colId: 'journalNumber',
@@ -53,7 +53,7 @@ const gridCols = ref<ISyncColModel[]>([
 		allowSorting: true,
 		type: 'number',
 		autoFit: true,
-		showInColumnChooser: false
+		showInColumnChooser: true
 	},
 	{
 		colId: 'postingDate',
@@ -100,7 +100,6 @@ const gridCols = ref<ISyncColModel[]>([
 		field: 'glAccountLabel',
 		autoFit: true,
 		headerText: 'GL Account'
-
 	},
 	{
 		colId: 'isDebit',
@@ -130,9 +129,18 @@ const gridCols = ref<ISyncColModel[]>([
 		allowSorting: false
 	},
 	{
+		colId: 'glAccount.accountType.class',
+		field: 'glAccount.accountType.class',
+		autoFit: true,
+		headerText: 'Account Class',
+		template: 'accountTypeTemplate'
+	},
+	{
 		colId: 'glAccount.accountTypeName',
 		field: 'glAccount.accountTypeName',
-		headerText: 'Account Type'
+		headerText: 'Account Type',
+		autoFit: true,
+		visible: false
 	}
 ]);
 
@@ -144,6 +152,8 @@ const pageSettings = ref<PageSettingsModel>({
 const filterSettings = ref<FilterSettingsModel>({
 	type: 'Excel'
 });
+
+const height = ref('100%');
 
 const toolbarClick = (args: ClickEventArgs) => {
 	console.log(`toolbarclick ${args.item.id}`);
@@ -181,6 +191,8 @@ const toolbarClick = (args: ClickEventArgs) => {
 				<ejs-grid
 					id="DefaultExport"
 					ref="grid"
+					:enable-adaptive-ui="true"
+					:height="height"
 					:data-source="jeData"
 					:allow-sorting="true"
 					:allow-paging="true"
@@ -192,6 +204,7 @@ const toolbarClick = (args: ClickEventArgs) => {
 					:allow-excel-export="true"
 					:toolbar="toolbarOptions"
 					:allow-reordering="true"
+					:allow-grouping="true"
 					:toolbar-click="toolbarClick"
 				>
 					<e-columns>
@@ -206,11 +219,28 @@ const toolbarClick = (args: ClickEventArgs) => {
 							:auto-fit="col.autoFit"
 							:sort-comparer="col.sortComparer"
 							:display-as-check-box="col.displayAsCheckBox"
-							:show-in-column-chooser="col.showInColumnChooser ?? true"
+							:show-in-column-chooser="
+								col.showInColumnChooser ?? true
+							"
 							:text-align="col.textAlign"
 							:header-text-align="col.headerTextAlign"
+							:visible="col.visible"
+							:template="col.template"
 						/>
 					</e-columns>
+					<template #accountTypeTemplate="{ data }">
+						<div>
+							<UBadge
+								:label="data.glAccount.accountType.class"
+								:color="
+									getAccountTypeClassColor(
+										data.glAccount.accountType.class
+									)
+								"
+							/>
+							<!-- <span>{{ data.glAccount.accountType.class }}</span> -->
+						</div>
+					</template>
 				</ejs-grid>
 			</ClientOnly>
 			<UPageGrid class="lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-px">

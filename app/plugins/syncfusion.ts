@@ -23,7 +23,8 @@ import {
 	Freeze,
 	Toolbar as GridToolbar,
 	ExcelExport as GridExcelExport,
-	Reorder
+	Reorder,
+	Aggregate
 } from '@syncfusion/ej2-vue-grids';
 import { ChartPlugin, LineSeries } from '@syncfusion/ej2-vue-charts';
 
@@ -61,6 +62,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
 		Freeze,
 		GridToolbar,
 		GridExcelExport,
-		Reorder
+		Reorder,
+		Aggregate
 	]);
 });
