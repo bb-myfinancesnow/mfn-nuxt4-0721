@@ -112,6 +112,27 @@ const gridCols = ref<ISyncColModel[]>([
 		allowSorting: false,
 		textAlign: 'Center',
 		headerTextAlign: 'Center'
+	},
+	{
+		colId: 'entryAmount',
+		field: 'entryAmount',
+		headerText: 'Amount',
+		autoFit: true,
+		allowSorting: true,
+		type: 'number',
+		textAlign: 'Right',
+		format: 'C2'
+	},
+	{
+		colId: 'memo',
+		field: 'memo',
+		headerText: 'Memo',
+		allowSorting: false
+	},
+	{
+		colId: 'glAccount.accountTypeName',
+		field: 'glAccount.accountTypeName',
+		headerText: 'Account Type'
 	}
 ]);
 
@@ -170,6 +191,7 @@ const toolbarClick = (args: ClickEventArgs) => {
 					:show-column-chooser="true"
 					:allow-excel-export="true"
 					:toolbar="toolbarOptions"
+					:allow-reordering="true"
 					:toolbar-click="toolbarClick"
 				>
 					<e-columns>
