@@ -2,7 +2,7 @@ import type { IDataSet } from '@syncfusion/ej2-pivotview';
 import z from 'zod';
 import { AccountTypeClass, SourceType } from '~/generated/graphql';
 
-export const getAccountTypeClassColor = (input: AccountTypeClass | string | undefined):
+export const getAccountTypeClassColor = (input: AccountTypeClass | string | undefined | null):
 	| 'error'
 	| 'primary'
 	| 'secondary'

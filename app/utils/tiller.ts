@@ -17,6 +17,17 @@ export const TillerCatRecordSchema = BaseIntIdDatesSchema.extend({
 		tillerTrans: z.number()
 	}),
 	glAccount: z.lazy(() => GlAccInfoSchema).nullable()
+}).transform((data) => {
+	const glAccountLabel = data.glAccount?.accountLabel ?? null;
+	const glAccountTypeName = data.glAccount?.accountTypeName ?? null;
+	const glAccountClass = data.glAccount?.accountType.class ?? null;
+
+	return {
+		...data,
+		glAccountLabel,
+		glAccountTypeName,
+		glAccountClass
+	};
 });
 
 export type TTillerCatRecordSchema = z.infer<typeof TillerCatRecordSchema>;

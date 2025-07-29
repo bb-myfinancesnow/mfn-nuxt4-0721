@@ -67,6 +67,25 @@ const gridCols = ref<ISyncFusionGridColModel[]>([
 		headerTextAlign: 'Center'
 	},
 	{
+		colId: 'glAccountLabel',
+		field: 'glAccountLabel',
+		headerText: 'Mapped To Account',
+		autoFit: true
+	},
+	{
+		colId: 'glAccountTypeName',
+		field: 'glAccountTypeName',
+		headerText: 'Mapped To Acc Type',
+		autoFit: true
+	},
+	{
+		colId: 'glAccountClass',
+		field: 'glAccountTypeName',
+		headerText: 'Mapped To Acc Class',
+		autoFit: true,
+		template: 'accountTypeTemplate'
+	},
+	{
 		colId: 'createdAt',
 		field: 'createdAt',
 		headerText: 'Created',
@@ -163,10 +182,10 @@ const toolbarClick = (args: ClickEventArgs) => {
 				<template #accountTypeTemplate="{ data }">
 					<div>
 						<UBadge
-							:label="data.glAccount.accountType.class"
+							:label="data.glAccountClass"
 							:color="
 								getAccountTypeClassColor(
-									data.glAccount.accountType.class
+									data.glAccountClass
 								)
 							"
 						/>
