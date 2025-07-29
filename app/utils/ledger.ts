@@ -92,6 +92,9 @@ export type TJournalEntryLedgerRecSchema = z.infer<typeof JournalEntryLedgerRecS
 export const FlatJournalEntryLedgerRecSchema = JournalEntryLedgerRecSchema.transform((data) => {
 	let entryAmount = data.amount / 100;
 	if (!data.isDebit) entryAmount *= -1;
+
+	const debit = entryAmount > 0 ? entryAmount : 0;
+	const credit = entryAmount < 0 ? entryAmount : 0;
 	return {
 		periodId: data.journal.postingPeriod.id,
 		periodLabel: data.journal.postingPeriod.label,
@@ -100,6 +103,8 @@ export const FlatJournalEntryLedgerRecSchema = JournalEntryLedgerRecSchema.trans
 		journalNumber: data.journal.tranNumber,
 		glAccountLabel: data.glAccount.accountLabel,
 		entryAmount,
+		debit,
+		credit,
 		...data
 	};
 });
@@ -117,6 +122,8 @@ export interface IPivotJournalEntryData extends IDataSet {
 	glAccountType: string;
 	glAccountTypeSortOrder: number;
 	accountClass: AccountTypeClass;
+	debit: number;
+	credit: number;
 }
 
 export const formatEntryLedgerPivotData = (entryData: TFlatJournalEntryLedgerRecSchema[]): IPivotJournalEntryData[] => {
@@ -129,7 +136,9 @@ export const formatEntryLedgerPivotData = (entryData: TFlatJournalEntryLedgerRec
 			entryAmount,
 			journalNumber,
 			id,
-			glAccount
+			glAccount,
+			debit,
+			credit
 		} = e;
 
 		return {
@@ -142,7 +151,9 @@ export const formatEntryLedgerPivotData = (entryData: TFlatJournalEntryLedgerRec
 			id,
 			glAccountType: glAccount.accountTypeName,
 			glAccountTypeSortOrder: glAccount.accountType.sortOrder,
-			accountClass: glAccount.accountType.class
+			accountClass: glAccount.accountType.class,
+			debit,
+			credit
 
 		};
 	});
