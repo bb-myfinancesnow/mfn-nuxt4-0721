@@ -29,19 +29,24 @@ const { data: tillerData, pending } = await useLazyAsyncData(
 
 <template>
 	<div>
-		<DisplaySpinner
-			v-if="pending || !tillerData"
-			:size="60"
-			variant="pulse"
-			text="Loading..."
-		/>
-		<TillerCatGrid v-else :is-loading="pending" :category-records="tillerData" />
-		<UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
+		<UPageCard title="Tiller Categories">
+			<div>card</div>
+		</UPageCard>
+		<div>
+			<DisplaySpinner
+				v-if="pending || !tillerData"
+				:size="60"
+				variant="pulse"
+				text="Loading..."
+			/>
+			<TillerCatGrid v-else :is-loading="pending" :category-records="tillerData" />
+		</div>
+		<!-- <UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
 			<div>
 				data:
 				<pre>{{ tillerData }}</pre>
 			</div>
 			<div>status: {{ String(pending) }}</div>
-		</UPageGrid>
+		</UPageGrid> -->
 	</div>
 </template>

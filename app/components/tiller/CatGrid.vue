@@ -83,7 +83,9 @@ const gridCols = ref<ISyncFusionGridColModel[]>([
 		field: 'glAccountTypeName',
 		headerText: 'Mapped To Acc Class',
 		autoFit: true,
-		template: 'accountTypeTemplate'
+		template: 'accountTypeTemplate',
+		textAlign: 'Center',
+		headerTextAlign: 'Center'
 	},
 	{
 		colId: 'createdAt',
