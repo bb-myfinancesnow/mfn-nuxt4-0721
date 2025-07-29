@@ -93,3 +93,28 @@ export const BaseTillerInfosSchema = z.object({
 });
 
 export type TBaseTillerInfosSchema = z.infer<typeof BaseTillerInfosSchema>;
+
+export const TillerTranRecordSchema = BaseIntIdDatesSchema.extend({
+	date: z.coerce.date(),
+	dateAdded: z.coerce.date(),
+	description: z.string().nonempty(),
+	reconciled: z.coerce.boolean(),
+	transactionId: z.string().nonempty(),
+	excluded: z.coerce.boolean(),
+	category: z.string().nonempty(),
+	account: z.string().nonempty(),
+	amount: z.coerce.number(),
+	generatedJournal: z.lazy(() => GeneratedJournalSchema).nullable()
+}).transform((data) => {
+	const generatedJournalId = data.generatedJournal?.id ?? null;
+	const generatedJournalNumber = data.generatedJournal?.tranNumber ?? null;
+
+	return {
+		...data,
+		generatedJournalId,
+		generatedJournalNumber,
+		decimalAmount: data.amount / 100
+	};
+});
+
+export type TTillerTranRecordSchema = z.infer<typeof TillerTranRecordSchema>;

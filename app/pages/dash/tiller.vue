@@ -18,6 +18,11 @@ const links = [
 			label: 'Categories',
 			icon: 'i-lucide-list',
 			to: '/dash/tiller/categories'
+		},
+		{
+			label: 'Transactions',
+			icon: 'i-lucide-receipt',
+			to: '/dash/tiller/trans'
 		}
 	],
 	[
