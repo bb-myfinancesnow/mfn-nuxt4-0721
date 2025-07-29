@@ -1,4 +1,5 @@
 import type { ColumnProps } from 'primevue/column';
+import type { ColumnModel } from '@syncfusion/ej2-grids';
 import { SourceType } from '~/generated/graphql';
 
 export const PrimePageLengthOptions = [5, 10, 25, 50, 100] as const;
@@ -52,6 +53,10 @@ export interface IPrimeColumnConfig<T> extends ColumnProps {
 	globalFilterable: boolean;
 	primeType: TBasePrimeColumnType;
 	showFilterMatchModes: boolean;
+}
+
+export interface ISyncFusionGridColModel extends ColumnModel {
+	colId: string;
 }
 
 export const convertPrimeColType = (
