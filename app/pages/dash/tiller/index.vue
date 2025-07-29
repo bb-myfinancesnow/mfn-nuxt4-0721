@@ -51,11 +51,12 @@ const { data: homeTillerData, pending } = await useLazyAsyncData(
 <template>
 	<div>
 		<DisplaySpinner
-			v-if="pending"
+			v-if="pending || !homeTillerData"
 			:size="60"
 			variant="pulse"
 			text="Loading..."
 		/>
+		<TillerBaseCards v-else :home-tiller-data="homeTillerData" :is-loading="pending" />
 		<UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
 			<div>
 				data:

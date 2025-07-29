@@ -32,6 +32,13 @@ export interface Stat {
 	formatter?: (value: number) => string;
 }
 
+export interface IPageCardStat {
+	title: string;
+	icon: string;
+	to?: string;
+
+}
+
 export type Period = 'daily' | 'weekly' | 'monthly';
 
 export interface Range {
