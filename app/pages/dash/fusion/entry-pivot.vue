@@ -14,9 +14,13 @@ const {
 
 <template>
 	<div>
-		<ClientOnly>
-			<FusionEntryBase :is-loading="pending" :entry-data="jeData" />
-		</ClientOnly>
+		<div v-if="!pending && jeData.length>0">
+			<ClientOnly>
+				<FusionEntryBase :is-loading="pending" :entry-data="jeData" />
+			</ClientOnly>
+		</div>
+		<DisplaySpinner v-else />
+
 		<UPageGrid class="lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-px">
 			<div>status: {{ String(pending) }}</div>
 
