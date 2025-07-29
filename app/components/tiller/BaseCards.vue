@@ -29,7 +29,8 @@ const tillerStatsComputed = computed<ITillerPageCardStat[]>(() => {
 		icon: 'i-lucide-list',
 		value: props.homeTillerData.tillerCategories.length,
 		counterValue: props.homeTillerData.tillerCategories.length,
-		counterPrefix: 'Total Categories: '
+		counterPrefix: 'Total Categories: ',
+		to: '/dash/tiller/categories'
 	};
 
 	// const totalTransCard: ITillerPageCardStat = {
