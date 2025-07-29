@@ -2328,6 +2328,16 @@ export enum QueryMode {
 	Insensitive = 'insensitive'
 }
 
+export type RawTillerSheetTranModel = {
+	account: Scalars['String']['output'];
+	amount: Scalars['Int']['output'];
+	category: Scalars['String']['output'];
+	date: Scalars['DateTime']['output'];
+	dateAdded: Scalars['DateTime']['output'];
+	description: Scalars['String']['output'];
+	transactionId: Scalars['String']['output'];
+};
+
 export type RecordImportJob = {
 	createdAt: Scalars['DateTime']['output'];
 	failed: Scalars['Int']['output'];
@@ -2416,6 +2426,7 @@ export type RunTillerSheetTransResultModel = {
 	missingAccounts: Array<Scalars['String']['output']>;
 	missingCategories: Array<Scalars['String']['output']>;
 	newTranCount: Scalars['Int']['output'];
+	pending: Array<RawTillerSheetTranModel>;
 };
 
 export enum SortOrder {
@@ -2971,7 +2982,7 @@ export type RunTillerSheetTransMutationVariables = Exact<{
 	createPending: Scalars['Boolean']['input'];
 }>;
 
-export type RunTillerSheetTransMutation = { runTillerSheetTrans: { createdCount: number; missingCategories: Array<string>; missingAccounts: Array<string>; newTranCount: number } };
+export type RunTillerSheetTransMutation = { runTillerSheetTrans: { createdCount: number; missingCategories: Array<string>; missingAccounts: Array<string>; newTranCount: number; pending: Array<{ account: string; amount: number; category: string; date: string; dateAdded: string; description: string; transactionId: string }> } };
 
 export type ListBookInfoQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -3359,6 +3370,15 @@ export const RunTillerSheetTransDocument = gql`
     missingCategories
     missingAccounts
     newTranCount
+    pending {
+      account
+      amount
+      category
+      date
+      dateAdded
+      description
+      transactionId
+    }
   }
 }
     `;

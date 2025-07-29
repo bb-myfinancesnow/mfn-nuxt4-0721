@@ -10,5 +10,14 @@ mutation RunTillerSheetTrans(
 		missingCategories
 		missingAccounts
 		newTranCount
+		pending {
+			account
+			amount
+			category
+			date
+			dateAdded
+			description
+			transactionId
+		}
 	}
 }
