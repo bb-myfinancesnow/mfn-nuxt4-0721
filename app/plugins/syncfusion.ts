@@ -9,7 +9,9 @@ import {
 	ExcelExport,
 	ConditionalFormatting,
 	NumberFormatting,
-	PivotChart
+	PivotChart,
+	DrillThrough,
+	Grouping
 } from '@syncfusion/ej2-vue-pivotview';
 import {
 	GridPlugin,
@@ -24,7 +26,9 @@ import {
 	Toolbar as GridToolbar,
 	ExcelExport as GridExcelExport,
 	Reorder,
-	Aggregate
+	Aggregate,
+	Edit,
+	DetailRow
 } from '@syncfusion/ej2-vue-grids';
 import {
 	ChartPlugin,
@@ -57,7 +61,9 @@ export default defineNuxtPlugin(async (nuxtApp) => {
 		ExcelExport,
 		ConditionalFormatting,
 		NumberFormatting,
-		PivotChart
+		PivotChart,
+		DrillThrough,
+		Grouping
 	]);
 
 	nuxtApp.vueApp.provide('grid', [
@@ -72,7 +78,9 @@ export default defineNuxtPlugin(async (nuxtApp) => {
 		GridToolbar,
 		GridExcelExport,
 		Reorder,
-		Aggregate
+		Aggregate,
+		Edit,
+		DetailRow
 	]);
 
 	nuxtApp.vueApp.provide('chart', [LineSeries, Legend, Category]);

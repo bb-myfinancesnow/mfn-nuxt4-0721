@@ -78,7 +78,7 @@ const dataSourceSettings = ref<DataSourceSettingsModel>({
 		{ name: 'glAccountLabel', caption: 'Account' }
 	],
 	columns: [{ name: 'periodLabel', caption: 'Period' }],
-	values: [{ name: 'entryAmount', caption: 'Amounts', type: 'Sum' }],
+	values: [{ name: 'entryAmount', caption: 'Period Amount', type: 'Sum' }],
 	formatSettings: [
 		{ name: 'entryAmount', format: 'C2' },
 		{ name: 'postingDate', type: 'date', format: 'MM/dd/yyyy' }
@@ -99,8 +99,8 @@ const chartSettings = ref<ChartSettingsModel>({
 const showFieldList = true;
 const showGroupingBar = true;
 const allowCalculatedField = true;
-// const height = ref(1000);
-// const width = ref('100%');
+const height = ref(1000);
+const width = ref('100%');
 const displayOption = ref<DisplayOptionModel>({ view: 'Both' });
 
 const allowExcelExport = true;
@@ -169,7 +169,7 @@ const load = (args: LoadEventArgs) => {
 			{ name: 'glAccountLabel', caption: 'Account' }
 		],
 		columns: [{ name: 'periodLabel', caption: 'Period' }],
-		values: [{ name: 'entryAmount', caption: 'Amounts' }],
+		values: [{ name: 'entryAmount', caption: 'Period Amount', type: 'Sum' }],
 		formatSettings: [
 			{ name: 'entryAmount', format: 'C2' },
 			{ name: 'postingDate', type: 'date', format: 'MM/dd/yyyy' }
@@ -198,6 +198,8 @@ const load = (args: LoadEventArgs) => {
 			<EjsPivotview
 				id="pivotviewbase"
 				ref="pivotviewbase"
+				:height="height"
+				:width="width"
 				:data-source-settings="dataSourceSettings"
 				:show-field-list="showFieldList"
 				:show-grouping-bar="showGroupingBar"
@@ -206,6 +208,7 @@ const load = (args: LoadEventArgs) => {
 				:allow-pdf-export="allowPdfExport"
 				:allow-number-formatting="allowNumberFormatting"
 				:allow-conditional-formatting="allowConditionalFormatting"
+				:allow-grouping="true"
 				:show-toolbar="showToolbar"
 				:toolbar="toolbar"
 				:display-option="displayOption"
