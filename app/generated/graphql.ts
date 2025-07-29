@@ -1523,6 +1523,7 @@ export type Mutation = {
 	revalueAssetChange: AssetChangeResultModel;
 	revalueInvestmentChange: InvestmentChangeActionResultModel;
 	runInvestmentValues: InvestmentResultModel;
+	runTillerSheetTrans: RunTillerSheetTransResultModel;
 	syncAssetValues: AssetValResultModel;
 	unlockPeriods: CountResultModel;
 	updateAsset: AssetResultModel;
@@ -1642,6 +1643,11 @@ export type MutationRevalueInvestmentChangeArgs = {
 
 export type MutationRunInvestmentValuesArgs = {
 	where: InvestmentWhereUniqueInput;
+};
+
+export type MutationRunTillerSheetTransArgs = {
+	abortOnFirstMissing: Scalars['Boolean']['input'];
+	createPending: Scalars['Boolean']['input'];
 };
 
 export type MutationSyncAssetValuesArgs = {
@@ -2405,6 +2411,13 @@ export enum Role {
 	User = 'User'
 }
 
+export type RunTillerSheetTransResultModel = {
+	createdCount: Scalars['Int']['output'];
+	missingAccounts: Array<Scalars['String']['output']>;
+	missingCategories: Array<Scalars['String']['output']>;
+	newTranCount: Scalars['Int']['output'];
+};
+
 export enum SortOrder {
 	Asc = 'asc',
 	Desc = 'desc'
@@ -2922,11 +2935,17 @@ export type ReportEntryDataFragment = { id: number; amount: number; glAccountNum
 
 export type ReportJournalDataFragment = { id: string; tranDate: string; tranNumber: number; bookId?: number | null; entries?: Array<ReportEntryDataFragment> | null };
 
+export type BaseTillerCatInfoFragment = { id: number; name: string; type: TillerCategoryType; group: string; glAccountNumber?: number | null; _count: { tillerTrans: number } };
+
 export type TillerCatRecordFragment = { id: number; createdAt: string; updatedAt: string; name: string; type: TillerCategoryType; group: string; glAccountNumber?: number | null; _count: { tillerTrans: number }; glAccount?: GlAccInfoFragment | null };
+
+export type BaseTillerAccInfoFragment = { id: number; name: string; group: string; institution: string; glAccountNumber: number; _count: { tillerTrans: number } };
 
 export type TillerAccountRecordFragment = { id: number; createdAt: string; updatedAt: string; name: string; accountId: string; glAccountNumber: number; group: string; institution: string; _count: { tillerTrans: number }; glAccount: GlAccInfoFragment };
 
-export type TillerTranBaseFragment = { id: number; createdAt: string; updatedAt: string; date: string; dateAdded: string; description: string; reconciled: boolean; transactionId: string; excluded: boolean; category: string; amount: number; account: string; generatedJournal?: { id: string; tranNumber: number } | null };
+export type BaseTillerTranInfoFragment = { id: number; date: string; dateAdded: string; account: string; category: string; amount: number; reconciled: boolean; excluded: boolean; generatedJournal?: { id: string; tranNumber: number } | null };
+
+export type TillerTranRecordFragment = { id: number; createdAt: string; updatedAt: string; date: string; dateAdded: string; description: string; reconciled: boolean; transactionId: string; excluded: boolean; category: string; amount: number; account: string; generatedJournal?: { id: string; tranNumber: number } | null };
 
 export type CreateBookMutationVariables = Exact<{
 	data: CreateBookInput;
@@ -2946,6 +2965,13 @@ export type UpdateBookMutationVariables = Exact<{
 }>;
 
 export type UpdateBookMutation = { updateBook: BookDataFragment };
+
+export type RunTillerSheetTransMutationVariables = Exact<{
+	abortOnFirstMissing: Scalars['Boolean']['input'];
+	createPending: Scalars['Boolean']['input'];
+}>;
+
+export type RunTillerSheetTransMutation = { runTillerSheetTrans: { createdCount: number; missingCategories: Array<string>; missingAccounts: Array<string>; newTranCount: number } };
 
 export type ListBookInfoQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -3034,7 +3060,25 @@ export type SearchBaseTillerTransQueryVariables = Exact<{
 	orderBy?: InputMaybe<Array<TillerTranOrderByWithRelationInput> | TillerTranOrderByWithRelationInput>;
 }>;
 
-export type SearchBaseTillerTransQuery = { tillerTrans: Array<TillerTranBaseFragment> };
+export type SearchBaseTillerTransQuery = { tillerTrans: Array<BaseTillerTranInfoFragment> };
+
+export type SearchTillerTranRecordsQueryVariables = Exact<{
+	where?: InputMaybe<TillerTranWhereInput>;
+	orderBy?: InputMaybe<Array<TillerTranOrderByWithRelationInput> | TillerTranOrderByWithRelationInput>;
+}>;
+
+export type SearchTillerTranRecordsQuery = { tillerTrans: Array<TillerTranRecordFragment> };
+
+export type GetBaseTillerRecInfoQueryVariables = Exact<{
+	catOrderBy?: InputMaybe<Array<TillerCategoryOrderByWithRelationInput> | TillerCategoryOrderByWithRelationInput>;
+	catWhere?: InputMaybe<TillerCategoryWhereInput>;
+	accOrderBy?: InputMaybe<Array<TillerAccountOrderByWithRelationInput> | TillerAccountOrderByWithRelationInput>;
+	accWhere?: InputMaybe<TillerAccountWhereInput>;
+	tranOrderBy?: InputMaybe<Array<TillerTranOrderByWithRelationInput> | TillerTranOrderByWithRelationInput>;
+	tranWhere?: InputMaybe<TillerTranWhereInput>;
+}>;
+
+export type GetBaseTillerRecInfoQuery = { tillerCategories: Array<BaseTillerCatInfoFragment>; tillerAccounts: Array<BaseTillerAccInfoFragment>; tillerTrans: Array<BaseTillerTranInfoFragment> };
 
 export const BookInfoFragmentDoc = gql`
     fragment BookInfo on Book {
@@ -3189,6 +3233,18 @@ export const ReportJournalDataFragmentDoc = gql`
   }
 }
     `;
+export const BaseTillerCatInfoFragmentDoc = gql`
+    fragment BaseTillerCatInfo on TillerCategory {
+  id
+  name
+  type
+  group
+  glAccountNumber
+  _count {
+    tillerTrans
+  }
+}
+    `;
 export const TillerCatRecordFragmentDoc = gql`
     fragment TillerCatRecord on TillerCategory {
   id
@@ -3203,6 +3259,18 @@ export const TillerCatRecordFragmentDoc = gql`
   }
   glAccount {
     ...GlAccInfo
+  }
+}
+    `;
+export const BaseTillerAccInfoFragmentDoc = gql`
+    fragment BaseTillerAccInfo on TillerAccount {
+  id
+  name
+  group
+  institution
+  glAccountNumber
+  _count {
+    tillerTrans
   }
 }
     `;
@@ -3224,8 +3292,24 @@ export const TillerAccountRecordFragmentDoc = gql`
   }
 }
     `;
-export const TillerTranBaseFragmentDoc = gql`
-    fragment TillerTranBase on TillerTran {
+export const BaseTillerTranInfoFragmentDoc = gql`
+    fragment BaseTillerTranInfo on TillerTran {
+  id
+  date
+  dateAdded
+  account
+  category
+  amount
+  reconciled
+  excluded
+  generatedJournal {
+    id
+    tranNumber
+  }
+}
+    `;
+export const TillerTranRecordFragmentDoc = gql`
+    fragment TillerTranRecord on TillerTran {
   id
   createdAt
   updatedAt
@@ -3265,6 +3349,19 @@ export const UpdateBookDocument = gql`
   }
 }
     ${BookDataFragmentDoc}`;
+export const RunTillerSheetTransDocument = gql`
+    mutation RunTillerSheetTrans($abortOnFirstMissing: Boolean!, $createPending: Boolean!) {
+  runTillerSheetTrans(
+    abortOnFirstMissing: $abortOnFirstMissing
+    createPending: $createPending
+  ) {
+    createdCount
+    missingCategories
+    missingAccounts
+    newTranCount
+  }
+}
+    `;
 export const ListBookInfoDocument = gql`
     query ListBookInfo {
   books {
@@ -3388,10 +3485,32 @@ ${GlAccTypeInfoFragmentDoc}`;
 export const SearchBaseTillerTransDocument = gql`
     query SearchBaseTillerTrans($where: TillerTranWhereInput, $orderBy: [TillerTranOrderByWithRelationInput!]) {
   tillerTrans(where: $where, orderBy: $orderBy) {
-    ...TillerTranBase
+    ...BaseTillerTranInfo
   }
 }
-    ${TillerTranBaseFragmentDoc}`;
+    ${BaseTillerTranInfoFragmentDoc}`;
+export const SearchTillerTranRecordsDocument = gql`
+    query SearchTillerTranRecords($where: TillerTranWhereInput, $orderBy: [TillerTranOrderByWithRelationInput!]) {
+  tillerTrans(where: $where, orderBy: $orderBy) {
+    ...TillerTranRecord
+  }
+}
+    ${TillerTranRecordFragmentDoc}`;
+export const GetBaseTillerRecInfoDocument = gql`
+    query GetBaseTillerRecInfo($catOrderBy: [TillerCategoryOrderByWithRelationInput!], $catWhere: TillerCategoryWhereInput, $accOrderBy: [TillerAccountOrderByWithRelationInput!], $accWhere: TillerAccountWhereInput, $tranOrderBy: [TillerTranOrderByWithRelationInput!], $tranWhere: TillerTranWhereInput) {
+  tillerCategories(where: $catWhere, orderBy: $catOrderBy) {
+    ...BaseTillerCatInfo
+  }
+  tillerAccounts(where: $accWhere, orderBy: $accOrderBy) {
+    ...BaseTillerAccInfo
+  }
+  tillerTrans(where: $tranWhere, orderBy: $tranOrderBy) {
+    ...BaseTillerTranInfo
+  }
+}
+    ${BaseTillerCatInfoFragmentDoc}
+${BaseTillerAccInfoFragmentDoc}
+${BaseTillerTranInfoFragmentDoc}`;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?: Record<string, string>) => Promise<T>, operationName: string, operationType?: string, variables?: any) => Promise<T>;
 
@@ -3407,6 +3526,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
 		},
 		UpdateBook(variables: UpdateBookMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<UpdateBookMutation> {
 			return withWrapper((wrappedRequestHeaders) => client.request<UpdateBookMutation>({ document: UpdateBookDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'UpdateBook', 'mutation', variables);
+		},
+		RunTillerSheetTrans(variables: RunTillerSheetTransMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<RunTillerSheetTransMutation> {
+			return withWrapper((wrappedRequestHeaders) => client.request<RunTillerSheetTransMutation>({ document: RunTillerSheetTransDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'RunTillerSheetTrans', 'mutation', variables);
 		},
 		ListBookInfo(variables?: ListBookInfoQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<ListBookInfoQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<ListBookInfoQuery>({ document: ListBookInfoDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'ListBookInfo', 'query', variables);
@@ -3446,6 +3568,12 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
 		},
 		SearchBaseTillerTrans(variables?: SearchBaseTillerTransQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchBaseTillerTransQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<SearchBaseTillerTransQuery>({ document: SearchBaseTillerTransDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchBaseTillerTrans', 'query', variables);
+		},
+		SearchTillerTranRecords(variables?: SearchTillerTranRecordsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchTillerTranRecordsQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<SearchTillerTranRecordsQuery>({ document: SearchTillerTranRecordsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchTillerTranRecords', 'query', variables);
+		},
+		GetBaseTillerRecInfo(variables?: GetBaseTillerRecInfoQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<GetBaseTillerRecInfoQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<GetBaseTillerRecInfoQuery>({ document: GetBaseTillerRecInfoDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'GetBaseTillerRecInfo', 'query', variables);
 		}
 	};
 }

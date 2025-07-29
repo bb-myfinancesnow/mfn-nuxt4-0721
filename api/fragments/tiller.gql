@@ -1,3 +1,14 @@
+fragment BaseTillerCatInfo on TillerCategory {
+	id
+	name
+	type
+	group
+	glAccountNumber
+	_count {
+		tillerTrans
+	}
+}
+
 fragment TillerCatRecord on TillerCategory {
 	id
 	createdAt
@@ -11,6 +22,17 @@ fragment TillerCatRecord on TillerCategory {
 	}
 	glAccount {
 		...GlAccInfo
+	}
+}
+
+fragment BaseTillerAccInfo on TillerAccount {
+	id
+	name
+	group
+	institution
+	glAccountNumber
+	_count {
+		tillerTrans
 	}
 }
 
@@ -31,15 +53,30 @@ fragment TillerAccountRecord on TillerAccount {
 	}
 }
 
-fragment TillerTranBase on TillerTran {
+fragment BaseTillerTranInfo on TillerTran {
+	id
+	date
+	dateAdded
+	account
+	category
+	amount
+	reconciled
+	excluded
+	generatedJournal {
+		id
+		tranNumber
+	}
+}
+
+fragment TillerTranRecord on TillerTran {
 	id
 	createdAt
 	updatedAt
 	date
 	dateAdded
-	description
+	description #  no
 	reconciled
-	transactionId
+	transactionId #  no
 	excluded
 	category
 	amount

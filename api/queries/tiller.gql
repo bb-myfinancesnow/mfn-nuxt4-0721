@@ -23,6 +23,34 @@ query SearchBaseTillerTrans(
 	$orderBy: [TillerTranOrderByWithRelationInput!]
 ) {
 	tillerTrans(where: $where, orderBy: $orderBy) {
-		...TillerTranBase
+		...BaseTillerTranInfo
+	}
+}
+
+query SearchTillerTranRecords(
+	$where: TillerTranWhereInput
+	$orderBy: [TillerTranOrderByWithRelationInput!]
+) {
+	tillerTrans(where: $where, orderBy: $orderBy) {
+		...TillerTranRecord
+	}
+}
+
+query GetBaseTillerRecInfo(
+	$catOrderBy: [TillerCategoryOrderByWithRelationInput!]
+	$catWhere: TillerCategoryWhereInput
+	$accOrderBy: [TillerAccountOrderByWithRelationInput!]
+	$accWhere: TillerAccountWhereInput
+	$tranOrderBy: [TillerTranOrderByWithRelationInput!]
+	$tranWhere: TillerTranWhereInput
+) {
+	tillerCategories(where: $catWhere, orderBy: $catOrderBy) {
+		...BaseTillerCatInfo
+	}
+	tillerAccounts(where: $accWhere, orderBy: $accOrderBy) {
+		...BaseTillerAccInfo
+	}
+	tillerTrans(where: $tranWhere, orderBy: $tranOrderBy) {
+		...BaseTillerTranInfo
 	}
 }

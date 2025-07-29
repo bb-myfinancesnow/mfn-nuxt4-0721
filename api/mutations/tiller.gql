@@ -1,0 +1,14 @@
+mutation RunTillerSheetTrans(
+	$abortOnFirstMissing: Boolean!
+	$createPending: Boolean!
+) {
+	runTillerSheetTrans(
+		abortOnFirstMissing: $abortOnFirstMissing
+		createPending: $createPending
+	) {
+		createdCount
+		missingCategories
+		missingAccounts
+		newTranCount
+	}
+}
