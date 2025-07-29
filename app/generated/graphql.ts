@@ -2982,7 +2982,7 @@ export type RunTillerSheetTransMutationVariables = Exact<{
 	createPending: Scalars['Boolean']['input'];
 }>;
 
-export type RunTillerSheetTransMutation = { runTillerSheetTrans: { createdCount: number; missingCategories: Array<string>; missingAccounts: Array<string>; newTranCount: number; pending: Array<{ account: string; amount: number; category: string; date: string; dateAdded: string; description: string; transactionId: string }> } };
+export type RunTillerSheetTransMutation = { runTillerSheetTrans: { createdCount: number; missingCategories: Array<string>; missingAccounts: Array<string>; newTranCount: number; pending: Array<{ account: string; category: string; date: string; dateAdded: string; description: string; transactionId: string; amount: number }> } };
 
 export type ListBookInfoQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -3372,12 +3372,12 @@ export const RunTillerSheetTransDocument = gql`
     newTranCount
     pending {
       account
-      amount
       category
       date
       dateAdded
       description
       transactionId
+      amount
     }
   }
 }

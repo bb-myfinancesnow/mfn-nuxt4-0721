@@ -12,12 +12,12 @@ mutation RunTillerSheetTrans(
 		newTranCount
 		pending {
 			account
-			amount
 			category
 			date
 			dateAdded
 			description
 			transactionId
+			amount
 		}
 	}
 }

@@ -118,3 +118,25 @@ export const TillerTranRecordSchema = BaseIntIdDatesSchema.extend({
 });
 
 export type TTillerTranRecordSchema = z.infer<typeof TillerTranRecordSchema>;
+
+export const RawTillerSheetTranSchema = z.object({
+	account: z.string().nonempty(),
+	amount: z.coerce.number(),
+	date: z.coerce.date(),
+	dateAdded: z.coerce.date(),
+	category: z.string(),
+	description: z.string().nonempty(),
+	transactionId: z.string().nonempty()
+});
+
+export type TRawTillerSheetTranSchema = z.infer<typeof RawTillerSheetTranSchema>;
+
+export const RunTIllerSheetTranResSchema = z.object({
+	createdCount: z.number().int(),
+	newTranCount: z.number().int(),
+	missingCategories: z.string().array(),
+	missingAccounts: z.string().array(),
+	pending: z.array(z.lazy(() => RawTillerSheetTranSchema))
+});
+
+export type TRunTIllerSheetTranResSchema = z.infer<typeof RunTIllerSheetTranResSchema>;

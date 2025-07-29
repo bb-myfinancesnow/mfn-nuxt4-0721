@@ -1,30 +1,34 @@
 <script lang="ts" setup>
-import {
-	SearchTillerTranRecordsDocument,
-	SortOrder,
-	type SearchTillerTranRecordsQueryVariables,
-	type SearchTillerTranRecordsQuery
-} from '~/generated/graphql';
+// import {
+// 	SearchTillerTranRecordsDocument,
+// 	SortOrder,
+// 	type SearchTillerTranRecordsQueryVariables,
+// 	type SearchTillerTranRecordsQuery
+// } from '~/generated/graphql';
 
-const { request } = useGql();
+// const { request } = useGql();
 
-const { data: tillerData, pending } = await useLazyAsyncData(
-	'listtillertrans',
-	() =>	request<
-			SearchTillerTranRecordsQuery,
-			SearchTillerTranRecordsQueryVariables
-		>(SearchTillerTranRecordsDocument, {
-		orderBy: [{ date: SortOrder.Desc },
-			{ dateAdded: SortOrder.Desc },
-			{ id: SortOrder.Asc }]
-	}),
-	{
-		transform: (input): TTillerTranRecordSchema[] => {
-			const arrSchema = TillerTranRecordSchema.array();
-			return arrSchema.parse(input.tillerTrans);
-		}
-	}
-);
+// const { data: tillerData, pending } = await useLazyAsyncData(
+// 	'listtillertrans',
+// 	() =>	request<
+// 			SearchTillerTranRecordsQuery,
+// 			SearchTillerTranRecordsQueryVariables
+// 		>(SearchTillerTranRecordsDocument, {
+// 		orderBy: [{ date: SortOrder.Desc },
+// 			{ dateAdded: SortOrder.Desc },
+// 			{ id: SortOrder.Asc }]
+// 	}),
+// 	{
+// 		transform: (input): TTillerTranRecordSchema[] => {
+// 			const arrSchema = TillerTranRecordSchema.array();
+// 			return arrSchema.parse(input.tillerTrans);
+// 		}
+// 	}
+// );
+
+const { searchTillerTranRecs } = useTiller();
+
+const { data: tillerData, pending } = await searchTillerTranRecs();
 </script>
 
 <template>
