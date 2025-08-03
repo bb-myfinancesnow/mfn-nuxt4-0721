@@ -65,6 +65,12 @@ const infoDescription = computed<string>(() => {
 					<div class="place-self-end">
 						{{ tranData.id }}
 					</div>
+					<div class="place-self-start font-bold">
+						Tran Source
+					</div>
+					<div class="place-self-end">
+						<TableSourceTypeCol :input="tranData.tranSource" />
+					</div>
 				</div>
 			</UPageCard>
 			<UPageCard title="Period" :description="periodDescription">
@@ -100,8 +106,9 @@ const infoDescription = computed<string>(() => {
 					<div class="place-self-start font-bold">
 						Tran Source
 					</div>
+
 					<div class="justify-self-end">
-						{{ tranData.tranSource }}
+						<TableSourceTypeCol :input="tranData.tranSource" />
 					</div>
 				</div>
 			</UPageCard>
