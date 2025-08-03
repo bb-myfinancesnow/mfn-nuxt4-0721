@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import type { TabsItem } from '@nuxt/ui';
+
 const route = useRoute();
 
 const { getJournalPageRecord } = useJournals();
@@ -7,12 +9,11 @@ if (!route.params.id) {
 	console.log(`must provide id`);
 }
 
-const {
-	data: tranData,
-	pending
-} = await getJournalPageRecord({
+const { data: tranData, pending } = await getJournalPageRecord({
 	where: {
-		id: Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
+		id: Array.isArray(route.params.id)
+			? route.params.id[0]
+			: route.params.id
 	}
 });
 
@@ -39,14 +40,38 @@ const infoDescription = computed<string>(() => {
 		return `Tran Detail is Null`;
 	}
 });
+
+const items = ref<TabsItem[]>([
+	{
+		label: 'Account',
+		icon: 'i-lucide-user',
+		content: 'This is the account content.'
+	},
+	{
+		label: 'Password',
+		icon: 'i-lucide-lock',
+		content: 'This is the password content.'
+	},
+	{
+		label: 'System Info',
+		icon: 'i-lucide-info',
+		slot: 'systeminfo' as const
+	}
+]);
 </script>
 
 <template>
 	<div>
 		<DisplaySpinner v-if="!tranData || pending" />
-		<UPageGrid v-else class="grid-cols-3 gap-4">
-			<UPageCard title="Main" :description="mainDescription">
-				<div class="grid grid-cols-2">
+		<UPageGrid
+			v-else
+			class="grid-cols-3 gap-4"
+		>
+			<UPageCard
+				title="Main"
+				:description="mainDescription"
+			>
+				<div class="grid grid-cols-2 gap-y-3">
 					<div class="place-self-start font-bold">
 						Tran Number
 					</div>
@@ -73,8 +98,11 @@ const infoDescription = computed<string>(() => {
 					</div>
 				</div>
 			</UPageCard>
-			<UPageCard title="Period" :description="periodDescription">
-				<div class="grid grid-cols-2">
+			<UPageCard
+				title="Period"
+				:description="periodDescription"
+			>
+				<div class="grid grid-cols-2 gap-y-3">
 					<div class="place-self-start font-bold">
 						Posting Period
 					</div>
@@ -85,7 +113,9 @@ const infoDescription = computed<string>(() => {
 						Period Locked
 					</div>
 					<div class="justify-self-end">
-						<DisplayBoolBadge :val="tranData.postingPeriod.locked" />
+						<DisplayBoolBadge
+							:val="tranData.postingPeriod.locked"
+						/>
 					</div>
 					<div class="place-self-start font-bold">
 						Posting Period ID
@@ -95,8 +125,11 @@ const infoDescription = computed<string>(() => {
 					</div>
 				</div>
 			</UPageCard>
-			<UPageCard title="Info" :description="infoDescription">
-				<div class="grid grid-cols-2">
+			<UPageCard
+				title="Info"
+				:description="infoDescription"
+			>
+				<div class="grid grid-cols-2 gap-y-3">
 					<div class="place-self-start font-bold">
 						Test
 					</div>
@@ -104,21 +137,41 @@ const infoDescription = computed<string>(() => {
 						Test val
 					</div>
 					<div class="place-self-start font-bold">
+						Tran External ID
+					</div>
+					<div class="place-self-end">
+						{{ tranData.externalId }}
+					</div>
+					<!-- <div class="place-self-start font-bold">
 						Tran Source
 					</div>
 
 					<div class="justify-self-end">
 						<TableSourceTypeCol :input="tranData.tranSource" />
-					</div>
+					</div> -->
 				</div>
 			</UPageCard>
 		</UPageGrid>
-		<UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
+		<DisplaySpinner v-if="!tranData || pending" />
+		<UTabs
+			v-else
+			:items="items"
+			class="w-full"
+		>
+			<template #systeminfo>
+				<DisplayStringIdSysInfo
+					:string-id="tranData.id"
+					:created-at="tranData.createdAt"
+					:updated-at="tranData.updatedAt"
+				/>
+			</template>
+		</UTabs>
+		<!-- <UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
 			<div>
 				tranData:
 				<pre>{{ tranData }}</pre>
 			</div>
 			<div>status: {{ String(pending) }}</div>
-		</UPageGrid>
+		</UPageGrid> -->
 	</div>
 </template>
