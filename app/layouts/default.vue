@@ -126,6 +126,11 @@ const navLinks = ref<NavigationMenuItem[][]>([
 			]
 		},
 		{
+			label: 'Journals',
+			icon: 'i-lucide-badge-dollar-sign',
+			to: '/dash/journals'
+		},
+		{
 			label: 'Tiller',
 			icon: 'i-lucide-chevrons-left-right-ellipsis',
 			to: '/dash/tiller'
