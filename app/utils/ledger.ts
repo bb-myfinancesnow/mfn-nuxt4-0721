@@ -179,3 +179,12 @@ export const formatEntryLedgerPivotData = (entryData: TFlatJournalEntryLedgerRec
 		};
 	});
 };
+
+export const GetJournalFormInputSchema = z.object({
+	periods: z.array(z.lazy(() => ReportPeriodSchema)),
+	glAccounts: z.array(z.lazy(() => GlAccInfoSchema)),
+	entities: z.array(z.lazy(() => EntityInfoRecordSchena)),
+	books: z.array(z.lazy(() => BookLedgerInfoSchema))
+});
+
+export type TGetJournalFormInputSchema = z.infer<typeof GetJournalFormInputSchema>;

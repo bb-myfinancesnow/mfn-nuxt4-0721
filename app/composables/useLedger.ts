@@ -1,6 +1,9 @@
 import {
+	QueryJournalFormInputsDocument,
 	SearchJeLineRecordsDocument,
 	SearchJournalRecordsDocument,
+	type QueryJournalFormInputsQuery,
+	type QueryJournalFormInputsQueryVariables,
 	type SearchJeLineRecordsQuery,
 	type SearchJeLineRecordsQueryVariables,
 	type SearchJournalRecordsQuery,
@@ -55,7 +58,11 @@ export const useLedger = () => {
 	const searchEntryRecs = (variables?: SearchJeLineRecordsQueryVariables) => {
 		return useLazyAsyncData(
 			`searchEntryRecs-${JSON.stringify(variables)}`,
-			() => request<SearchJeLineRecordsQuery, SearchJeLineRecordsQueryVariables>(SearchJeLineRecordsDocument, variables),
+			() =>
+				request<
+					SearchJeLineRecordsQuery,
+					SearchJeLineRecordsQueryVariables
+				>(SearchJeLineRecordsDocument, variables),
 			{
 				transform: (input): TJournalEntryLedgerRecSchema[] => {
 					const arrSchema = JournalEntryLedgerRecSchema.array();
@@ -73,10 +80,16 @@ export const useLedger = () => {
 		);
 	};
 
-	const searchGlEntryRecs = (variables?: SearchJeLineRecordsQueryVariables) => {
+	const searchGlEntryRecs = (
+		variables?: SearchJeLineRecordsQueryVariables
+	) => {
 		return useLazyAsyncData(
 			`searchGlEntryRecs-${JSON.stringify(variables)}`,
-			() => request<SearchJeLineRecordsQuery, SearchJeLineRecordsQueryVariables>(SearchJeLineRecordsDocument, variables),
+			() =>
+				request<
+					SearchJeLineRecordsQuery,
+					SearchJeLineRecordsQueryVariables
+				>(SearchJeLineRecordsDocument, variables),
 			{
 				transform: (input): TFlatJournalEntryLedgerRecSchema[] => {
 					const arrSchema = FlatJournalEntryLedgerRecSchema.array();
@@ -94,10 +107,31 @@ export const useLedger = () => {
 		);
 	};
 
+	const queryLedgerInputs = (
+		variables?: QueryJournalFormInputsQueryVariables
+	) => {
+		return useLazyAsyncData(
+			`queryLedgerInputs-${JSON.stringify(variables)}`,
+			() =>
+				request<
+					QueryJournalFormInputsQuery,
+					QueryJournalFormInputsQueryVariables
+				>(QueryJournalFormInputsDocument, variables),
+			{
+				transform: (input) => {
+					return GetJournalFormInputSchema.parse(input);
+				}
+
+			}
+
+		);
+	};
+
 	return {
 		searchJournalRecs,
 		searchJournalFormattedRecs,
 		searchEntryRecs,
-		searchGlEntryRecs
+		searchGlEntryRecs,
+		queryLedgerInputs
 	};
 };

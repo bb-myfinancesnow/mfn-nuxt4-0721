@@ -33,3 +33,33 @@ query SearchJeLineRecords(
 		...JournalEntryLedgerRecord
 	}
 }
+
+# query GetJournalFormInputs($periodWhere: PeriodWhereInput) {
+# 	periods(orderBy: [{ year: asc }, { month: asc }], where: $periodWhere) {
+# 		...PeriodRecord
+# 	}
+# 	glAccounts(orderBy: [{ accountNumber: asc }]) {
+# 		...GlAccInfo
+# 	}
+# 	entities(orderBy: [{ id: asc }]) {
+# 		...EntityInfo
+# 	}
+# 	books(orderBy: [{ id: asc }]) {
+# 		...BookLedgerInfo
+# 	}
+# }
+
+query QueryJournalFormInputs($periodWhere: PeriodWhereInput) {
+	periods(orderBy: [{ year: asc }, { month: asc }], where: $periodWhere) {
+		...PeriodRecord
+	}
+	glAccounts(orderBy: [{ accountNumber: asc }]) {
+		...GlAccInfo
+	}
+	entities(orderBy: [{ id: asc }]) {
+		...EntityInfo
+	}
+	books(orderBy: [{ id: asc }]) {
+		...BookLedgerInfo
+	}
+}

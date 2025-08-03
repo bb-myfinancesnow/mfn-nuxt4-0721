@@ -3095,6 +3095,12 @@ export type SearchJeLineRecordsQueryVariables = Exact<{
 
 export type SearchJeLineRecordsQuery = { journalEntries: Array<JournalEntryLedgerRecordFragment> };
 
+export type QueryJournalFormInputsQueryVariables = Exact<{
+	periodWhere?: InputMaybe<PeriodWhereInput>;
+}>;
+
+export type QueryJournalFormInputsQuery = { periods: Array<PeriodRecordFragment>; glAccounts: Array<GlAccInfoFragment>; entities: Array<EntityInfoFragment>; books: Array<BookLedgerInfoFragment> };
+
 export type SearchPeriodRecordsQueryVariables = Exact<{
 	where?: InputMaybe<PeriodWhereInput>;
 }>;
@@ -3643,6 +3649,27 @@ ${GlAccInfoFragmentDoc}
 ${GlAccTypeInfoFragmentDoc}
 ${JournalHeaderInfoFragmentDoc}
 ${EntityInfoFragmentDoc}`;
+export const QueryJournalFormInputsDocument = gql`
+    query QueryJournalFormInputs($periodWhere: PeriodWhereInput) {
+  periods(orderBy: [{year: asc}, {month: asc}], where: $periodWhere) {
+    ...PeriodRecord
+  }
+  glAccounts(orderBy: [{accountNumber: asc}]) {
+    ...GlAccInfo
+  }
+  entities(orderBy: [{id: asc}]) {
+    ...EntityInfo
+  }
+  books(orderBy: [{id: asc}]) {
+    ...BookLedgerInfo
+  }
+}
+    ${PeriodRecordFragmentDoc}
+${PeriodInfoFragmentDoc}
+${GlAccInfoFragmentDoc}
+${GlAccTypeInfoFragmentDoc}
+${EntityInfoFragmentDoc}
+${BookLedgerInfoFragmentDoc}`;
 export const SearchPeriodRecordsDocument = gql`
     query SearchPeriodRecords($where: PeriodWhereInput) {
   periods(orderBy: [{year: asc}, {month: asc}], where: $where) {
@@ -3798,6 +3825,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
 		},
 		SearchJeLineRecords(variables?: SearchJeLineRecordsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchJeLineRecordsQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<SearchJeLineRecordsQuery>({ document: SearchJeLineRecordsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchJeLineRecords', 'query', variables);
+		},
+		QueryJournalFormInputs(variables?: QueryJournalFormInputsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<QueryJournalFormInputsQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<QueryJournalFormInputsQuery>({ document: QueryJournalFormInputsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'QueryJournalFormInputs', 'query', variables);
 		},
 		SearchPeriodRecords(variables?: SearchPeriodRecordsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchPeriodRecordsQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<SearchPeriodRecordsQuery>({ document: SearchPeriodRecordsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchPeriodRecords', 'query', variables);
