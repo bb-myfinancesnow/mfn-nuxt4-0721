@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { JournalsEntryDetailTable } from '#components';
 import type { TabsItem } from '@nuxt/ui';
 
 const route = useRoute();
@@ -48,9 +49,14 @@ const items = ref<TabsItem[]>([
 		content: 'This is the account content.'
 	},
 	{
-		label: 'Password',
-		icon: 'i-lucide-lock',
-		content: 'This is the password content.'
+		label: 'Entries',
+		icon: 'i-lucide-list',
+		slot: 'tableentries' as const
+	},
+	{
+		label: 'Entries Raw',
+		icon: 'i-lucide-align-justify',
+		slot: 'rawentries' as const
 	},
 	{
 		label: 'System Info',
@@ -142,6 +148,12 @@ const items = ref<TabsItem[]>([
 					<div class="place-self-end">
 						{{ tranData.externalId }}
 					</div>
+					<div v-if="tranData.createdFromTillerTranId" class="place-self-start font-bold">
+						Created From Tiller Id
+					</div>
+					<div v-if="tranData.createdFromTillerTranId" class="place-self-end">
+						{{ tranData.createdFromTillerTranId }}
+					</div>
 					<!-- <div class="place-self-start font-bold">
 						Tran Source
 					</div>
@@ -165,13 +177,22 @@ const items = ref<TabsItem[]>([
 					:updated-at="tranData.updatedAt"
 				/>
 			</template>
+			<template #rawentries>
+				<div>
+					tranData:
+					<pre>{{ tranData.entries }}</pre>
+				</div>
+			</template>
+			<template #tableentries>
+				<JournalsEntryDetailTable :is-loading="pending" :je-recs="tranData.entries" />
+			</template>
 		</UTabs>
-		<!-- <UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
+		<UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
 			<div>
 				tranData:
 				<pre>{{ tranData }}</pre>
 			</div>
 			<div>status: {{ String(pending) }}</div>
-		</UPageGrid> -->
+		</UPageGrid>
 	</div>
 </template>
