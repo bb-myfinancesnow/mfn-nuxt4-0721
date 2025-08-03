@@ -8,7 +8,10 @@ import {
 	RunTillerSheetTransDocument,
 	type CreateTillerGenImportJobMutationVariables,
 	type CreateTillerGenImportJobMutation,
-	CreateTillerGenImportJobDocument
+	CreateTillerGenImportJobDocument,
+	type TillerTranAggsQueryVariables,
+	type TillerTranAggsQuery,
+	TillerTranAggsDocument
 } from '~/generated/graphql';
 
 export const useTiller = () => {
@@ -44,7 +47,19 @@ export const useTiller = () => {
 		);
 	};
 
-	const runTillerSheetTrans = async (variables: RunTillerSheetTransMutationVariables): Promise<TRunTIllerSheetTranResSchema> => {
+	const getTillerTranAgg = (variables?: TillerTranAggsQueryVariables) => {
+		return useLazyAsyncData(
+			`getTillerTranAgg-${JSON.stringify(variables)}`,
+			() => request<TillerTranAggsQuery, TillerTranAggsQueryVariables>(TillerTranAggsDocument, variables),
+			{
+				transform: (input): TGetTillerTranAggsSchema => {
+					return GetTillerTranAggsSchema.parse(input.aggregateTillerTran);
+				}
+			}
+		);
+	};
+
+	const runTillerSheetTrans = async (variables: RunTillerSheetTransMutationVariables): Promise<TRunTillerSheetTranResSchema> => {
 		// try {
 		// 	const res = await request<RunTillerSheetTransMutation, RunTillerSheetTransMutationVariables>(RunTillerSheetTransDocument, variables);
 
@@ -60,7 +75,7 @@ export const useTiller = () => {
 
 		console.log(`runTillerSheetTrans res: ${JSON.stringify(res.runTillerSheetTrans, null, 2)}`);
 
-		const parsedRes = await RunTIllerSheetTranResSchema.parseAsync(res.runTillerSheetTrans);
+		const parsedRes = await RunTillerSheetTranResSchema.parseAsync(res.runTillerSheetTrans);
 
 		return parsedRes;
 	};
@@ -78,6 +93,7 @@ export const useTiller = () => {
 	return {
 		searchTillerTranRecs,
 		runTillerSheetTrans,
-		genTillerJournals
+		genTillerJournals,
+		getTillerTranAgg
 	};
 };

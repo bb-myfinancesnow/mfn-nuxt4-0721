@@ -131,7 +131,7 @@ export const RawTillerSheetTranSchema = z.object({
 
 export type TRawTillerSheetTranSchema = z.infer<typeof RawTillerSheetTranSchema>;
 
-export const RunTIllerSheetTranResSchema = z.object({
+export const RunTillerSheetTranResSchema = z.object({
 	createdCount: z.number().int(),
 	newTranCount: z.number().int(),
 	missingCategories: z.string().array(),
@@ -139,4 +139,18 @@ export const RunTIllerSheetTranResSchema = z.object({
 	pending: z.array(z.lazy(() => RawTillerSheetTranSchema))
 });
 
-export type TRunTIllerSheetTranResSchema = z.infer<typeof RunTIllerSheetTranResSchema>;
+export type TRunTillerSheetTranResSchema = z.infer<typeof RunTillerSheetTranResSchema>;
+
+export const GetTillerTranAggsSchema = z.object({
+	idCount: z.number().int(),
+	tranIdCount: z.number().int(),
+	minCreatedAt: z.coerce.date().nullable(),
+	minDate: z.coerce.date().nullable(),
+	minDateAdded: z.coerce.date().nullable(),
+	maxCreatedAt: z.coerce.date().nullable(),
+	maxDate: z.coerce.date().nullable(),
+	maxDateAdded: z.coerce.date().nullable(),
+	unRecCount: z.number().int()
+});
+
+export type TGetTillerTranAggsSchema = z.infer<typeof GetTillerTranAggsSchema>;
