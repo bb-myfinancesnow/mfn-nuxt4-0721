@@ -20,3 +20,12 @@ query ListBookData(
 		...BookData
 	}
 }
+
+query BookLedgerInfoList(
+	$orderBy: [BookOrderByWithRelationInput!]
+	$where: BookWhereInput
+) {
+	books(orderBy: $orderBy, where: $where) {
+		...BookLedgerInfo
+	}
+}

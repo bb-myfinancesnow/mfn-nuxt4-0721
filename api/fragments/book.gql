@@ -14,3 +14,12 @@ fragment BookData on Book {
 		journals
 	}
 }
+
+fragment BookLedgerInfo on Book {
+	id
+	name
+	system
+	_count {
+		journals
+	}
+}

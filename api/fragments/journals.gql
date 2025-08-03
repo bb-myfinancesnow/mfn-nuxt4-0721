@@ -1,0 +1,43 @@
+fragment JournalHeaderDetail on Journal {
+	id
+	createdAt
+	updatedAt
+	tranNumber
+	tranDate
+	bookId
+	book {
+		...BookLedgerInfo
+	}
+	description
+	tranSource
+	reversalDate
+	externalId
+	createdFromTillerTranId
+	idReversalOf
+	postingMonth
+	postingYear
+	postingPeriod {
+		id
+		locked
+		label
+	}
+	_count {
+		entries
+		migrationLoanChanges
+		templateForTranSchedules
+	}
+}
+
+fragment JournalPageRecord on Journal {
+	...JournalHeaderDetail
+	reversalOf {
+		id
+		tranNumber
+		tranDate
+	}
+	reversedTransaction {
+		id
+		tranNumber
+		tranDate
+	}
+}

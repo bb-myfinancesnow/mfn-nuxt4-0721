@@ -2942,6 +2942,15 @@ export type BookInfoFragment = { id: number; name: string; system: boolean };
 
 export type BookDataFragment = { id: number; name: string; system: boolean; createdAt: string; updatedAt: string; _count: { journals: number } };
 
+export type BookLedgerInfoFragment = { id: number; name: string; system: boolean; _count: { journals: number } };
+
+export type JournalHeaderDetailFragment = { id: string; createdAt: string; updatedAt: string; tranNumber: number; tranDate: string; bookId?: number | null; description: string; tranSource: SourceType; reversalDate?: string | null; externalId?: string | null; createdFromTillerTranId?: number | null; idReversalOf?: string | null; postingMonth: number; postingYear: number; book?: BookLedgerInfoFragment | null; postingPeriod: { id: number; locked: boolean; label: string }; _count: { entries: number; migrationLoanChanges: number; templateForTranSchedules: number } };
+
+export type JournalPageRecordFragment = (
+  { reversalOf?: { id: string; tranNumber: number; tranDate: string } | null; reversedTransaction?: { id: string; tranNumber: number; tranDate: string } | null }
+  & JournalHeaderDetailFragment
+);
+
 export type EntityInfoFragment = { id: number; name: string; system: boolean; entityType: EntityType; description: string; defaultAccountNumber?: number | null };
 
 export type JournalEntryLineRecordFragment = { id: number; amount: number; glAccountNumber: number; isDebit: boolean; entrySource: SourceType; entityId?: number | null; memo: string; glAccount: GlAccInfoFragment };
@@ -3038,6 +3047,29 @@ export type ListBookDataQueryVariables = Exact<{
 }>;
 
 export type ListBookDataQuery = { books: Array<BookDataFragment> };
+
+export type BookLedgerInfoListQueryVariables = Exact<{
+	orderBy?: InputMaybe<Array<BookOrderByWithRelationInput> | BookOrderByWithRelationInput>;
+	where?: InputMaybe<BookWhereInput>;
+}>;
+
+export type BookLedgerInfoListQuery = { books: Array<BookLedgerInfoFragment> };
+
+export type SearchJournalDetailsQueryVariables = Exact<{
+	where?: InputMaybe<JournalWhereInput>;
+	orderBy?: InputMaybe<Array<JournalOrderByWithRelationInput> | JournalOrderByWithRelationInput>;
+	skip?: InputMaybe<Scalars['Int']['input']>;
+	take?: InputMaybe<Scalars['Int']['input']>;
+	cursor?: InputMaybe<JournalWhereUniqueInput>;
+}>;
+
+export type SearchJournalDetailsQuery = { journals: Array<JournalHeaderDetailFragment> };
+
+export type GetJournalPageRecordQueryVariables = Exact<{
+	where: JournalWhereUniqueInput;
+}>;
+
+export type GetJournalPageRecordQuery = { journal: JournalPageRecordFragment };
 
 export type SearchJournalRecordsQueryVariables = Exact<{
 	where?: InputMaybe<JournalWhereInput>;
@@ -3151,6 +3183,62 @@ export const BookDataFragmentDoc = gql`
   updatedAt
   _count {
     journals
+  }
+}
+    `;
+export const BookLedgerInfoFragmentDoc = gql`
+    fragment BookLedgerInfo on Book {
+  id
+  name
+  system
+  _count {
+    journals
+  }
+}
+    `;
+export const JournalHeaderDetailFragmentDoc = gql`
+    fragment JournalHeaderDetail on Journal {
+  id
+  createdAt
+  updatedAt
+  tranNumber
+  tranDate
+  bookId
+  book {
+    ...BookLedgerInfo
+  }
+  description
+  tranSource
+  reversalDate
+  externalId
+  createdFromTillerTranId
+  idReversalOf
+  postingMonth
+  postingYear
+  postingPeriod {
+    id
+    locked
+    label
+  }
+  _count {
+    entries
+    migrationLoanChanges
+    templateForTranSchedules
+  }
+}
+    `;
+export const JournalPageRecordFragmentDoc = gql`
+    fragment JournalPageRecord on Journal {
+  ...JournalHeaderDetail
+  reversalOf {
+    id
+    tranNumber
+    tranDate
+  }
+  reversedTransaction {
+    id
+    tranNumber
+    tranDate
   }
 }
     `;
@@ -3456,6 +3544,36 @@ export const ListBookDataDocument = gql`
   }
 }
     ${BookDataFragmentDoc}`;
+export const BookLedgerInfoListDocument = gql`
+    query BookLedgerInfoList($orderBy: [BookOrderByWithRelationInput!], $where: BookWhereInput) {
+  books(orderBy: $orderBy, where: $where) {
+    ...BookLedgerInfo
+  }
+}
+    ${BookLedgerInfoFragmentDoc}`;
+export const SearchJournalDetailsDocument = gql`
+    query SearchJournalDetails($where: JournalWhereInput, $orderBy: [JournalOrderByWithRelationInput!], $skip: Int, $take: Int, $cursor: JournalWhereUniqueInput) {
+  journals(
+    where: $where
+    orderBy: $orderBy
+    skip: $skip
+    take: $take
+    cursor: $cursor
+  ) {
+    ...JournalHeaderDetail
+  }
+}
+    ${JournalHeaderDetailFragmentDoc}
+${BookLedgerInfoFragmentDoc}`;
+export const GetJournalPageRecordDocument = gql`
+    query GetJournalPageRecord($where: JournalWhereUniqueInput!) {
+  journal(where: $where) {
+    ...JournalPageRecord
+  }
+}
+    ${JournalPageRecordFragmentDoc}
+${JournalHeaderDetailFragmentDoc}
+${BookLedgerInfoFragmentDoc}`;
 export const SearchJournalRecordsDocument = gql`
     query SearchJournalRecords($where: JournalWhereInput, $orderBy: [JournalOrderByWithRelationInput!], $skip: Int, $take: Int, $cursor: JournalWhereUniqueInput) {
   journals(
@@ -3629,6 +3747,15 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
 		},
 		ListBookData(variables?: ListBookDataQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<ListBookDataQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<ListBookDataQuery>({ document: ListBookDataDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'ListBookData', 'query', variables);
+		},
+		BookLedgerInfoList(variables?: BookLedgerInfoListQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<BookLedgerInfoListQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<BookLedgerInfoListQuery>({ document: BookLedgerInfoListDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'BookLedgerInfoList', 'query', variables);
+		},
+		SearchJournalDetails(variables?: SearchJournalDetailsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchJournalDetailsQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<SearchJournalDetailsQuery>({ document: SearchJournalDetailsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchJournalDetails', 'query', variables);
+		},
+		GetJournalPageRecord(variables: GetJournalPageRecordQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<GetJournalPageRecordQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<GetJournalPageRecordQuery>({ document: GetJournalPageRecordDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'GetJournalPageRecord', 'query', variables);
 		},
 		SearchJournalRecords(variables?: SearchJournalRecordsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchJournalRecordsQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<SearchJournalRecordsQuery>({ document: SearchJournalRecordsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchJournalRecords', 'query', variables);
