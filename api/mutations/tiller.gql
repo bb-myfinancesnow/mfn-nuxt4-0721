@@ -21,3 +21,11 @@ mutation RunTillerSheetTrans(
 		}
 	}
 }
+
+mutation CreateTillerGenImportJob($input: [GenerateTillerJournalInput!]!) {
+	addTillerGenImportJob(input: $input) {
+		id
+		queue
+		recordCount
+	}
+}

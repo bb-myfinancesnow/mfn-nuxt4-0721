@@ -28,7 +28,8 @@ const links = [
 	[
 		{
 			label: 'Imports',
-			icon: 'i-lucide-file'
+			icon: 'i-lucide-file',
+			to: '/dash/tiller/imports'
 		},
 		{
 			label: 'Tran Imports',

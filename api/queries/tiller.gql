@@ -54,3 +54,17 @@ query GetBaseTillerRecInfo(
 		...BaseTillerTranInfo
 	}
 }
+
+query TillerTranAggs($aggWhere: TillerTranWhereInput) {
+	aggregateTillerTran(where: $aggWhere) {
+		idCount
+		tranIdCount
+		minDate
+		minDateAdded
+		minCreatedAt
+		maxDate
+		maxDateAdded
+		maxCreatedAt
+		unRecCount
+	}
+}

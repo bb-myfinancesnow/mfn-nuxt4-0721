@@ -5,7 +5,10 @@ import {
 	type SearchTillerTranRecordsQuery,
 	type RunTillerSheetTransMutationVariables,
 	type RunTillerSheetTransMutation,
-	RunTillerSheetTransDocument
+	RunTillerSheetTransDocument,
+	type CreateTillerGenImportJobMutationVariables,
+	type CreateTillerGenImportJobMutation,
+	CreateTillerGenImportJobDocument
 } from '~/generated/graphql';
 
 export const useTiller = () => {
@@ -61,8 +64,20 @@ export const useTiller = () => {
 
 		return parsedRes;
 	};
+
+	const genTillerJournals = async (variables: CreateTillerGenImportJobMutationVariables) => {
+		console.log(`variables genTillerJournals res: ${JSON.stringify(variables, null, 2)}`);
+
+		const res = await request<CreateTillerGenImportJobMutation, CreateTillerGenImportJobMutationVariables>(CreateTillerGenImportJobDocument, variables);
+
+		console.log(`runTillerSheetTrans res: ${JSON.stringify(res.addTillerGenImportJob, null, 2)}`);
+
+		return res.addTillerGenImportJob;
+	};
+
 	return {
 		searchTillerTranRecs,
-		runTillerSheetTrans
+		runTillerSheetTrans,
+		genTillerJournals
 	};
 };

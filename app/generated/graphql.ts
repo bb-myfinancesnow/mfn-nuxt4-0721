@@ -28,6 +28,18 @@ export enum AccountTypeClass {
 	Revenue = 'Revenue'
 }
 
+export type AggregateTillerTranModel = {
+	idCount: Scalars['Int']['output'];
+	maxCreatedAt?: Maybe<Scalars['DateTime']['output']>;
+	maxDate?: Maybe<Scalars['DateTime']['output']>;
+	maxDateAdded?: Maybe<Scalars['DateTime']['output']>;
+	minCreatedAt?: Maybe<Scalars['DateTime']['output']>;
+	minDate?: Maybe<Scalars['DateTime']['output']>;
+	minDateAdded?: Maybe<Scalars['DateTime']['output']>;
+	tranIdCount: Scalars['Int']['output'];
+	unRecCount: Scalars['Int']['output'];
+};
+
 export type AsOfReportEntryModel = {
 	accountTypeClass: AccountTypeClass;
 	accountTypeName: Scalars['String']['output'];
@@ -677,6 +689,10 @@ export type FromEntryInvestmentChangeCreateInput = {
 	changeType?: InputMaybe<InvestmentChangeType>;
 	effectiveDate: Scalars['DateTime']['input'];
 	relatedEntryId: Scalars['Int']['input'];
+};
+
+export type GenerateTillerJournalInput = {
+	createdFromTillerTranId: Scalars['Int']['input'];
 };
 
 export enum GenerationStatus {
@@ -1497,6 +1513,7 @@ export type LoanWhereUniqueInput = {
 };
 
 export type Mutation = {
+	addTillerGenImportJob: NewJobResultModel;
 	bulkUpdateScheduleLogs: CountResultModel;
 	clearPeriods: CountResultModel;
 	createAsset: AssetResultModel;
@@ -1531,6 +1548,10 @@ export type Mutation = {
 	updateEntity: Entity;
 	updateJournal: JournalResultModel;
 	updateTranSchedule: TranScheduleResultModel;
+};
+
+export type MutationAddTillerGenImportJobArgs = {
+	input: Array<GenerateTillerJournalInput>;
 };
 
 export type MutationBulkUpdateScheduleLogsArgs = {
@@ -1862,6 +1883,12 @@ export type NestedStringNullableFilter = {
 	startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type NewJobResultModel = {
+	id: Scalars['String']['output'];
+	queue: Scalars['String']['output'];
+	recordCount: Scalars['Int']['output'];
+};
+
 export enum NullsOrder {
 	First = 'first',
 	Last = 'last'
@@ -1974,6 +2001,7 @@ export type PeriodYearMonthCompoundUniqueInput = {
 };
 
 export type Query = {
+	aggregateTillerTran: AggregateTillerTranModel;
 	asset: Asset;
 	assetChange: AssetChange;
 	assetChanges: Array<AssetChange>;
@@ -2025,6 +2053,10 @@ export type Query = {
 	tranScheduleLogs: Array<TranScheduleLog>;
 	tranSchedules: Array<TranSchedule>;
 	users: Array<UserModel>;
+};
+
+export type QueryAggregateTillerTranArgs = {
+	where?: InputMaybe<TillerTranWhereInput>;
 };
 
 export type QueryAssetArgs = {
@@ -2984,6 +3016,12 @@ export type RunTillerSheetTransMutationVariables = Exact<{
 
 export type RunTillerSheetTransMutation = { runTillerSheetTrans: { createdCount: number; missingCategories: Array<string>; missingAccounts: Array<string>; newTranCount: number; pending: Array<{ account: string; category: string; date: string; dateAdded: string; description: string; transactionId: string; amount: number }> } };
 
+export type CreateTillerGenImportJobMutationVariables = Exact<{
+	input: Array<GenerateTillerJournalInput> | GenerateTillerJournalInput;
+}>;
+
+export type CreateTillerGenImportJobMutation = { addTillerGenImportJob: { id: string; queue: string; recordCount: number } };
+
 export type ListBookInfoQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ListBookInfoQuery = { books: Array<BookInfoFragment> };
@@ -3090,6 +3128,12 @@ export type GetBaseTillerRecInfoQueryVariables = Exact<{
 }>;
 
 export type GetBaseTillerRecInfoQuery = { tillerCategories: Array<BaseTillerCatInfoFragment>; tillerAccounts: Array<BaseTillerAccInfoFragment>; tillerTrans: Array<BaseTillerTranInfoFragment> };
+
+export type TillerTranAggsQueryVariables = Exact<{
+	aggWhere?: InputMaybe<TillerTranWhereInput>;
+}>;
+
+export type TillerTranAggsQuery = { aggregateTillerTran: { idCount: number; tranIdCount: number; minDate?: string | null; minDateAdded?: string | null; minCreatedAt?: string | null; maxDate?: string | null; maxDateAdded?: string | null; maxCreatedAt?: string | null; unRecCount: number } };
 
 export const BookInfoFragmentDoc = gql`
     fragment BookInfo on Book {
@@ -3382,6 +3426,15 @@ export const RunTillerSheetTransDocument = gql`
   }
 }
     `;
+export const CreateTillerGenImportJobDocument = gql`
+    mutation CreateTillerGenImportJob($input: [GenerateTillerJournalInput!]!) {
+  addTillerGenImportJob(input: $input) {
+    id
+    queue
+    recordCount
+  }
+}
+    `;
 export const ListBookInfoDocument = gql`
     query ListBookInfo {
   books {
@@ -3531,6 +3584,21 @@ export const GetBaseTillerRecInfoDocument = gql`
     ${BaseTillerCatInfoFragmentDoc}
 ${BaseTillerAccInfoFragmentDoc}
 ${BaseTillerTranInfoFragmentDoc}`;
+export const TillerTranAggsDocument = gql`
+    query TillerTranAggs($aggWhere: TillerTranWhereInput) {
+  aggregateTillerTran(where: $aggWhere) {
+    idCount
+    tranIdCount
+    minDate
+    minDateAdded
+    minCreatedAt
+    maxDate
+    maxDateAdded
+    maxCreatedAt
+    unRecCount
+  }
+}
+    `;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?: Record<string, string>) => Promise<T>, operationName: string, operationType?: string, variables?: any) => Promise<T>;
 
@@ -3549,6 +3617,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
 		},
 		RunTillerSheetTrans(variables: RunTillerSheetTransMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<RunTillerSheetTransMutation> {
 			return withWrapper((wrappedRequestHeaders) => client.request<RunTillerSheetTransMutation>({ document: RunTillerSheetTransDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'RunTillerSheetTrans', 'mutation', variables);
+		},
+		CreateTillerGenImportJob(variables: CreateTillerGenImportJobMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<CreateTillerGenImportJobMutation> {
+			return withWrapper((wrappedRequestHeaders) => client.request<CreateTillerGenImportJobMutation>({ document: CreateTillerGenImportJobDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'CreateTillerGenImportJob', 'mutation', variables);
 		},
 		ListBookInfo(variables?: ListBookInfoQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<ListBookInfoQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<ListBookInfoQuery>({ document: ListBookInfoDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'ListBookInfo', 'query', variables);
@@ -3594,6 +3665,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
 		},
 		GetBaseTillerRecInfo(variables?: GetBaseTillerRecInfoQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<GetBaseTillerRecInfoQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<GetBaseTillerRecInfoQuery>({ document: GetBaseTillerRecInfoDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'GetBaseTillerRecInfo', 'query', variables);
+		},
+		TillerTranAggs(variables?: TillerTranAggsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<TillerTranAggsQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<TillerTranAggsQuery>({ document: TillerTranAggsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'TillerTranAggs', 'query', variables);
 		}
 	};
 }
