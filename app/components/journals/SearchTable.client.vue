@@ -144,6 +144,18 @@ const filterEmit = (event: DataTableFilterEvent) => {
 
 	if (l && typeof l === 'number') filteredRowCount.value = l;
 };
+
+const goToJePage = async (journalId: string) => {
+	console.log(`go to page ${journalId}`);
+
+	// await navigateTo({
+	// 	path: '/dash/journals/record/',
+	// 	params: {
+	// 		id: journalId
+	// 	}
+	// });
+	await navigateTo(`/dash/journals/record/${journalId}`);
+};
 </script>
 
 <template>
@@ -207,6 +219,16 @@ const filterEmit = (event: DataTableFilterEvent) => {
 			</div>
 			<USeparator class="py-2" />
 		</template>
+		<PColumn column-key="view">
+			<template #body="{ data }">
+				<PButton
+					icon="pi pi-eye"
+					severity="secondary"
+					raised
+					@click="() => goToJePage(data.id)"
+				/>
+			</template>
+		</PColumn>
 		<PColumn
 			v-for="col of visibleColumns"
 			:key="col.colId"
