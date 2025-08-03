@@ -34,6 +34,22 @@ fragment JournalHeaderDetail on Journal {
 	}
 }
 
+fragment JournalLineDetail on JournalEntry {
+	journalId
+	id
+	createdAt
+	updatedAt
+	amount
+	glAccountNumber
+	isDebit
+	entrySource
+	entityId
+	memo
+	glAccount {
+		...GlAccInfo
+	}
+}
+
 fragment JournalPageRecord on Journal {
 	...JournalHeaderDetail
 	reversalOf {
@@ -44,5 +60,8 @@ fragment JournalPageRecord on Journal {
 	}
 	createdFromTillerTran {
 		...BaseTillerTranInfo
+	}
+	entries {
+		...JournalLineDetail
 	}
 }

@@ -1,5 +1,8 @@
 import {
+	GetJournalPageRecordDocument,
 	SearchJournalDetailsDocument,
+	type GetJournalPageRecordQuery,
+	type GetJournalPageRecordQueryVariables,
 	type SearchJournalDetailsQuery,
 	type SearchJournalDetailsQueryVariables
 } from '~/generated/graphql';
@@ -35,7 +38,21 @@ export const useJournals = () => {
 		);
 	};
 
+	const getJournalPageRecord = (variables: GetJournalPageRecordQueryVariables) => {
+		return useLazyAsyncData(
+			`getJournalPageRecord-${JSON.stringify(variables)}`,
+			() => request<GetJournalPageRecordQuery, GetJournalPageRecordQueryVariables>(GetJournalPageRecordDocument, variables),
+			{
+				transform: (input): TJournalPageRecordSchema => {
+					const parsed = JournalPageRecordSchema.parse(input.journal);
+					return parsed;
+				}
+			}
+		);
+	};
+
 	return {
-		searchJournalHeaderDetails
+		searchJournalHeaderDetails,
+		getJournalPageRecord
 	};
 };

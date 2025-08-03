@@ -20,3 +20,19 @@ export const JournalHeaderDetailSchema = JournalHeaderRecSchema.extend({
 });
 
 export type TJournalHeaderDetailSchema = z.infer<typeof JournalHeaderDetailSchema>;
+
+export const JournalLineDetailSchema = JournalLineRecSchema.extend({
+	createdAt: z.coerce.date(),
+	updatedAt: z.coerce.date()
+});
+
+export type TJournalLineDetailSchema = z.infer<typeof JournalLineDetailSchema>;
+
+export const JournalPageRecordSchema = JournalHeaderDetailSchema.extend({
+	createdFromTillerTran: z.lazy(() => BaseTillerTranInfoSchema).nullable(),
+	reversalOf: z.lazy(() => JournalRecInfoSchema).nullable(),
+	reversedTransaction: z.lazy(() => JournalRecInfoSchema).nullable(),
+	entries: z.array(z.lazy(() => JournalLineDetailSchema))
+});
+
+export type TJournalPageRecordSchema = z.infer<typeof JournalPageRecordSchema>;

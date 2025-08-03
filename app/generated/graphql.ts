@@ -2948,8 +2948,10 @@ export type JournalRecInfoFragment = { id: string; tranNumber: number; tranDate:
 
 export type JournalHeaderDetailFragment = { id: string; createdAt: string; updatedAt: string; tranNumber: number; tranDate: string; bookId?: number | null; description: string; tranSource: SourceType; reversalDate?: string | null; externalId?: string | null; createdFromTillerTranId?: number | null; idReversalOf?: string | null; postingMonth: number; postingYear: number; book?: BookLedgerInfoFragment | null; postingPeriod: { id: number; locked: boolean; label: string }; _count: { entries: number; migrationLoanChanges: number; templateForTranSchedules: number } };
 
+export type JournalLineDetailFragment = { journalId: string; id: number; createdAt: string; updatedAt: string; amount: number; glAccountNumber: number; isDebit: boolean; entrySource: SourceType; entityId?: number | null; memo: string; glAccount: GlAccInfoFragment };
+
 export type JournalPageRecordFragment = (
-  { reversalOf?: JournalRecInfoFragment | null; reversedTransaction?: JournalRecInfoFragment | null; createdFromTillerTran?: BaseTillerTranInfoFragment | null }
+  { reversalOf?: JournalRecInfoFragment | null; reversedTransaction?: JournalRecInfoFragment | null; createdFromTillerTran?: BaseTillerTranInfoFragment | null; entries?: Array<JournalLineDetailFragment> | null }
   & JournalHeaderDetailFragment
 );
 
@@ -3251,6 +3253,43 @@ export const BaseTillerTranInfoFragmentDoc = gql`
   }
 }
     `;
+export const GlAccTypeInfoFragmentDoc = gql`
+    fragment GlAccTypeInfo on GlAccountType {
+  id
+  name
+  sortOrder
+  class
+}
+    `;
+export const GlAccInfoFragmentDoc = gql`
+    fragment GlAccInfo on GlAccount {
+  id
+  accountNumber
+  name
+  accountTypeName
+  system
+  accountType {
+    ...GlAccTypeInfo
+  }
+}
+    `;
+export const JournalLineDetailFragmentDoc = gql`
+    fragment JournalLineDetail on JournalEntry {
+  journalId
+  id
+  createdAt
+  updatedAt
+  amount
+  glAccountNumber
+  isDebit
+  entrySource
+  entityId
+  memo
+  glAccount {
+    ...GlAccInfo
+  }
+}
+    `;
 export const JournalPageRecordFragmentDoc = gql`
     fragment JournalPageRecord on Journal {
   ...JournalHeaderDetail
@@ -3262,6 +3301,9 @@ export const JournalPageRecordFragmentDoc = gql`
   }
   createdFromTillerTran {
     ...BaseTillerTranInfo
+  }
+  entries {
+    ...JournalLineDetail
   }
 }
     `;
@@ -3289,26 +3331,6 @@ export const JournalEntryHeaderRecordFragmentDoc = gql`
   ...JournalHeaderInfo
   createdAt
   updatedAt
-}
-    `;
-export const GlAccTypeInfoFragmentDoc = gql`
-    fragment GlAccTypeInfo on GlAccountType {
-  id
-  name
-  sortOrder
-  class
-}
-    `;
-export const GlAccInfoFragmentDoc = gql`
-    fragment GlAccInfo on GlAccount {
-  id
-  accountNumber
-  name
-  accountTypeName
-  system
-  accountType {
-    ...GlAccTypeInfo
-  }
 }
     `;
 export const JournalEntryLineRecordFragmentDoc = gql`
@@ -3581,7 +3603,10 @@ export const GetJournalPageRecordDocument = gql`
 ${JournalHeaderDetailFragmentDoc}
 ${BookLedgerInfoFragmentDoc}
 ${JournalRecInfoFragmentDoc}
-${BaseTillerTranInfoFragmentDoc}`;
+${BaseTillerTranInfoFragmentDoc}
+${JournalLineDetailFragmentDoc}
+${GlAccInfoFragmentDoc}
+${GlAccTypeInfoFragmentDoc}`;
 export const SearchJournalRecordsDocument = gql`
     query SearchJournalRecords($where: JournalWhereInput, $orderBy: [JournalOrderByWithRelationInput!], $skip: Int, $take: Int, $cursor: JournalWhereUniqueInput) {
   journals(
