@@ -1,9 +1,24 @@
 <script lang="ts" setup>
+import { SortOrder } from '~/generated/graphql';
 
+const { searchJournalHeaderDetails } = useJournals();
+
+const {
+	data: jeData,
+	pending
+} = await searchJournalHeaderDetails({
+	orderBy: [{ tranDate: SortOrder.Asc }, { tranNumber: SortOrder.Asc }]
+});
 </script>
 
 <template>
 	<div>
-		index journals
+		<UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
+			<div>
+				data:
+				<pre>{{ jeData }}</pre>
+			</div>
+			<div>status: {{ String(pending) }}</div>
+		</UPageGrid>
 	</div>
 </template>

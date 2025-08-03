@@ -1,3 +1,9 @@
+fragment JournalRecInfo on Journal {
+	id
+	tranNumber
+	tranDate
+}
+
 fragment JournalHeaderDetail on Journal {
 	id
 	createdAt
@@ -31,13 +37,12 @@ fragment JournalHeaderDetail on Journal {
 fragment JournalPageRecord on Journal {
 	...JournalHeaderDetail
 	reversalOf {
-		id
-		tranNumber
-		tranDate
+		...JournalRecInfo
 	}
 	reversedTransaction {
-		id
-		tranNumber
-		tranDate
+		...JournalRecInfo
+	}
+	createdFromTillerTran {
+		...BaseTillerTranInfo
 	}
 }

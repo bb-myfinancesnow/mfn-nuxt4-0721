@@ -1,12 +1,12 @@
 import z from 'zod';
 import { TillerCategoryType } from '~/generated/graphql';
 
-export const GeneratedJournalSchema = z.object({
-	id: z.string(),
-	tranNumber: z.coerce.number().int()
-});
+// export const GeneratedJournalSchema = z.object({
+// 	id: z.string(),
+// 	tranNumber: z.coerce.number().int()
+// });
 
-export type TGeneratedJournalSchema = z.infer<typeof GeneratedJournalSchema>;
+// export type TGeneratedJournalSchema = z.infer<typeof GeneratedJournalSchema>;
 
 export const TillerCatRecordSchema = BaseIntIdDatesSchema.extend({
 	name: z.string().nonempty(),
@@ -81,7 +81,7 @@ export const BaseTillerTranInfoSchema = z.object({
 	amount: z.coerce.number(),
 	reconciled: z.coerce.boolean(),
 	excluded: z.coerce.boolean(),
-	generatedJournal: z.lazy(() => GeneratedJournalSchema).nullable()
+	generatedJournal: z.lazy(() => JournalRecInfoSchema).nullable()
 });
 
 export type TBaseTillerTranInfoSchema = z.infer<typeof BaseTillerTranInfoSchema>;
@@ -104,7 +104,7 @@ export const TillerTranRecordSchema = BaseIntIdDatesSchema.extend({
 	category: z.string().nonempty(),
 	account: z.string().nonempty(),
 	amount: z.coerce.number(),
-	generatedJournal: z.lazy(() => GeneratedJournalSchema).nullable()
+	generatedJournal: z.lazy(() => JournalRecInfoSchema).nullable()
 }).transform((data) => {
 	const generatedJournalId = data.generatedJournal?.id ?? null;
 	const generatedJournalNumber = data.generatedJournal?.tranNumber ?? null;

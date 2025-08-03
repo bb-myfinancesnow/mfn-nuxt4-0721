@@ -11,7 +11,8 @@ const links = [
 		},
 		{
 			label: 'List',
-			icon: 'i-lucide-list'
+			icon: 'i-lucide-list',
+			to: '/dash/journals/list'
 		}
 	],
 	[

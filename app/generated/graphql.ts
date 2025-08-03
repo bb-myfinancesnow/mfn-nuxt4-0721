@@ -2944,10 +2944,12 @@ export type BookDataFragment = { id: number; name: string; system: boolean; crea
 
 export type BookLedgerInfoFragment = { id: number; name: string; system: boolean; _count: { journals: number } };
 
+export type JournalRecInfoFragment = { id: string; tranNumber: number; tranDate: string };
+
 export type JournalHeaderDetailFragment = { id: string; createdAt: string; updatedAt: string; tranNumber: number; tranDate: string; bookId?: number | null; description: string; tranSource: SourceType; reversalDate?: string | null; externalId?: string | null; createdFromTillerTranId?: number | null; idReversalOf?: string | null; postingMonth: number; postingYear: number; book?: BookLedgerInfoFragment | null; postingPeriod: { id: number; locked: boolean; label: string }; _count: { entries: number; migrationLoanChanges: number; templateForTranSchedules: number } };
 
 export type JournalPageRecordFragment = (
-  { reversalOf?: { id: string; tranNumber: number; tranDate: string } | null; reversedTransaction?: { id: string; tranNumber: number; tranDate: string } | null }
+  { reversalOf?: JournalRecInfoFragment | null; reversedTransaction?: JournalRecInfoFragment | null; createdFromTillerTran?: BaseTillerTranInfoFragment | null }
   & JournalHeaderDetailFragment
 );
 
@@ -2995,9 +2997,9 @@ export type BaseTillerAccInfoFragment = { id: number; name: string; group: strin
 
 export type TillerAccountRecordFragment = { id: number; createdAt: string; updatedAt: string; name: string; accountId: string; glAccountNumber: number; group: string; institution: string; _count: { tillerTrans: number }; glAccount: GlAccInfoFragment };
 
-export type BaseTillerTranInfoFragment = { id: number; date: string; dateAdded: string; account: string; category: string; amount: number; reconciled: boolean; excluded: boolean; generatedJournal?: { id: string; tranNumber: number } | null };
+export type BaseTillerTranInfoFragment = { id: number; date: string; dateAdded: string; account: string; category: string; amount: number; reconciled: boolean; excluded: boolean; generatedJournal?: JournalRecInfoFragment | null };
 
-export type TillerTranRecordFragment = { id: number; createdAt: string; updatedAt: string; date: string; dateAdded: string; description: string; reconciled: boolean; transactionId: string; excluded: boolean; category: string; amount: number; account: string; generatedJournal?: { id: string; tranNumber: number } | null };
+export type TillerTranRecordFragment = { id: number; createdAt: string; updatedAt: string; date: string; dateAdded: string; description: string; reconciled: boolean; transactionId: string; excluded: boolean; category: string; amount: number; account: string; generatedJournal?: JournalRecInfoFragment | null };
 
 export type CreateBookMutationVariables = Exact<{
 	data: CreateBookInput;
@@ -3227,18 +3229,39 @@ export const JournalHeaderDetailFragmentDoc = gql`
   }
 }
     `;
+export const JournalRecInfoFragmentDoc = gql`
+    fragment JournalRecInfo on Journal {
+  id
+  tranNumber
+  tranDate
+}
+    `;
+export const BaseTillerTranInfoFragmentDoc = gql`
+    fragment BaseTillerTranInfo on TillerTran {
+  id
+  date
+  dateAdded
+  account
+  category
+  amount
+  reconciled
+  excluded
+  generatedJournal {
+    ...JournalRecInfo
+  }
+}
+    `;
 export const JournalPageRecordFragmentDoc = gql`
     fragment JournalPageRecord on Journal {
   ...JournalHeaderDetail
   reversalOf {
-    id
-    tranNumber
-    tranDate
+    ...JournalRecInfo
   }
   reversedTransaction {
-    id
-    tranNumber
-    tranDate
+    ...JournalRecInfo
+  }
+  createdFromTillerTran {
+    ...BaseTillerTranInfo
   }
 }
     `;
@@ -3435,22 +3458,6 @@ export const TillerAccountRecordFragmentDoc = gql`
   }
 }
     `;
-export const BaseTillerTranInfoFragmentDoc = gql`
-    fragment BaseTillerTranInfo on TillerTran {
-  id
-  date
-  dateAdded
-  account
-  category
-  amount
-  reconciled
-  excluded
-  generatedJournal {
-    id
-    tranNumber
-  }
-}
-    `;
 export const TillerTranRecordFragmentDoc = gql`
     fragment TillerTranRecord on TillerTran {
   id
@@ -3466,8 +3473,7 @@ export const TillerTranRecordFragmentDoc = gql`
   amount
   account
   generatedJournal {
-    id
-    tranNumber
+    ...JournalRecInfo
   }
 }
     `;
@@ -3573,7 +3579,9 @@ export const GetJournalPageRecordDocument = gql`
 }
     ${JournalPageRecordFragmentDoc}
 ${JournalHeaderDetailFragmentDoc}
-${BookLedgerInfoFragmentDoc}`;
+${BookLedgerInfoFragmentDoc}
+${JournalRecInfoFragmentDoc}
+${BaseTillerTranInfoFragmentDoc}`;
 export const SearchJournalRecordsDocument = gql`
     query SearchJournalRecords($where: JournalWhereInput, $orderBy: [JournalOrderByWithRelationInput!], $skip: Int, $take: Int, $cursor: JournalWhereUniqueInput) {
   journals(
@@ -3679,14 +3687,16 @@ export const SearchBaseTillerTransDocument = gql`
     ...BaseTillerTranInfo
   }
 }
-    ${BaseTillerTranInfoFragmentDoc}`;
+    ${BaseTillerTranInfoFragmentDoc}
+${JournalRecInfoFragmentDoc}`;
 export const SearchTillerTranRecordsDocument = gql`
     query SearchTillerTranRecords($where: TillerTranWhereInput, $orderBy: [TillerTranOrderByWithRelationInput!]) {
   tillerTrans(where: $where, orderBy: $orderBy) {
     ...TillerTranRecord
   }
 }
-    ${TillerTranRecordFragmentDoc}`;
+    ${TillerTranRecordFragmentDoc}
+${JournalRecInfoFragmentDoc}`;
 export const GetBaseTillerRecInfoDocument = gql`
     query GetBaseTillerRecInfo($catOrderBy: [TillerCategoryOrderByWithRelationInput!], $catWhere: TillerCategoryWhereInput, $accOrderBy: [TillerAccountOrderByWithRelationInput!], $accWhere: TillerAccountWhereInput, $tranOrderBy: [TillerTranOrderByWithRelationInput!], $tranWhere: TillerTranWhereInput) {
   tillerCategories(where: $catWhere, orderBy: $catOrderBy) {
@@ -3701,7 +3711,8 @@ export const GetBaseTillerRecInfoDocument = gql`
 }
     ${BaseTillerCatInfoFragmentDoc}
 ${BaseTillerAccInfoFragmentDoc}
-${BaseTillerTranInfoFragmentDoc}`;
+${BaseTillerTranInfoFragmentDoc}
+${JournalRecInfoFragmentDoc}`;
 export const TillerTranAggsDocument = gql`
     query TillerTranAggs($aggWhere: TillerTranWhereInput) {
   aggregateTillerTran(where: $aggWhere) {

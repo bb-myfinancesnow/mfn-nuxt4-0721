@@ -63,8 +63,7 @@ fragment BaseTillerTranInfo on TillerTran {
 	reconciled
 	excluded
 	generatedJournal {
-		id
-		tranNumber
+		...JournalRecInfo
 	}
 }
 
@@ -82,7 +81,6 @@ fragment TillerTranRecord on TillerTran {
 	amount
 	account
 	generatedJournal {
-		id
-		tranNumber
+		...JournalRecInfo
 	}
 }

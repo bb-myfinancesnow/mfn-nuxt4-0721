@@ -30,6 +30,17 @@ export const BookRecordSchema = z.object({
 
 export type TBookRecordSchema = z.infer<typeof BookRecordSchema>;
 
+export const BookLedgerInfoSchema = z.object({
+	id: z.number().int(),
+	name: z.string(),
+	system: z.boolean(),
+	_count: z.object({
+		journals: z.number()
+	})
+});
+
+export type TBookLedgerInfoSchema = z.infer<typeof BookLedgerInfoSchema>;
+
 export const NewBookInputSchema = z.object({
 	name: z.string().min(3, {
 		message: 'Name must be at least 3 characters.'
