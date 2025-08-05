@@ -36,3 +36,77 @@ export const JournalPageRecordSchema = JournalHeaderDetailSchema.extend({
 });
 
 export type TJournalPageRecordSchema = z.infer<typeof JournalPageRecordSchema>;
+
+export const JournalLineCreateSchema = z.object({
+	memo: z.string().min(3, {
+		message: 'Memo must be at least 3 characters.'
+	}),
+	glAccountNumber: z.coerce.number().int().min(10000).max(99999),
+	debit: z.coerce.number().min(0),
+	credit: z.coerce.number().min(0),
+	entityId: z.coerce.number().int().optional().nullable()
+});
+
+export type TJournalLineCreateInput = z.output<typeof JournalLineCreateSchema>;
+
+export const UpdateJournalLineSchema = JournalLineCreateSchema.extend({
+	id: z.number().int().optional()
+});
+
+export type TUpdateJournalLineInput = z.output<typeof UpdateJournalLineSchema>;
+
+export const JournalCreateSchema = z.object({
+	description: z.string().min(3, {
+		message: 'Description must be at least 3 characters.'
+	}),
+	tranDate: z.coerce.date(),
+	externalId: z.string().optional(),
+	reversalDate: z.coerce.date().optional(),
+	bookId: z.number().int().optional(),
+	inputLines: z
+		.array(z.lazy(() => JournalLineCreateSchema))
+		.min(1, 'Requires at least 1 line')
+		.superRefine((val, ctx) => {
+			const debitTotal = sumValuesByProperty(val, 'debit');
+			const creditTotal = sumValuesByProperty(val, 'credit');
+
+			const variance = roundToHundreths(debitTotal - creditTotal);
+
+			if (variance !== 0) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: `Out of Balance by ${formatCurrency(variance)}`
+				});
+			}
+		})
+});
+
+export type TJournalCreateInput = z.infer<typeof JournalCreateSchema>;
+
+export const UpdateJournalInputSchema = z.object({
+	description: z.string().min(3, {
+		message: 'Description must be at least 3 characters.'
+	}),
+	tranDate: z.coerce.date(),
+	externalId: z.string().optional(),
+	reversalDate: z.coerce.date().optional(),
+	bookId: z.number().optional(),
+	inputLines: z
+		.array(z.lazy(() => UpdateJournalLineSchema))
+		.min(1, 'Requires at least 1 line')
+		.superRefine((val, ctx) => {
+			const debitTotal = sumValuesByProperty(val, 'debit');
+			const creditTotal = sumValuesByProperty(val, 'credit');
+
+			const variance = roundToHundreths(debitTotal - creditTotal);
+
+			if (variance !== 0) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: `Out of Balance by ${formatCurrency(variance)}`
+				});
+			}
+		})
+});
+
+export type TUpdateJournalInput = z.infer<typeof UpdateJournalInputSchema>;
