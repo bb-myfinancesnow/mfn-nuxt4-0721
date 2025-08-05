@@ -1,0 +1,23 @@
+mutation CreateNewJournal($data: JournalCreateInput!) {
+	createJournal(data: $data) {
+		id
+		tranNumber
+	}
+}
+
+mutation EditJournalRecord(
+	$where: JournalWhereUniqueInput!
+	$dto: JournalUpdateInput!
+) {
+	updateJournal(where: $where, dto: $dto) {
+		id
+		tranNumber
+	}
+}
+
+mutation DelJournalId($id: String!) {
+	removeJournal(id: $id) {
+		id
+		tranNumber
+	}
+}

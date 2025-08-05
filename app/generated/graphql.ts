@@ -1535,6 +1535,7 @@ export type Mutation = {
 	removeEntity: Entity;
 	removeInvestment: InvestmentResultModel;
 	removeInvestmentChange: InvestmentChangeResultModel;
+	removeJournal: JournalResultModel;
 	removeLoan: LoanResultModel;
 	removeTranSchedule: TranScheduleResultModel;
 	revalueAssetChange: AssetChangeResultModel;
@@ -1641,6 +1642,10 @@ export type MutationRemoveInvestmentArgs = {
 
 export type MutationRemoveInvestmentChangeArgs = {
 	where: InvestmentChangeWhereUniqueInput;
+};
+
+export type MutationRemoveJournalArgs = {
+	id: Scalars['String']['input'];
 };
 
 export type MutationRemoveLoanArgs = {
@@ -3022,6 +3027,25 @@ export type UpdateBookMutationVariables = Exact<{
 
 export type UpdateBookMutation = { updateBook: BookDataFragment };
 
+export type CreateNewJournalMutationVariables = Exact<{
+	data: JournalCreateInput;
+}>;
+
+export type CreateNewJournalMutation = { createJournal: { id: string; tranNumber: number } };
+
+export type EditJournalRecordMutationVariables = Exact<{
+	where: JournalWhereUniqueInput;
+	dto: JournalUpdateInput;
+}>;
+
+export type EditJournalRecordMutation = { updateJournal: { id: string; tranNumber: number } };
+
+export type DelJournalIdMutationVariables = Exact<{
+	id: Scalars['String']['input'];
+}>;
+
+export type DelJournalIdMutation = { removeJournal: { id: string; tranNumber: number } };
+
 export type RunTillerSheetTransMutationVariables = Exact<{
 	abortOnFirstMissing: Scalars['Boolean']['input'];
 	createPending: Scalars['Boolean']['input'];
@@ -3526,6 +3550,30 @@ export const UpdateBookDocument = gql`
   }
 }
     ${BookDataFragmentDoc}`;
+export const CreateNewJournalDocument = gql`
+    mutation CreateNewJournal($data: JournalCreateInput!) {
+  createJournal(data: $data) {
+    id
+    tranNumber
+  }
+}
+    `;
+export const EditJournalRecordDocument = gql`
+    mutation EditJournalRecord($where: JournalWhereUniqueInput!, $dto: JournalUpdateInput!) {
+  updateJournal(where: $where, dto: $dto) {
+    id
+    tranNumber
+  }
+}
+    `;
+export const DelJournalIdDocument = gql`
+    mutation DelJournalId($id: String!) {
+  removeJournal(id: $id) {
+    id
+    tranNumber
+  }
+}
+    `;
 export const RunTillerSheetTransDocument = gql`
     mutation RunTillerSheetTrans($abortOnFirstMissing: Boolean!, $createPending: Boolean!) {
   runTillerSheetTrans(
@@ -3795,6 +3843,15 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
 		},
 		UpdateBook(variables: UpdateBookMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<UpdateBookMutation> {
 			return withWrapper((wrappedRequestHeaders) => client.request<UpdateBookMutation>({ document: UpdateBookDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'UpdateBook', 'mutation', variables);
+		},
+		CreateNewJournal(variables: CreateNewJournalMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<CreateNewJournalMutation> {
+			return withWrapper((wrappedRequestHeaders) => client.request<CreateNewJournalMutation>({ document: CreateNewJournalDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'CreateNewJournal', 'mutation', variables);
+		},
+		EditJournalRecord(variables: EditJournalRecordMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<EditJournalRecordMutation> {
+			return withWrapper((wrappedRequestHeaders) => client.request<EditJournalRecordMutation>({ document: EditJournalRecordDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'EditJournalRecord', 'mutation', variables);
+		},
+		DelJournalId(variables: DelJournalIdMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<DelJournalIdMutation> {
+			return withWrapper((wrappedRequestHeaders) => client.request<DelJournalIdMutation>({ document: DelJournalIdDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'DelJournalId', 'mutation', variables);
 		},
 		RunTillerSheetTrans(variables: RunTillerSheetTransMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<RunTillerSheetTransMutation> {
 			return withWrapper((wrappedRequestHeaders) => client.request<RunTillerSheetTransMutation>({ document: RunTillerSheetTransDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'RunTillerSheetTrans', 'mutation', variables);
