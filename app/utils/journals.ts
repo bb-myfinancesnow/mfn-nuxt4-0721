@@ -1,4 +1,5 @@
 import z from 'zod';
+import { SourceType, type JournalCreateInput, type JournalEntryInput } from '~/generated/graphql';
 
 export const JournalRecInfoSchema = z.object({
 	id: z.string(),
@@ -47,13 +48,13 @@ export const JournalLineCreateSchema = z.object({
 	entityId: z.coerce.number().int().optional().nullable()
 });
 
-export type TJournalLineCreateInput = z.output<typeof JournalLineCreateSchema>;
+export type TJournalLineCreateSchema = z.output<typeof JournalLineCreateSchema>;
 
 export const UpdateJournalLineSchema = JournalLineCreateSchema.extend({
 	id: z.number().int().optional()
 });
 
-export type TUpdateJournalLineInput = z.output<typeof UpdateJournalLineSchema>;
+export type TUpdateJournalLineSchema = z.output<typeof UpdateJournalLineSchema>;
 
 export const JournalCreateSchema = z.object({
 	description: z.string().min(3, {
@@ -81,7 +82,7 @@ export const JournalCreateSchema = z.object({
 		})
 });
 
-export type TJournalCreateInput = z.infer<typeof JournalCreateSchema>;
+export type TJournalCreateSchema = z.infer<typeof JournalCreateSchema>;
 
 export const UpdateJournalInputSchema = z.object({
 	description: z.string().min(3, {
@@ -109,4 +110,30 @@ export const UpdateJournalInputSchema = z.object({
 		})
 });
 
-export type TUpdateJournalInput = z.infer<typeof UpdateJournalInputSchema>;
+export type TUpdateJournalInputSchema = z.infer<typeof UpdateJournalInputSchema>;
+
+export const journalLineToEntryInput = (
+	line: TJournalLineCreateSchema
+): JournalEntryInput => {
+	const { debit, credit, ...rest } = line;
+	const baseAmount = roundToHundreths(debit - credit);
+
+	return {
+		...rest,
+		amount: Math.abs(Math.round(baseAmount * 100)),
+		isDebit: baseAmount >= 0
+	};
+};
+
+export const formToJournalCreateInput = async (
+	input: TJournalCreateSchema
+): Promise<JournalCreateInput> => {
+	const { inputLines, ...header } = input;
+
+	const entries = inputLines.map((l) => journalLineToEntryInput(l));
+	return {
+		...header,
+		tranSource: SourceType.Ui,
+		entries
+	};
+};

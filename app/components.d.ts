@@ -18,6 +18,7 @@ declare module 'vue' {
     PMultiSelect: typeof import('primevue/multiselect')['default']
     PPickList: typeof import('primevue/picklist')['default']
     PProgressSpinner: typeof import('primevue/progressspinner')['default']
+    PSelect: typeof import('primevue/select')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
