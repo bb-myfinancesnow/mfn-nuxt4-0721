@@ -26,26 +26,26 @@ export const getAccountTypeClassColor = (input: AccountTypeClass | string | unde
 	}
 };
 
-export const getSourceTypeColor = (input: SourceType):	| 'error'
-	| 'primary'
-	| 'secondary'
-	| 'success'
-	| 'info'
-	| 'warning'
-	| 'neutral' => {
-	switch (input) {
-		case SourceType.Auto:
-			return 'info';
-		case SourceType.Import:
-			return 'warning';
-		case SourceType.Tiller:
-			return 'success';
-		case SourceType.Ui:
-			return 'secondary';
-		default:
-			return 'neutral';
-	}
-};
+// export const getSourceTypeColor = (input: SourceType):	| 'error'
+// 	| 'primary'
+// 	| 'secondary'
+// 	| 'success'
+// 	| 'info'
+// 	| 'warning'
+// 	| 'neutral' => {
+// 	switch (input) {
+// 		case SourceType.Auto:
+// 			return 'info';
+// 		case SourceType.Import:
+// 			return 'warning';
+// 		case SourceType.Tiller:
+// 			return 'success';
+// 		case SourceType.Ui:
+// 			return 'secondary';
+// 		default:
+// 			return 'neutral';
+// 	}
+// };
 
 export const LedgerPeriodInfoSchema = z.object({
 	id: z.number().int(),

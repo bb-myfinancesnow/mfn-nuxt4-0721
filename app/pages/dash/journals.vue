@@ -1,5 +1,11 @@
 <script lang="ts" setup>
-import type { NavigationMenuItem } from '@nuxt/ui';
+import type { DropdownMenuItem, NavigationMenuItem } from '@nuxt/ui';
+
+const route = useRoute();
+
+const toolbarDisabled = computed(() => {
+	return route.fullPath.startsWith('/dash/journals/record');
+});
 
 const links = [
 	[
@@ -27,6 +33,15 @@ const links = [
 		}
 	]
 ] satisfies NavigationMenuItem[][];
+
+const items = [[{
+	label: 'New mail',
+	icon: 'i-lucide-send'
+}, {
+	label: 'New Journal',
+	icon: 'i-lucide-clipboard-plus',
+	to: '/dash/journals/record/create'
+}]] satisfies DropdownMenuItem[][];
 </script>
 
 <template>
@@ -38,6 +53,17 @@ const links = [
 			<UDashboardNavbar title="Journals">
 				<template #leading>
 					<UDashboardSidebarCollapse />
+				</template>
+
+				<template #right>
+					<UDropdownMenu :items="items">
+						<UButton
+							:disabled="toolbarDisabled"
+							icon="i-lucide-plus"
+							size="md"
+							class="rounded-full"
+						/>
+					</UDropdownMenu>
 				</template>
 			</UDashboardNavbar>
 
@@ -52,6 +78,8 @@ const links = [
 		</template>
 
 		<template #body>
+			<!-- <div>Record Check: {{ String(toolbarDisabled) }}</div> -->
+			<div>{{ route.fullPath }}</div>
 			<!-- <div
 				class="flex flex-col gap-4 sm:gap-6 lg:gap-12 w-full lg:max-w-2xl mx-auto"
 			>

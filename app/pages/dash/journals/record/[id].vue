@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { JournalsEntryDetailTable } from '#components';
 import type { TabsItem } from '@nuxt/ui';
 
 const route = useRoute();

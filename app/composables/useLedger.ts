@@ -118,7 +118,7 @@ export const useLedger = () => {
 					QueryJournalFormInputsQueryVariables
 				>(QueryJournalFormInputsDocument, variables),
 			{
-				transform: (input) => {
+				transform: (input): TGetJournalFormInputSchema => {
 					return GetJournalFormInputSchema.parse(input);
 				}
 
