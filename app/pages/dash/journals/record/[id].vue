@@ -3,7 +3,7 @@ import type { TabsItem } from '@nuxt/ui';
 
 const route = useRoute();
 
-const { getJournalPageRecord } = useJournals();
+const { getJournalPageRecord, deleteJournalIdMutation } = useJournals();
 const toast = useToast();
 const confirm = useConfirm();
 
@@ -115,15 +115,20 @@ const deleteConfirmDialog = () => {
 			outlined: true
 		},
 		acceptProps: {
-			label: 'Save'
+			label: 'Delete',
+			severity: 'danger'
 		},
-		accept: () => {
+		accept: async () => {
 			toast.add({
 				title: 'Confirmed',
 				description: 'Confirm Delete',
 				color: 'error',
 				duration: 5000
 			});
+
+			if (tranData.value) {
+				await runDelJournal(tranData.value.id);
+			}
 		},
 		reject: () => {
 			toast.add({
@@ -134,6 +139,24 @@ const deleteConfirmDialog = () => {
 			});
 		}
 	});
+};
+
+const runDelJournal = async (id: string) => {
+	isLoading.value = true;
+	console.log(`rundeljournal id: ${id}`);
+	await new Promise((r) => setTimeout(r, 2000));
+
+	try {
+		const res = await deleteJournalIdMutation({ id });
+		console.log(`form res: ${JSON.stringify(res, null, 2)}`);
+		await new Promise((r) => setTimeout(r, 2000));
+		await navigateTo({ path: '/dash/journals/list' });
+		isLoading.value = false;
+	} catch (e) {
+		console.error(`error submit: ${e}`);
+		await new Promise((r) => setTimeout(r, 2000));
+		isLoading.value = false;
+	}
 };
 </script>
 
@@ -278,7 +301,7 @@ const deleteConfirmDialog = () => {
 				</div>
 			</UPageCard>
 		</UPageGrid>
-		<DisplaySpinner v-if="!tranData || pending" />
+		<DisplaySpinner v-if="!tranData || pending || isLoading" />
 		<UTabs
 			v-else
 			:items="items"
