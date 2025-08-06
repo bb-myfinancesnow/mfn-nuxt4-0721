@@ -112,17 +112,10 @@ const getEntityLabel = (id: number | null | undefined): string => {
 	return '';
 };
 
-const state = reactive<Partial<TJournalCreateSchema>>({
+const state = ref<Partial<TJournalCreateSchema>>({
 	description: '',
 	tranDate: new Date(),
-	inputLines: [
-		// {
-		// 	memo: '',
-		// 	glAccountNumber: 10001,
-		// 	debit: 0,
-		// 	credit: 0
-		// }
-	]
+	inputLines: []
 });
 
 const validate = (state: Partial<TJournalCreateSchema>): FormError[] => {
@@ -146,7 +139,7 @@ const onRowEditSave = (
 	const { newData, index } = event;
 	const editedNewData = newData;
 
-	if (state && state.inputLines) {
+	if (state.value && state.value.inputLines) {
 		const editedDebit = newData.debit;
 		const editedCredit = newData.credit;
 
@@ -163,21 +156,21 @@ const onRowEditSave = (
 			editedNewData.credit = -1 * editedAmount;
 		}
 
-		state.inputLines[index] = editedNewData;
+		state.value.inputLines[index] = editedNewData;
 	}
 };
 
 const addEntryRow = () => {
-	if (state && state.inputLines) {
-		const debitTotal = sumValuesByProperty(state.inputLines, 'debit');
-		const creditTotal = sumValuesByProperty(state.inputLines, 'credit');
+	if (state.value && state.value.inputLines) {
+		const debitTotal = sumValuesByProperty(state.value.inputLines, 'debit');
+		const creditTotal = sumValuesByProperty(state.value.inputLines, 'credit');
 
 		const variance = roundToHundreths(debitTotal - creditTotal);
 
 		const debit: number = variance < 0 ? Math.abs(variance) : 0;
 		const credit: number = variance > 0 ? variance : 0;
 
-		state.inputLines.push({
+		state.value.inputLines.push({
 			memo: '',
 			glAccountNumber: 0,
 			debit,
@@ -187,14 +180,22 @@ const addEntryRow = () => {
 };
 
 const removeLineAtIndex = (index: number) => {
-	if (index >= 0 && state.inputLines && index < state.inputLines.length) {
-		state.inputLines.splice(index, 1);
+	if (index >= 0 && state.value.inputLines && index < state.value.inputLines.length) {
+		state.value.inputLines.splice(index, 1);
 	}
 };
 
 const resetFormVals = async () => {
 	isLoading.value = true;
 	await new Promise((r) => setTimeout(r, 2000));
+	state.value = {
+		description: '',
+		tranDate: new Date(),
+		inputLines: []
+	};
+	if (form.value) {
+		form.value.errors = [];
+	}
 
 	isLoading.value = false;
 };
@@ -212,9 +213,9 @@ async function onSubmit(event: FormSubmitEvent<TJournalCreateSchema>) {
 }
 
 const tranDatePeriod = computed<TReportPeriodSchema>(() => {
-	if (state.tranDate && ledgerData.value && ledgerData.value.periods) {
-		const postingMonth = state.tranDate.getMonth();
-		const postingYear = state.tranDate.getFullYear();
+	if (state.value.tranDate && ledgerData.value && ledgerData.value.periods) {
+		const postingMonth = state.value.tranDate.getMonth();
+		const postingYear = state.value.tranDate.getFullYear();
 
 		const lookup = ledgerData.value.periods.find(
 			(p) => p.month === postingMonth && p.year === postingYear
@@ -241,12 +242,12 @@ const tranDatePeriod = computed<TReportPeriodSchema>(() => {
 });
 
 watch(
-	() => state.reversalDate,
+	() => state.value.reversalDate,
 	(newRev, oldRev) => {
 		console.log(`state's reversalDate changed from ${oldRev} to ${newRev}`);
 
 		if (oldRev !== null && newRev === null) {
-			state.reversalDate = undefined;
+			state.value.reversalDate = undefined;
 		}
 	}
 );
