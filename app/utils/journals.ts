@@ -1,5 +1,5 @@
 import z from 'zod';
-import { SourceType, type JournalCreateInput, type JournalEntryInput } from '~/generated/graphql';
+import { RecurrenceFrequency, SourceType, Weekday, type JournalCreateInput, type JournalEntryInput } from '~/generated/graphql';
 
 export const JournalRecInfoSchema = z.object({
 	id: z.string(),
@@ -137,3 +137,26 @@ export const formToJournalCreateInput = async (
 		entries
 	};
 };
+
+export const TranSchedRecordSchema = BaseIntIdDatesSchema.extend({
+	name: z.string(),
+	dayOfMonth: z.coerce.number().int().nullable(),
+	dayOfWeek: z.nativeEnum(Weekday).nullable(),
+	frequency: z.nativeEnum(RecurrenceFrequency),
+	interval: z.coerce.number().int(),
+	isActive: z.coerce.boolean(),
+	startDate: z.coerce.date(),
+	endDate: z.coerce.date().nullable(),
+	templateJournalId: z.string(),
+	_count: z.object({
+		scheduleLogs: z.number()
+	}),
+	templateJournal: z.object({
+		id: z.string(),
+		tranNumber: z.coerce.number().int(),
+		tranDate: z.coerce.date(),
+		bookId: z.number().int().nullable()
+	})
+});
+
+export type TTranSchedRecordSchema = z.infer<typeof TranSchedRecordSchema>;
