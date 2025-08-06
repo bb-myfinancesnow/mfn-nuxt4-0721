@@ -196,6 +196,7 @@ const resetFormVals = async () => {
 	if (form.value) {
 		form.value.errors = [];
 	}
+	editingRows.value = [];
 
 	isLoading.value = false;
 };
@@ -217,11 +218,13 @@ async function onSubmit(event: FormSubmitEvent<TJournalCreateSchema>) {
 		const res = await createJournalMutation({ data: mutationData });
 		console.log(`form res: ${JSON.stringify(res, null, 2)}`);
 		await new Promise((r) => setTimeout(r, 2000));
+		await navigateTo({ path: '/dash/journals/list' });
+		isLoading.value = false;
 	} catch (e) {
 		console.error(`error submit: ${e}`);
 		await new Promise((r) => setTimeout(r, 2000));
+		isLoading.value = false;
 	}
-	isLoading.value = false;
 }
 
 const tranDatePeriod = computed<TReportPeriodSchema>(() => {
@@ -291,7 +294,7 @@ watch(
 						label="Save Record"
 						color="neutral"
 						type="submit"
-						:disabled="isLoading"
+						:disabled="isLoading|| editingRows.length>0"
 						:loading="isLoading"
 					/>
 					<UButton
@@ -396,7 +399,7 @@ watch(
 									icon="pi pi-plus"
 									rounded
 									raised
-									:disabled="ledgerDataPending || isLoading"
+									:disabled="ledgerDataPending || isLoading || editingRows.length>0"
 									:loading="isLoading"
 									@click="addEntryRow"
 								/>
@@ -513,7 +516,7 @@ watch(
 									:label="String(index)"
 									icon="i-lucide-x"
 									color="error"
-									:disabled="ledgerDataPending || isLoading"
+									:disabled="ledgerDataPending || isLoading || editingRows.length>0"
 									:loading="isLoading"
 									@click="() => removeLineAtIndex(index)"
 								/>
@@ -524,21 +527,25 @@ watch(
 				</UFormField>
 			</UPageCard>
 			<UPageCard title="Vals">
-				<div class="grid lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
+				<div class="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-px">
+					<div>
+						ledgerDataPending: {{ String(ledgerDataPending) }}
+					</div>
 					<div>
 						state:
 						<pre>{{ state }}</pre>
+					</div>
+					<div>
+						formerrors:
+						<pre>{{ form?.errors }}</pre>
 					</div>
 					<div>
 						tranDatePeriod:
 						<pre>{{ tranDatePeriod }}</pre>
 					</div>
 					<div>
-						ledgerDataPending: {{ String(ledgerDataPending) }}
-					</div>
-					<div>
-						tranDatePeriod:
-						<pre>{{ form?.errors }}</pre>
+						editingRows:
+						<pre>{{ editingRows }}</pre>
 					</div>
 				</div>
 			</UPageCard>
