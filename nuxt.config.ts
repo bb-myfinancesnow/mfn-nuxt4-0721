@@ -140,7 +140,8 @@ export default defineNuxtConfig({
 				'StepItem',
 				'Step',
 				'StepPanel',
-				'ProgressSpinner'
+				'ProgressSpinner',
+				'ConfirmDialog'
 			],
 			prefix: 'P'
 		},

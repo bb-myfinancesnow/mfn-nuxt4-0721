@@ -1,9 +1,12 @@
 import {
 	CreateNewJournalDocument,
+	DelJournalIdDocument,
 	GetJournalPageRecordDocument,
 	SearchJournalDetailsDocument,
 	type CreateNewJournalMutation,
 	type CreateNewJournalMutationVariables,
+	type DelJournalIdMutation,
+	type DelJournalIdMutationVariables,
 	type GetJournalPageRecordQuery,
 	type GetJournalPageRecordQueryVariables,
 	type SearchJournalDetailsQuery,
@@ -69,9 +72,19 @@ export const useJournals = () => {
 		>(CreateNewJournalDocument, variables);
 	};
 
+	const deleteJournalIdMutation = (
+		variables: DelJournalIdMutationVariables
+	) => {
+		return request<DelJournalIdMutation, DelJournalIdMutationVariables>(
+			DelJournalIdDocument,
+			variables
+		);
+	};
+
 	return {
 		searchJournalHeaderDetails,
 		getJournalPageRecord,
-		createJournalMutation
+		createJournalMutation,
+		deleteJournalIdMutation
 	};
 };

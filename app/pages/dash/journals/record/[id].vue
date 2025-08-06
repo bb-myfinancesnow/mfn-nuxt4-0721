@@ -4,6 +4,8 @@ import type { TabsItem } from '@nuxt/ui';
 const route = useRoute();
 
 const { getJournalPageRecord } = useJournals();
+const toast = useToast();
+const confirm = useConfirm();
 
 const isLoading = ref(false);
 
@@ -101,6 +103,38 @@ const editTooltipText = computed<string>(() => {
 		return `Loading Data`;
 	}
 });
+
+const deleteConfirmDialog = () => {
+	confirm.require({
+		message: `Are you sure you want to delete this journal?`,
+		header: 'Confirm Delete',
+		icon: 'pi pi-exclamation-triangle',
+		rejectProps: {
+			label: 'Cancel',
+			severity: 'secondary',
+			outlined: true
+		},
+		acceptProps: {
+			label: 'Save'
+		},
+		accept: () => {
+			toast.add({
+				title: 'Confirmed',
+				description: 'Confirm Delete',
+				color: 'error',
+				duration: 5000
+			});
+		},
+		reject: () => {
+			toast.add({
+				title: 'Rejected',
+				description: 'Reject Delete',
+				color: 'info',
+				duration: 5000
+			});
+		}
+	});
+};
 </script>
 
 <template>
@@ -110,6 +144,7 @@ const editTooltipText = computed<string>(() => {
 			v-else
 			class="grid-cols-3 gap-4"
 		>
+			<PConfirmDialog />
 			<UPageCard
 				:title="headerTitle"
 				class="col-span-3 mb-4"
@@ -141,6 +176,7 @@ const editTooltipText = computed<string>(() => {
 									|| deleteTooltipText !== 'Delete Journal'
 							"
 							:loading="pending || isLoading"
+							@click="() => deleteConfirmDialog()"
 						/>
 					</UTooltip>
 				</UButtonGroup>
