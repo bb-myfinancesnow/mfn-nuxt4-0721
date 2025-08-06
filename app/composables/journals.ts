@@ -1,6 +1,9 @@
 import {
+	CreateNewJournalDocument,
 	GetJournalPageRecordDocument,
 	SearchJournalDetailsDocument,
+	type CreateNewJournalMutation,
+	type CreateNewJournalMutationVariables,
 	type GetJournalPageRecordQuery,
 	type GetJournalPageRecordQueryVariables,
 	type SearchJournalDetailsQuery,
@@ -38,10 +41,16 @@ export const useJournals = () => {
 		);
 	};
 
-	const getJournalPageRecord = (variables: GetJournalPageRecordQueryVariables) => {
+	const getJournalPageRecord = (
+		variables: GetJournalPageRecordQueryVariables
+	) => {
 		return useLazyAsyncData(
 			`getJournalPageRecord-${JSON.stringify(variables)}`,
-			() => request<GetJournalPageRecordQuery, GetJournalPageRecordQueryVariables>(GetJournalPageRecordDocument, variables),
+			() =>
+				request<
+					GetJournalPageRecordQuery,
+					GetJournalPageRecordQueryVariables
+				>(GetJournalPageRecordDocument, variables),
 			{
 				transform: (input): TJournalPageRecordSchema => {
 					const parsed = JournalPageRecordSchema.parse(input.journal);
@@ -51,8 +60,18 @@ export const useJournals = () => {
 		);
 	};
 
+	const createJournalMutation = (
+		variables: CreateNewJournalMutationVariables
+	) => {
+		return request<
+			CreateNewJournalMutation,
+			CreateNewJournalMutationVariables
+		>(CreateNewJournalDocument, variables);
+	};
+
 	return {
 		searchJournalHeaderDetails,
-		getJournalPageRecord
+		getJournalPageRecord,
+		createJournalMutation
 	};
 };

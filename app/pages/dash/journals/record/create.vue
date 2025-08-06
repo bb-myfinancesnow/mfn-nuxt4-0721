@@ -8,7 +8,7 @@ const toast = useToast();
 const form = useTemplateRef('form');
 
 const { queryLedgerInputs } = useLedger();
-
+const { createJournalMutation } = useJournals();
 const isLoading = ref(false);
 
 const { data: ledgerData, pending: ledgerDataPending }
@@ -203,12 +203,24 @@ const resetFormVals = async () => {
 async function onSubmit(event: FormSubmitEvent<TJournalCreateSchema>) {
 	isLoading.value = true;
 	toast.add({
-		title: 'Success',
+		title: 'Submitted',
 		description: 'The form has been submitted.',
-		color: 'success'
+		color: 'info'
 	});
 	console.log(event.data);
 	await new Promise((r) => setTimeout(r, 2000));
+
+	const mutationData = await formToJournalCreateInput(event.data);
+	console.log(`form mutationData: ${JSON.stringify(mutationData, null, 2)}`);
+
+	try {
+		const res = await createJournalMutation({ data: mutationData });
+		console.log(`form res: ${JSON.stringify(res, null, 2)}`);
+		await new Promise((r) => setTimeout(r, 2000));
+	} catch (e) {
+		console.error(`error submit: ${e}`);
+		await new Promise((r) => setTimeout(r, 2000));
+	}
 	isLoading.value = false;
 }
 
