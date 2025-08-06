@@ -9,6 +9,8 @@ const form = useTemplateRef('form');
 
 const { queryLedgerInputs } = useLedger();
 
+const isLoading = ref(false);
+
 const { data: ledgerData, pending: ledgerDataPending }
 	= await queryLedgerInputs({
 		periodWhere: {
@@ -98,10 +100,12 @@ const getAccountLabel = (num: number): string => {
 };
 
 const getEntityLabel = (id: number | null | undefined): string => {
-	if (typeof id === 'number' && ledgerData.value && ledgerData.value.entities) {
-		const found = ledgerData.value.entities.find(
-			(e) => e.id === id
-		);
+	if (
+		typeof id === 'number'
+		&& ledgerData.value
+		&& ledgerData.value.entities
+	) {
+		const found = ledgerData.value.entities.find((e) => e.id === id);
 
 		if (found) return `${found.id}-${found.name}`;
 	}
@@ -112,12 +116,12 @@ const state = reactive<Partial<TJournalCreateSchema>>({
 	description: '',
 	tranDate: new Date(),
 	inputLines: [
-		{
-			memo: '',
-			glAccountNumber: 10001,
-			debit: 0,
-			credit: 0
-		}
+		// {
+		// 	memo: '',
+		// 	glAccountNumber: 10001,
+		// 	debit: 0,
+		// 	credit: 0
+		// }
 	]
 });
 
@@ -126,14 +130,19 @@ const validate = (state: Partial<TJournalCreateSchema>): FormError[] => {
 
 	if (state.tranDate && state.reversalDate) {
 		if (isBefore(state.reversalDate, state.tranDate)) {
-			errors.push({ name: 'reversalDate', message: 'Reversal Date must be after Posting' });
+			errors.push({
+				name: 'reversalDate',
+				message: 'Reversal Date must be after Posting'
+			});
 		}
 	}
 
 	return errors;
 };
 
-const onRowEditSave = (event: DataTableRowEditSaveEvent<TJournalLineCreateSchema>) => {
+const onRowEditSave = (
+	event: DataTableRowEditSaveEvent<TJournalLineCreateSchema>
+) => {
 	const { newData, index } = event;
 	const editedNewData = newData;
 
@@ -160,11 +169,19 @@ const onRowEditSave = (event: DataTableRowEditSaveEvent<TJournalLineCreateSchema
 
 const addEntryRow = () => {
 	if (state && state.inputLines) {
+		const debitTotal = sumValuesByProperty(state.inputLines, 'debit');
+		const creditTotal = sumValuesByProperty(state.inputLines, 'credit');
+
+		const variance = roundToHundreths(debitTotal - creditTotal);
+
+		const debit: number = variance < 0 ? Math.abs(variance) : 0;
+		const credit: number = variance > 0 ? variance : 0;
+
 		state.inputLines.push({
 			memo: '',
 			glAccountNumber: 0,
-			debit: 0,
-			credit: 0
+			debit,
+			credit
 		});
 	}
 };
@@ -174,13 +191,24 @@ const removeLineAtIndex = (index: number) => {
 		state.inputLines.splice(index, 1);
 	}
 };
+
+const resetFormVals = async () => {
+	isLoading.value = true;
+	await new Promise((r) => setTimeout(r, 2000));
+
+	isLoading.value = false;
+};
+
 async function onSubmit(event: FormSubmitEvent<TJournalCreateSchema>) {
+	isLoading.value = true;
 	toast.add({
 		title: 'Success',
 		description: 'The form has been submitted.',
 		color: 'success'
 	});
 	console.log(event.data);
+	await new Promise((r) => setTimeout(r, 2000));
+	isLoading.value = false;
 }
 
 const tranDatePeriod = computed<TReportPeriodSchema>(() => {
@@ -212,13 +240,16 @@ const tranDatePeriod = computed<TReportPeriodSchema>(() => {
 	};
 });
 
-watch(() => state.reversalDate, (newRev, oldRev) => {
-	console.log(`state's reversalDate changed from ${oldRev} to ${newRev}`);
+watch(
+	() => state.reversalDate,
+	(newRev, oldRev) => {
+		console.log(`state's reversalDate changed from ${oldRev} to ${newRev}`);
 
-	if (oldRev !== null && newRev === null) {
-		state.reversalDate = undefined;
+		if (oldRev !== null && newRev === null) {
+			state.reversalDate = undefined;
+		}
 	}
-});
+);
 </script>
 
 <template>
@@ -241,13 +272,25 @@ watch(() => state.reversalDate, (newRev, oldRev) => {
 				orientation="horizontal"
 				class="mb-4"
 			>
-				<UButton
-					form="createjournal"
-					label="Save Record"
-					color="neutral"
-					type="submit"
-					class="w-fit lg:ms-auto"
-				/>
+				<div class="grid grid-cols-1 w-fit lg:ms-auto">
+					<UButton
+						form="createjournal"
+						label="Save Record"
+						color="neutral"
+						type="submit"
+						:disabled="isLoading"
+						:loading="isLoading"
+					/>
+					<UButton
+						form="createjournal"
+						label="Reset Journal"
+						color="error"
+						type="reset"
+						:disabled="isLoading"
+						:loading="isLoading"
+						@click="resetFormVals"
+					/>
+				</div>
 			</UPageCard>
 			<UPageCard variant="subtle">
 				<div class="grid grid-cols-4 gap-2 gap-x-8 py-2">
@@ -258,6 +301,8 @@ watch(() => state.reversalDate, (newRev, oldRev) => {
 						<USelect
 							v-model="state.bookId"
 							:items="bookOptions"
+							:disabled="isLoading"
+							:loading="isLoading"
 							class="w-full"
 						/>
 					</UFormField>
@@ -270,6 +315,8 @@ watch(() => state.reversalDate, (newRev, oldRev) => {
 						<UInput
 							v-model="state.description"
 							placeholder="Enter a header description"
+							:disabled="isLoading"
+							:loading="isLoading"
 							class="w-7/8"
 						/>
 					</UFormField>
@@ -282,6 +329,7 @@ watch(() => state.reversalDate, (newRev, oldRev) => {
 							v-model:model-value="state.tranDate"
 							:min-date="startFirstPeriod"
 							:max-date="endLastPeriod"
+							:disabled="isLoading"
 						/>
 					</UFormField>
 					<UFormField label="Posting Period">
@@ -308,7 +356,7 @@ watch(() => state.reversalDate, (newRev, oldRev) => {
 							v-model:model-value="state.reversalDate"
 							:min-date="state.tranDate ?? startFirstPeriod"
 							:max-date="endLastPeriod"
-							:disabled="!state.tranDate"
+							:disabled="!state.tranDate || isLoading"
 							:default-value="undefined"
 						/>
 					</UFormField>
@@ -335,7 +383,8 @@ watch(() => state.reversalDate, (newRev, oldRev) => {
 									icon="pi pi-plus"
 									rounded
 									raised
-									:disabled="ledgerDataPending"
+									:disabled="ledgerDataPending || isLoading"
+									:loading="isLoading"
 									@click="addEntryRow"
 								/>
 							</div>
@@ -356,6 +405,7 @@ watch(() => state.reversalDate, (newRev, oldRev) => {
 									:options="ledgerData.glAccounts"
 									option-label="accountLabel"
 									option-value="accountNumber"
+									:disabled="ledgerDataPending || isLoading"
 								/>
 							</template>
 							<template #body="slotProps">
@@ -366,7 +416,10 @@ watch(() => state.reversalDate, (newRev, oldRev) => {
 								}}</span>
 							</template>
 						</PColumn>
-						<PColumn header="Debit" field="debit">
+						<PColumn
+							header="Debit"
+							field="debit"
+						>
 							<template #editor="{ data, field }">
 								<PInputNumber
 									v-model="data[field]"
@@ -375,7 +428,7 @@ watch(() => state.reversalDate, (newRev, oldRev) => {
 									locale="en-US"
 									:min-fraction-digits="2"
 									:max-fraction-digits="2"
-
+									:disabled="ledgerDataPending || isLoading"
 									fluid
 								/>
 							</template>
@@ -383,7 +436,10 @@ watch(() => state.reversalDate, (newRev, oldRev) => {
 								{{ formatCurrency(slotProps.data.debit) }}
 							</template>
 						</PColumn>
-						<PColumn header="Credit" field="credit">
+						<PColumn
+							header="Credit"
+							field="credit"
+						>
 							<template #editor="{ data, field }">
 								<PInputNumber
 									v-model="data[field]"
@@ -392,7 +448,7 @@ watch(() => state.reversalDate, (newRev, oldRev) => {
 									locale="en-US"
 									:min-fraction-digits="2"
 									:max-fraction-digits="2"
-
+									:disabled="ledgerDataPending || isLoading"
 									fluid
 								/>
 							</template>
@@ -400,20 +456,22 @@ watch(() => state.reversalDate, (newRev, oldRev) => {
 								{{ formatCurrency(slotProps.data.credit) }}
 							</template>
 						</PColumn>
-						<PColumn field="entityId" header="Entity">
+						<PColumn
+							field="entityId"
+							header="Entity"
+						>
 							<template #editor="{ data, field }">
 								<PSelect
 									v-model="data[field]"
 									:options="entityOptions"
 									option-label="label"
 									option-value="value"
+									:disabled="ledgerDataPending || isLoading"
 								/>
 							</template>
 							<template #body="slotProps">
 								<span>{{
-									getEntityLabel(
-										slotProps.data.entityId
-									)
+									getEntityLabel(slotProps.data.entityId)
 								}}</span>
 							</template>
 						</PColumn>
@@ -421,8 +479,16 @@ watch(() => state.reversalDate, (newRev, oldRev) => {
 							field="memo"
 							header="Memo"
 						>
-							<template #editor="{ data, field }">
-								<UInput v-model="data[field]" />
+							<template #editor="{ data, field, index }">
+								<UFormField :name="`inputLines.${index}.memo`">
+									<UInput
+										v-model="data[field]"
+										:disabled="
+											ledgerDataPending || isLoading
+										"
+										:loading="isLoading"
+									/>
+								</UFormField>
 							</template>
 						</PColumn>
 						<PColumn
@@ -434,6 +500,8 @@ watch(() => state.reversalDate, (newRev, oldRev) => {
 									:label="String(index)"
 									icon="i-lucide-x"
 									color="error"
+									:disabled="ledgerDataPending || isLoading"
+									:loading="isLoading"
 									@click="() => removeLineAtIndex(index)"
 								/>
 								<!-- <UBadge :label="index" icon="i-lucide-x" color="error" /> -->
