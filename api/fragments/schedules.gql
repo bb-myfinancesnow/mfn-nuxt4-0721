@@ -1,0 +1,23 @@
+fragment TranScheduleRecord on TranSchedule {
+	id
+	createdAt
+	updatedAt
+	name
+	dayOfMonth
+	dayOfWeek
+	frequency
+	interval
+	isActive
+	startDate
+	endDate
+	templateJournalId
+	templateJournal {
+		bookId
+		id
+		tranNumber
+		tranDate
+	}
+	_count {
+		scheduleLogs
+	}
+}

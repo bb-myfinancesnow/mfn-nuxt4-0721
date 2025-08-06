@@ -1,0 +1,46 @@
+mutation NewTranSched(
+	$templateJournalId: String!
+	$dto: TranScheduleCreateInput!
+	$genToDate: DateTime
+) {
+	createTranSchedule(
+		templateJournalId: $templateJournalId
+		dto: $dto
+		genToDate: $genToDate
+	) {
+		id
+		name
+		_count {
+			scheduleLogs
+		}
+	}
+}
+
+mutation TranSchedGenLogDates(
+	$generateUpToDate: DateTime!
+	$where: TranScheduleWhereInput!
+) {
+	genLogDates(generateUpToDate: $generateUpToDate, where: $where) {
+		count
+	}
+}
+
+mutation GenTranScheduleLogJournal($where: TranScheduleLogWhereUniqueInput!) {
+	genScheduleLogJournal(where: $where) {
+		errorMessage
+		id
+		scheduleDate
+		scheduleIndex
+		status
+		templateId
+	}
+}
+
+mutation BulkUpdateTranScheduleLogs(
+	$data: TranScheduleLogUpdateManyMutationInput!
+	$where: TranScheduleLogWhereInput!
+) {
+	bulkUpdateScheduleLogs(data: $data, where: $where) {
+		count
+	}
+}

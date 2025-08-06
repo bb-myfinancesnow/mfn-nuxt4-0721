@@ -2996,6 +2996,8 @@ export type ReportEntryDataFragment = { id: number; amount: number; glAccountNum
 
 export type ReportJournalDataFragment = { id: string; tranDate: string; tranNumber: number; bookId?: number | null; entries?: Array<ReportEntryDataFragment> | null };
 
+export type TranScheduleRecordFragment = { id: number; createdAt: string; updatedAt: string; name: string; dayOfMonth?: number | null; dayOfWeek?: Weekday | null; frequency: RecurrenceFrequency; interval: number; isActive: boolean; startDate: string; endDate?: string | null; templateJournalId: string; templateJournal: { bookId?: number | null; id: string; tranNumber: number; tranDate: string }; _count: { scheduleLogs: number } };
+
 export type BaseTillerCatInfoFragment = { id: number; name: string; type: TillerCategoryType; group: string; glAccountNumber?: number | null; _count: { tillerTrans: number } };
 
 export type TillerCatRecordFragment = { id: number; createdAt: string; updatedAt: string; name: string; type: TillerCategoryType; group: string; glAccountNumber?: number | null; _count: { tillerTrans: number }; glAccount?: GlAccInfoFragment | null };
@@ -3045,6 +3047,14 @@ export type DelJournalIdMutationVariables = Exact<{
 }>;
 
 export type DelJournalIdMutation = { removeJournal: { id: string; tranNumber: number } };
+
+export type NewTranSchedMutationVariables = Exact<{
+	templateJournalId: Scalars['String']['input'];
+	dto: TranScheduleCreateInput;
+	genToDate?: InputMaybe<Scalars['DateTime']['input']>;
+}>;
+
+export type NewTranSchedMutation = { createTranSchedule: { id: number; name: string; _count: { scheduleLogs: number } } };
 
 export type RunTillerSheetTransMutationVariables = Exact<{
 	abortOnFirstMissing: Scalars['Boolean']['input'];
@@ -3151,6 +3161,13 @@ export type SearchReportJournalsQueryVariables = Exact<{
 }>;
 
 export type SearchReportJournalsQuery = { journals: Array<ReportJournalDataFragment> };
+
+export type SearchTranScheduleRecordsQueryVariables = Exact<{
+	where?: InputMaybe<TranScheduleWhereInput>;
+	orderBy?: InputMaybe<Array<TranScheduleOrderByWithRelationInput> | TranScheduleOrderByWithRelationInput>;
+}>;
+
+export type SearchTranScheduleRecordsQuery = { tranSchedules: Array<TranScheduleRecordFragment> };
 
 export type GetSetupValsQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -3451,6 +3468,31 @@ export const ReportJournalDataFragmentDoc = gql`
   }
 }
     `;
+export const TranScheduleRecordFragmentDoc = gql`
+    fragment TranScheduleRecord on TranSchedule {
+  id
+  createdAt
+  updatedAt
+  name
+  dayOfMonth
+  dayOfWeek
+  frequency
+  interval
+  isActive
+  startDate
+  endDate
+  templateJournalId
+  templateJournal {
+    bookId
+    id
+    tranNumber
+    tranDate
+  }
+  _count {
+    scheduleLogs
+  }
+}
+    `;
 export const BaseTillerCatInfoFragmentDoc = gql`
     fragment BaseTillerCatInfo on TillerCategory {
   id
@@ -3571,6 +3613,21 @@ export const DelJournalIdDocument = gql`
   removeJournal(id: $id) {
     id
     tranNumber
+  }
+}
+    `;
+export const NewTranSchedDocument = gql`
+    mutation NewTranSched($templateJournalId: String!, $dto: TranScheduleCreateInput!, $genToDate: DateTime) {
+  createTranSchedule(
+    templateJournalId: $templateJournalId
+    dto: $dto
+    genToDate: $genToDate
+  ) {
+    id
+    name
+    _count {
+      scheduleLogs
+    }
   }
 }
     `;
@@ -3749,6 +3806,13 @@ export const SearchReportJournalsDocument = gql`
 }
     ${ReportJournalDataFragmentDoc}
 ${ReportEntryDataFragmentDoc}`;
+export const SearchTranScheduleRecordsDocument = gql`
+    query SearchTranScheduleRecords($where: TranScheduleWhereInput, $orderBy: [TranScheduleOrderByWithRelationInput!]) {
+  tranSchedules(where: $where, orderBy: $orderBy) {
+    ...TranScheduleRecord
+  }
+}
+    ${TranScheduleRecordFragmentDoc}`;
 export const GetSetupValsDocument = gql`
     query GetSetupVals {
   users {
@@ -3853,6 +3917,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
 		DelJournalId(variables: DelJournalIdMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<DelJournalIdMutation> {
 			return withWrapper((wrappedRequestHeaders) => client.request<DelJournalIdMutation>({ document: DelJournalIdDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'DelJournalId', 'mutation', variables);
 		},
+		NewTranSched(variables: NewTranSchedMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<NewTranSchedMutation> {
+			return withWrapper((wrappedRequestHeaders) => client.request<NewTranSchedMutation>({ document: NewTranSchedDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'NewTranSched', 'mutation', variables);
+		},
 		RunTillerSheetTrans(variables: RunTillerSheetTransMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<RunTillerSheetTransMutation> {
 			return withWrapper((wrappedRequestHeaders) => client.request<RunTillerSheetTransMutation>({ document: RunTillerSheetTransDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'RunTillerSheetTrans', 'mutation', variables);
 		},
@@ -3897,6 +3964,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
 		},
 		SearchReportJournals(variables?: SearchReportJournalsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchReportJournalsQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<SearchReportJournalsQuery>({ document: SearchReportJournalsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchReportJournals', 'query', variables);
+		},
+		SearchTranScheduleRecords(variables?: SearchTranScheduleRecordsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchTranScheduleRecordsQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<SearchTranScheduleRecordsQuery>({ document: SearchTranScheduleRecordsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchTranScheduleRecords', 'query', variables);
 		},
 		GetSetupVals(variables?: GetSetupValsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<GetSetupValsQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<GetSetupValsQuery>({ document: GetSetupValsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'GetSetupVals', 'query', variables);

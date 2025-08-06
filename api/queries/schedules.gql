@@ -1,0 +1,8 @@
+query SearchTranScheduleRecords(
+	$where: TranScheduleWhereInput
+	$orderBy: [TranScheduleOrderByWithRelationInput!]
+) {
+	tranSchedules(where: $where, orderBy: $orderBy) {
+		...TranScheduleRecord
+	}
+}
