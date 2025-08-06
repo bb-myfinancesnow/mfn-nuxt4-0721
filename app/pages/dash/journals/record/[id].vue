@@ -5,6 +5,8 @@ const route = useRoute();
 
 const { getJournalPageRecord } = useJournals();
 
+const isLoading = ref(false);
+
 if (!route.params.id) {
 	console.log(`must provide id`);
 }
@@ -14,6 +16,14 @@ const { data: tranData, pending } = await getJournalPageRecord({
 		id: Array.isArray(route.params.id)
 			? route.params.id[0]
 			: route.params.id
+	}
+});
+
+const headerTitle = computed<string>(() => {
+	if (tranData.value) {
+		return `Journal #${tranData.value.tranNumber}`;
+	} else {
+		return 'Journal #';
 	}
 });
 
@@ -63,6 +73,34 @@ const items = ref<TabsItem[]>([
 		slot: 'systeminfo' as const
 	}
 ]);
+
+const deleteTooltipText = computed<string>(() => {
+	if (tranData.value) {
+		if (tranData.value.postingPeriod.locked) {
+			return `Cannot Delete in Locked Period`;
+		} else if (tranData.value.reversalOf) {
+			return `Cannot Delete Reversal of Journal #${tranData.value.reversalOf.tranNumber}`;
+		} else {
+			return `Delete Journal`;
+		}
+	} else {
+		return `Loading Data`;
+	}
+});
+
+const editTooltipText = computed<string>(() => {
+	if (tranData.value) {
+		if (tranData.value.postingPeriod.locked) {
+			return `Cannot Edit in Locked Period`;
+		} else if (tranData.value.reversalOf) {
+			return `Cannot Edit Reversal of Journal #${tranData.value.reversalOf.tranNumber}`;
+		} else {
+			return `Edit Journal`;
+		}
+	} else {
+		return `Loading Data`;
+	}
+});
 </script>
 
 <template>
@@ -72,6 +110,41 @@ const items = ref<TabsItem[]>([
 			v-else
 			class="grid-cols-3 gap-4"
 		>
+			<UPageCard
+				:title="headerTitle"
+				class="col-span-3 mb-4"
+			>
+				<UButtonGroup
+					size="xl"
+					class="w-fit ms-auto align-top -mt-10"
+				>
+					<UTooltip :text="editTooltipText">
+						<UButton
+							icon="i-lucide-pencil-line"
+							color="info"
+							:disabled="
+								pending
+									|| isLoading
+									|| editTooltipText !== 'Edit Journal'
+							"
+							:loading="pending || isLoading"
+						/>
+					</UTooltip>
+
+					<UTooltip :text="deleteTooltipText">
+						<UButton
+							icon="i-lucide-trash-2"
+							color="error"
+							:disabled="
+								pending
+									|| isLoading
+									|| deleteTooltipText !== 'Delete Journal'
+							"
+							:loading="pending || isLoading"
+						/>
+					</UTooltip>
+				</UButtonGroup>
+			</UPageCard>
 			<UPageCard
 				title="Main"
 				:description="mainDescription"
@@ -147,10 +220,16 @@ const items = ref<TabsItem[]>([
 					<div class="place-self-end">
 						{{ tranData.externalId }}
 					</div>
-					<div v-if="tranData.createdFromTillerTranId" class="place-self-start font-bold">
+					<div
+						v-if="tranData.createdFromTillerTranId"
+						class="place-self-start font-bold"
+					>
 						Created From Tiller Id
 					</div>
-					<div v-if="tranData.createdFromTillerTranId" class="place-self-end">
+					<div
+						v-if="tranData.createdFromTillerTranId"
+						class="place-self-end"
+					>
 						{{ tranData.createdFromTillerTranId }}
 					</div>
 					<!-- <div class="place-self-start font-bold">
@@ -183,7 +262,10 @@ const items = ref<TabsItem[]>([
 				</div>
 			</template>
 			<template #tableentries>
-				<JournalsEntryDetailTable :is-loading="pending" :je-recs="tranData.entries" />
+				<JournalsEntryDetailTable
+					:is-loading="pending"
+					:je-recs="tranData.entries"
+				/>
 			</template>
 		</UTabs>
 		<UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
