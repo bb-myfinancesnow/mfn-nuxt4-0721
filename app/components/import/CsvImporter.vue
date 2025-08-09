@@ -100,6 +100,7 @@ const parseCSV = (csvText: string) => {
 	try {
 		const lines = csvText.split('\n').filter((line) => line.trim());
 		if (lines.length === 0 || !lines[0]) throw new Error('Empty CSV file');
+		if (lines.length === 1) throw new Error('File Contains Only Header');
 
 		const headers = lines[0].split(',').map((header) => header.trim().replace(/['"]/g, ''));
 		csvHeaders.value = headers;
@@ -222,25 +223,25 @@ const resetImporter = () => {
 	isImporting.value = false;
 };
 
-const getValidKey = (value: string | number | boolean | null | undefined): string | undefined => {
-	// Ensure the key is either a string or undefined (avoiding null)
-	if (value === null || value === undefined) {
-		return undefined;
-	}
-	return String(value); // Convert other types to string
-};
+// const getValidKey = (value: string | number | boolean | null | undefined): string | undefined => {
+// 	// Ensure the key is either a string or undefined (avoiding null)
+// 	if (value === null || value === undefined) {
+// 		return undefined;
+// 	}
+// 	return String(value); // Convert other types to string
+// };
 </script>
 
 <template>
-	<div class="csv-importer">
+	<div class="min-h-screen py-8">
 		<div class="max-w-4xl mx-auto p-6 space-y-6">
-			<h2 class="text-2xl font-bold text-gray-900">
+			<h2 class="text-2xl font-bold">
 				CSV Importer
 			</h2>
 
 			<!-- Step 1: File Upload -->
 			<div v-if="currentStep === 1" class="space-y-4">
-				<h3 class="text-lg font-semibold text-gray-700">
+				<h3 class="text-lg font-semibold">
 					Step 1: Upload CSV File
 				</h3>
 
@@ -253,7 +254,7 @@ const getValidKey = (value: string | number | boolean | null | undefined): strin
 				>
 					<div class="space-y-4">
 						<svg
-							class="mx-auto h-12 w-12 text-gray-400"
+							class="mx-auto h-12 w-12"
 							stroke="currentColor"
 							fill="none"
 							viewBox="0 0 48 48"
@@ -266,7 +267,7 @@ const getValidKey = (value: string | number | boolean | null | undefined): strin
 							/>
 						</svg>
 						<div>
-							<p class="text-lg font-medium text-gray-900">
+							<p class="text-lg font-medium">
 								Drop your CSV file here, or
 								<label class="text-blue-600 hover:text-blue-500 cursor-pointer">
 									browse
@@ -295,7 +296,7 @@ const getValidKey = (value: string | number | boolean | null | undefined): strin
 			<!-- Step 2: Field Mapping -->
 			<div v-if="currentStep === 2" class="space-y-6">
 				<div class="flex items-center justify-between">
-					<h3 class="text-lg font-semibold text-gray-700">
+					<h3 class="text-lg font-semibold">
 						Step 2: Map CSV Fields
 					</h3>
 					<button
@@ -315,18 +316,18 @@ const getValidKey = (value: string | number | boolean | null | undefined): strin
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 					<!-- CSV Columns -->
 					<div class="space-y-4">
-						<h4 class="font-medium text-gray-900">
+						<h4 class="font-medium">
 							CSV Columns ({{ csvHeaders.length }})
 						</h4>
-						<div class="bg-gray-50 rounded-lg p-4 space-y-2 max-h-80 overflow-y-auto">
+						<div class="rounded-lg p-4 space-y-2 max-h-80 overflow-y-auto">
 							<div
 								v-for="(header, index) in csvHeaders"
 								:key="index"
-								class="bg-white rounded px-3 py-2 border text-sm"
+								class="rounded px-3 py-2 border text-sm"
 							>
 								<div class="flex items-center justify-between">
 									<span class="font-medium">{{ header }}</span>
-									<span class="text-xs text-gray-500">
+									<span class="text-xs">
 										{{ getSampleValue(header) || 'No data' }}
 									</span>
 								</div>
@@ -336,22 +337,22 @@ const getValidKey = (value: string | number | boolean | null | undefined): strin
 
 					<!-- Target Fields -->
 					<div class="space-y-4">
-						<h4 class="font-medium text-gray-900">
+						<h4 class="font-medium">
 							Target Fields
 						</h4>
 						<div class="space-y-3">
 							<div
 								v-for="field in targetFields"
 								:key="field.key"
-								class="bg-white border rounded-lg p-4"
+								class="border rounded-lg p-4"
 							>
 								<div class="space-y-2">
 									<div class="flex items-center justify-between">
-										<label class="font-medium text-gray-700">
+										<label class="font-medium">
 											{{ field.label }}
 											<span v-if="field.required" class="text-red-500">*</span>
 										</label>
-										<span class="text-xs text-gray-500">{{ field.type }}</span>
+										<span class="text-xs">{{ field.type }}</span>
 									</div>
 
 									<select
@@ -370,7 +371,7 @@ const getValidKey = (value: string | number | boolean | null | undefined): strin
 										</option>
 									</select>
 
-									<p v-if="field.description" class="text-xs text-gray-500">
+									<p v-if="field.description" class="text-xs">
 										{{ field.description }}
 									</p>
 								</div>
@@ -413,7 +414,7 @@ const getValidKey = (value: string | number | boolean | null | undefined): strin
 			<!-- Step 3: Data Preview -->
 			<div v-if="currentStep === 3" class="space-y-6">
 				<div class="flex items-center justify-between">
-					<h3 class="text-lg font-semibold text-gray-700">
+					<h3 class="text-lg font-semibold">
 						Step 3: Preview & Import
 					</h3>
 					<div class="space-x-2">
