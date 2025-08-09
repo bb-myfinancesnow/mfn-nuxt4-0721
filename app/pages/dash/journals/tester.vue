@@ -1,33 +1,22 @@
 <script lang="ts" setup>
-const { queryLedgerInputs } = useLedger();
+const customFields: ITargetField[] = [
+	{ key: 'firstName', label: 'First Name', type: 'string', required: true },
+	{ key: 'lastName', label: 'Last Name', type: 'string', required: true },
+	{ key: 'email', label: 'Email', type: 'email', required: true }
+	// ... more fields
+];
 
-const {
-	data: inputData,
-	pending
-} = await queryLedgerInputs();
+const handleImportedData = (data: IMappedRow[]) => {
+	console.log('Imported data:', data);
+	// Process the imported data as needed
+};
 </script>
 
 <template>
 	<div>
-		<UPageGrid v-if="inputData" class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
-			<div>status: {{ String(pending) }}</div>
-			<div>
-				books data:
-				<pre>{{ inputData.books }}</pre>
-			</div>
-			<div>
-				entities data:
-				<pre>{{ inputData.entities }}</pre>
-			</div>
-			<div>
-				periods data:
-				<pre>{{ inputData.periods }}</pre>
-			</div>
-
-			<div>
-				glAccounts data:
-				<pre>{{ inputData.glAccounts }}</pre>
-			</div>
-		</UPageGrid>
+		<ImportCsvImporter
+			:target-fields="customFields"
+			@import="handleImportedData"
+		/>
 	</div>
 </template>
