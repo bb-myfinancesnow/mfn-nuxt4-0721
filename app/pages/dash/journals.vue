@@ -33,6 +33,11 @@ const links = [
 			to: '/dash/journals/imports'
 		},
 		{
+			label: 'Prime Import',
+			icon: 'i-lucide-file-up',
+			to: '/dash/journals/prime-imports'
+		},
+		{
 			label: 'Tester',
 			icon: 'i-lucide-pencil',
 			to: '/dash/journals/tester'
