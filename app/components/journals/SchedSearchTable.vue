@@ -7,7 +7,7 @@ import type {
 import { SourceType } from '~/generated/graphql';
 
 interface Props {
-	jeRecs: TJournalHeaderDetailSchema[];
+	schedRecs: TTranSchedRecordSchema[];
 	isLoading: boolean;
 }
 
@@ -15,104 +15,69 @@ const props = defineProps<Props>();
 
 const tranSourceVals = Object.values(SourceType);
 
-const columnDefs: IPrimeColumnDef<TJournalHeaderDetailSchema>[] = [
+const columnDefs: IPrimeColumnDef<TTranSchedRecordSchema>[] = [
 	{
-		colId: 'tranNumber',
+		colId: 'id',
 		colType: 'integer',
 		filterable: true,
-		field: 'tranNumber',
+		field: 'id',
 		sortable: true,
 		frozen: true,
-		header: '#',
-		displayLabel: '#',
+		header: 'ID',
+		displayLabel: 'ID',
 		disableHide: true
 	},
 	{
-		colId: 'tranDate',
+		colId: 'name',
+		colType: 'text',
+		field: 'name',
 		filterable: true,
-		field: 'tranDate',
+		header: 'Name',
+		globalFilterable: true,
+		displayLabel: 'Name'
+	},
+	{
+		colId: 'startDate',
+		filterable: true,
+		field: 'startDate',
 		sortable: true,
-		header: 'Tran Date',
+		header: 'Start Date',
 		style: 'min-width: 200px',
-		displayLabel: 'Tran Date',
-		disableHide: true,
+		displayLabel: 'Start Date',
+		disableHide: false,
 		colType: 'date'
 	},
 	{
-		colId: 'postingPeriod.label',
-		field: 'postingPeriod.label',
-		sortField: 'postingPeriod.id',
-		header: 'Period',
-		sortable: true,
-		displayLabel: 'Period',
-		colType: 'multiselect'
-	},
-	{
-		colId: 'description',
+		colId: 'isActive',
 		filterable: true,
-		field: 'description',
-		colType: 'text',
-		header: 'Description',
-		displayLabel: 'Description',
-		globalFilterable: true
-	},
-	{
-		colId: 'postingPeriod.locked',
-		filterable: true,
-		field: 'postingPeriod.locked',
+		field: 'isActive',
 		colType: 'boolean',
-		header: 'Locked',
-		displayLabel: 'Period Locked'
+		header: 'Active',
+		displayLabel: 'Active'
 	},
 	{
-		colId: 'tranSource',
-		field: 'tranSource',
-		colType: 'tranSources',
-		header: 'Source',
-		displayLabel: 'Journal Source',
-		filterable: true
-	},
-	{
-		colId: 'bookId',
-		field: 'bookId',
-		header: 'Book',
-		displayLabel: 'Book',
-		colType: 'text',
-		sortable: true
-	},
-	{
-		colId: '_count.entries',
-		field: '_count.entries',
+		colId: '_count.scheduleLogs',
+		field: '_count.scheduleLogs',
 		colType: 'integer',
-		header: 'Entry Count',
-		displayLabel: 'Entry Count',
+		header: 'Log Count',
+		displayLabel: 'Log Count',
 		sortable: true,
 		filterable: true
-	},
-	{
-		colId: 'id',
-		filterable: true,
-		field: 'id',
-		colType: 'text',
-		sortable: true,
-		header: 'ID',
-		displayLabel: 'ID',
-		defaultHidden: true,
-		globalFilterable: true
 	}
+
 ];
 
 const defaultFilters: DataTableFilterMeta = {
 	global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 	id: {
 		operator: FilterOperator.AND,
+		constraints: [{ value: null, matchMode: FilterMatchMode.GREATER_THAN }]
+	},
+	name: {
+		operator: FilterOperator.AND,
 		constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }]
 	},
-	tranNumber: {
-		operator: FilterOperator.AND,
-		constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }]
-	},
-	tranDate: {
+	startDate: {
 		operator: FilterOperator.AND,
 		constraints: [{ value: null, matchMode: FilterMatchMode.DATE_AFTER }]
 	},
@@ -120,12 +85,11 @@ const defaultFilters: DataTableFilterMeta = {
 		operator: FilterOperator.AND,
 		constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }]
 	},
-	'_count.entries': {
+	'_count.scheduleLogs': {
 		operator: FilterOperator.AND,
 		constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }]
 	},
-	'postingPeriod.locked': { value: null, matchMode: FilterMatchMode.EQUALS },
-	tranSource: { value: null, matchMode: FilterMatchMode.IN }
+	isActive: { value: null, matchMode: FilterMatchMode.EQUALS }
 };
 
 const {
@@ -143,7 +107,7 @@ const {
 resetVisibleColumns();
 initFilters();
 
-const filteredRowCount = ref<number>(props.jeRecs.length);
+const filteredRowCount = ref<number>(props.schedRecs.length);
 
 const filterEmit = (event: DataTableFilterEvent) => {
 	console.log(`filterEmit`, event);
@@ -153,23 +117,15 @@ const filterEmit = (event: DataTableFilterEvent) => {
 	if (l && typeof l === 'number') filteredRowCount.value = l;
 };
 
-const goToJePage = async (journalId: string) => {
-	console.log(`go to page ${journalId}`);
-
-	// await navigateTo({
-	// 	path: '/dash/journals/record/',
-	// 	params: {
-	// 		id: journalId
-	// 	}
-	// });
-	await navigateTo(`/dash/journals/record/${journalId}`);
+const goToSchedPage = async (templateId: number) => {
+	console.log(`go to page ${templateId}`);
 };
 </script>
 
 <template>
 	<PDataTable
 		v-model:filters="filters"
-		:value="jeRecs"
+		:value="schedRecs"
 		data-key="id"
 		:loading="isLoading"
 		table-style="min-width: 150rem"
@@ -215,15 +171,15 @@ const goToJePage = async (journalId: string) => {
 					@update-cols="
 						(cols) =>
 							updateVisCols(
-								cols as IPrimeColumnConfig<TJournalHeaderDetailSchema>[]
+								cols as IPrimeColumnConfig<TTranSchedRecordSchema>[]
 							)
 					"
 				/>
 			</div>
 			<USeparator class="py-2" />
 			<div class="flex items-center justify-between gap-2">
-				<DisplayCountto prefix="Total Journals: " :end-value="jeRecs.length" />
-				<DisplayCountto prefix="Filtered Journals: " :end-value="filteredRowCount" :duration="3000" />
+				<DisplayCountto prefix="Total Records: " :end-value="schedRecs.length" />
+				<DisplayCountto prefix="Filtered Records: " :end-value="filteredRowCount" :duration="3000" />
 			</div>
 			<USeparator class="py-2" />
 		</template>
@@ -233,7 +189,7 @@ const goToJePage = async (journalId: string) => {
 					icon="pi pi-eye"
 					severity="secondary"
 					raised
-					@click="() => goToJePage(data.id)"
+					@click="() => goToSchedPage(data.id)"
 				/>
 			</template>
 		</PColumn>

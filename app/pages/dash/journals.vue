@@ -19,6 +19,11 @@ const links = [
 			label: 'List',
 			icon: 'i-lucide-list',
 			to: '/dash/journals/list'
+		},
+		{
+			label: 'Schedules',
+			icon: 'i-lucide-calendar-cog',
+			to: '/dash/journals/schedules'
 		}
 	],
 	[

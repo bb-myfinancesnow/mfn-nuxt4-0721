@@ -14,5 +14,8 @@ const {
 <template>
 	<div>
 		<JournalsSearchTable :is-loading="pending" :je-recs="jeData" />
+		<!-- <div>
+			<pre>{{ jeData }}</pre>
+		</div> -->
 	</div>
 </template>
