@@ -3056,6 +3056,26 @@ export type NewTranSchedMutationVariables = Exact<{
 
 export type NewTranSchedMutation = { createTranSchedule: { id: number; name: string; _count: { scheduleLogs: number } } };
 
+export type TranSchedGenLogDatesMutationVariables = Exact<{
+	generateUpToDate: Scalars['DateTime']['input'];
+	where: TranScheduleWhereInput;
+}>;
+
+export type TranSchedGenLogDatesMutation = { genLogDates: { count: number } };
+
+export type GenTranScheduleLogJournalMutationVariables = Exact<{
+	where: TranScheduleLogWhereUniqueInput;
+}>;
+
+export type GenTranScheduleLogJournalMutation = { genScheduleLogJournal: { errorMessage?: string | null; id: number; scheduleDate: string; scheduleIndex: number; status: GenerationStatus; templateId: number } };
+
+export type BulkUpdateTranScheduleLogsMutationVariables = Exact<{
+	data: TranScheduleLogUpdateManyMutationInput;
+	where: TranScheduleLogWhereInput;
+}>;
+
+export type BulkUpdateTranScheduleLogsMutation = { bulkUpdateScheduleLogs: { count: number } };
+
 export type RunTillerSheetTransMutationVariables = Exact<{
 	abortOnFirstMissing: Scalars['Boolean']['input'];
 	createPending: Scalars['Boolean']['input'];
@@ -3631,6 +3651,32 @@ export const NewTranSchedDocument = gql`
   }
 }
     `;
+export const TranSchedGenLogDatesDocument = gql`
+    mutation TranSchedGenLogDates($generateUpToDate: DateTime!, $where: TranScheduleWhereInput!) {
+  genLogDates(generateUpToDate: $generateUpToDate, where: $where) {
+    count
+  }
+}
+    `;
+export const GenTranScheduleLogJournalDocument = gql`
+    mutation GenTranScheduleLogJournal($where: TranScheduleLogWhereUniqueInput!) {
+  genScheduleLogJournal(where: $where) {
+    errorMessage
+    id
+    scheduleDate
+    scheduleIndex
+    status
+    templateId
+  }
+}
+    `;
+export const BulkUpdateTranScheduleLogsDocument = gql`
+    mutation BulkUpdateTranScheduleLogs($data: TranScheduleLogUpdateManyMutationInput!, $where: TranScheduleLogWhereInput!) {
+  bulkUpdateScheduleLogs(data: $data, where: $where) {
+    count
+  }
+}
+    `;
 export const RunTillerSheetTransDocument = gql`
     mutation RunTillerSheetTrans($abortOnFirstMissing: Boolean!, $createPending: Boolean!) {
   runTillerSheetTrans(
@@ -3919,6 +3965,15 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
 		},
 		NewTranSched(variables: NewTranSchedMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<NewTranSchedMutation> {
 			return withWrapper((wrappedRequestHeaders) => client.request<NewTranSchedMutation>({ document: NewTranSchedDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'NewTranSched', 'mutation', variables);
+		},
+		TranSchedGenLogDates(variables: TranSchedGenLogDatesMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<TranSchedGenLogDatesMutation> {
+			return withWrapper((wrappedRequestHeaders) => client.request<TranSchedGenLogDatesMutation>({ document: TranSchedGenLogDatesDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'TranSchedGenLogDates', 'mutation', variables);
+		},
+		GenTranScheduleLogJournal(variables: GenTranScheduleLogJournalMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<GenTranScheduleLogJournalMutation> {
+			return withWrapper((wrappedRequestHeaders) => client.request<GenTranScheduleLogJournalMutation>({ document: GenTranScheduleLogJournalDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'GenTranScheduleLogJournal', 'mutation', variables);
+		},
+		BulkUpdateTranScheduleLogs(variables: BulkUpdateTranScheduleLogsMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<BulkUpdateTranScheduleLogsMutation> {
+			return withWrapper((wrappedRequestHeaders) => client.request<BulkUpdateTranScheduleLogsMutation>({ document: BulkUpdateTranScheduleLogsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'BulkUpdateTranScheduleLogs', 'mutation', variables);
 		},
 		RunTillerSheetTrans(variables: RunTillerSheetTransMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<RunTillerSheetTransMutation> {
 			return withWrapper((wrappedRequestHeaders) => client.request<RunTillerSheetTransMutation>({ document: RunTillerSheetTransDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'RunTillerSheetTrans', 'mutation', variables);

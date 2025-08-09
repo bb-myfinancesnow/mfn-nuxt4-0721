@@ -14,7 +14,7 @@
     "cleandep": "rm -rf node_modules && pnpm -r exec rm -rf node_modules",
     "cleanfull": "rm -rf node_modules && rm -rf .nuxt && rm -rf .output",
     "codegen": "graphql-codegen --config codegen.ts",
-    "codegen:watch": "graphql-codegen --config codegen.ts --watch"
+    "codegen:watch": "graphql-codegen --config codegen.ts --watch api/"
   },
   "dependencies": {
     "@handsontable/vue3": "^16.0.1",
