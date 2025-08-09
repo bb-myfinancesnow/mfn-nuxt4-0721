@@ -13,7 +13,7 @@ if (!route.params.id) {
 	console.log(`must provide id`);
 }
 
-const { data: tranData, pending } = await getJournalPageRecord({
+const { data: tranData, pending, refresh: refreshPageData } = await getJournalPageRecord({
 	where: {
 		id: Array.isArray(route.params.id)
 			? route.params.id[0]
@@ -74,6 +74,7 @@ const items = ref<TabsItem[]>([
 		icon: 'i-lucide-info',
 		slot: 'systeminfo' as const
 	}
+
 ]);
 
 const deleteTooltipText = computed<string>(() => {
@@ -205,6 +206,7 @@ const runDelJournal = async (id: string) => {
 					<JournalsCreateSchedForm
 						:template-journal="tranData"
 						:is-open-disabled="pending || isLoading"
+						@saved-new="() => refreshPageData()"
 					/>
 				</UButtonGroup>
 			</UPageCard>
@@ -323,6 +325,26 @@ const runDelJournal = async (id: string) => {
 					:created-at="tranData.createdAt"
 					:updated-at="tranData.updatedAt"
 				/>
+				<div class="grid grid-cols-2 gap-y-3 px-6 py-2">
+					<div class="place-self-start font-bold">
+						Entries Count
+					</div>
+					<div class="place-self-end">
+						{{ tranData._count.entries }}
+					</div>
+					<div class="place-self-start font-bold">
+						Schedule Template Count
+					</div>
+					<div class="place-self-end">
+						{{ tranData._count.templateForTranSchedules }}
+					</div>
+					<div class="place-self-start font-bold">
+						Migration Loan Changes Count
+					</div>
+					<div class="place-self-end">
+						{{ tranData._count.migrationLoanChanges }}
+					</div>
+				</div>
 			</template>
 			<template #rawentries>
 				<div>

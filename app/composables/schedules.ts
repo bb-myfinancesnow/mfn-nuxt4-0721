@@ -1,4 +1,4 @@
-import { SearchTranScheduleRecordsDocument, type SearchTranScheduleRecordsQuery, type SearchTranScheduleRecordsQueryVariables } from '~/generated/graphql';
+import { NewTranSchedDocument, SearchTranScheduleRecordsDocument, type NewTranSchedMutation, type NewTranSchedMutationVariables, type SearchTranScheduleRecordsQuery, type SearchTranScheduleRecordsQueryVariables } from '~/generated/graphql';
 
 export const useSchedules = () => {
 	const { request } = useGql();
@@ -28,7 +28,12 @@ export const useSchedules = () => {
 			}
 		);
 	};
+
+	const genNewTranSchedule = (variables: NewTranSchedMutationVariables) => {
+		return request<NewTranSchedMutation, NewTranSchedMutationVariables>(NewTranSchedDocument, variables);
+	};
 	return {
-		searchTranSchedRecords
+		searchTranSchedRecords,
+		genNewTranSchedule
 	};
 };
