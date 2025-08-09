@@ -8,11 +8,7 @@ mutation NewTranSched(
 		dto: $dto
 		genToDate: $genToDate
 	) {
-		id
-		name
-		_count {
-			scheduleLogs
-		}
+		...TranSchedResultInfo
 	}
 }
 

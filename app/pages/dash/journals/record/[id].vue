@@ -202,6 +202,10 @@ const runDelJournal = async (id: string) => {
 							@click="() => deleteConfirmDialog()"
 						/>
 					</UTooltip>
+					<JournalsCreateSchedForm
+						:template-journal="tranData"
+						:is-open-disabled="pending || isLoading"
+					/>
 				</UButtonGroup>
 			</UPageCard>
 			<UPageCard
@@ -278,6 +282,12 @@ const runDelJournal = async (id: string) => {
 					</div>
 					<div class="place-self-end">
 						{{ tranData.externalId }}
+					</div>
+					<div class="place-self-start font-bold">
+						Book
+					</div>
+					<div class="place-self-end">
+						{{ tranData.bookId }}
 					</div>
 					<div
 						v-if="tranData.createdFromTillerTranId"

@@ -2998,6 +2998,8 @@ export type ReportJournalDataFragment = { id: string; tranDate: string; tranNumb
 
 export type TranScheduleRecordFragment = { id: number; createdAt: string; updatedAt: string; name: string; dayOfMonth?: number | null; dayOfWeek?: Weekday | null; frequency: RecurrenceFrequency; interval: number; isActive: boolean; startDate: string; endDate?: string | null; templateJournalId: string; templateJournal: { bookId?: number | null; id: string; tranNumber: number; tranDate: string }; _count: { scheduleLogs: number } };
 
+export type TranSchedResultInfoFragment = { id: number; name: string; _count: { scheduleLogs: number } };
+
 export type BaseTillerCatInfoFragment = { id: number; name: string; type: TillerCategoryType; group: string; glAccountNumber?: number | null; _count: { tillerTrans: number } };
 
 export type TillerCatRecordFragment = { id: number; createdAt: string; updatedAt: string; name: string; type: TillerCategoryType; group: string; glAccountNumber?: number | null; _count: { tillerTrans: number }; glAccount?: GlAccInfoFragment | null };
@@ -3054,7 +3056,7 @@ export type NewTranSchedMutationVariables = Exact<{
 	genToDate?: InputMaybe<Scalars['DateTime']['input']>;
 }>;
 
-export type NewTranSchedMutation = { createTranSchedule: { id: number; name: string; _count: { scheduleLogs: number } } };
+export type NewTranSchedMutation = { createTranSchedule: TranSchedResultInfoFragment };
 
 export type TranSchedGenLogDatesMutationVariables = Exact<{
 	generateUpToDate: Scalars['DateTime']['input'];
@@ -3513,6 +3515,15 @@ export const TranScheduleRecordFragmentDoc = gql`
   }
 }
     `;
+export const TranSchedResultInfoFragmentDoc = gql`
+    fragment TranSchedResultInfo on TranScheduleResultModel {
+  id
+  name
+  _count {
+    scheduleLogs
+  }
+}
+    `;
 export const BaseTillerCatInfoFragmentDoc = gql`
     fragment BaseTillerCatInfo on TillerCategory {
   id
@@ -3643,14 +3654,10 @@ export const NewTranSchedDocument = gql`
     dto: $dto
     genToDate: $genToDate
   ) {
-    id
-    name
-    _count {
-      scheduleLogs
-    }
+    ...TranSchedResultInfo
   }
 }
-    `;
+    ${TranSchedResultInfoFragmentDoc}`;
 export const TranSchedGenLogDatesDocument = gql`
     mutation TranSchedGenLogDates($generateUpToDate: DateTime!, $where: TranScheduleWhereInput!) {
   genLogDates(generateUpToDate: $generateUpToDate, where: $where) {

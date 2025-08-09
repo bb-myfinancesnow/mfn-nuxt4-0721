@@ -21,3 +21,11 @@ fragment TranScheduleRecord on TranSchedule {
 		scheduleLogs
 	}
 }
+
+fragment TranSchedResultInfo on TranScheduleResultModel {
+	id
+	name
+	_count {
+		scheduleLogs
+	}
+}
