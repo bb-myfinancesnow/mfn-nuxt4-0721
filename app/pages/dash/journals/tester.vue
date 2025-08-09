@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { ImportUploadCsv } from '#components';
+
 const customFields: ITargetField[] = [
 	{ key: 'firstName', label: 'First Name', type: 'string', required: true },
 	{ key: 'lastName', label: 'Last Name', type: 'string', required: true },
@@ -14,7 +16,7 @@ const handleImportedData = (data: IMappedRow[]) => {
 
 <template>
 	<div>
-		<ImportCsvImporter
+		<ImportUploadCsv
 			:target-fields="customFields"
 			@import="handleImportedData"
 		/>
