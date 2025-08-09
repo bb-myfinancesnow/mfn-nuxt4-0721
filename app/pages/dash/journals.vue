@@ -28,6 +28,11 @@ const links = [
 	],
 	[
 		{
+			label: 'Import CSV',
+			icon: 'i-lucide-file-up',
+			to: '/dash/journals/imports'
+		},
+		{
 			label: 'Tester',
 			icon: 'i-lucide-pencil',
 			to: '/dash/journals/tester'

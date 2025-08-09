@@ -141,7 +141,8 @@ export default defineNuxtConfig({
 				'Step',
 				'StepPanel',
 				'ProgressSpinner',
-				'ConfirmDialog'
+				'ConfirmDialog',
+				'FileUpload'
 			],
 			prefix: 'P'
 		},
