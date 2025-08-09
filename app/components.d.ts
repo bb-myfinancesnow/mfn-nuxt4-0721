@@ -14,6 +14,7 @@ declare module 'vue' {
     PConfirmDialog: typeof import('primevue/confirmdialog')['default']
     PDataTable: typeof import('primevue/datatable')['default']
     PDatePicker: typeof import('primevue/datepicker')['default']
+    PFileUpload: typeof import('primevue/fileupload')['default']
     PInputNumber: typeof import('primevue/inputnumber')['default']
     PInputText: typeof import('primevue/inputtext')['default']
     PMultiSelect: typeof import('primevue/multiselect')['default']

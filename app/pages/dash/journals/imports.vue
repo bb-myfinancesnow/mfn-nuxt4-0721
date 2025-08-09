@@ -1,13 +1,16 @@
 <script lang="ts" setup>
 import type { StepperItem } from '@nuxt/ui';
 
+const isLoading = ref(false);
+
 const items: StepperItem[] = [
 	{
 		title: 'File Upload',
 		// description: 'Choose your file here',
 		icon: 'i-lucide-file-up',
 		disabled: true,
-		value: 0
+		value: 0,
+		slot: 'fileupload' as const
 	},
 	{
 		title: 'Field Mapping',
@@ -40,10 +43,16 @@ const activeStep = ref(0);
 		:items="items"
 		class="w-full"
 	>
-		<template #content="{ item }">
+		<!-- <template #content="{ item }">
 			<div class="aspect-video">
 				This is the {{ item?.title }} step.
 			</div>
+		</template> -->
+		<template #fileupload>
+			<ImportPrimeCsv
+				card-title="Choose Journal File"
+				:is-parent-disabled="isLoading"
+			/>
 		</template>
 	</UStepper>
 </template>
