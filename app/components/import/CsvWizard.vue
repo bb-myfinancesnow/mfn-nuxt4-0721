@@ -395,6 +395,78 @@ const resetImporter = () => {
 									Step 2: Map CSV Fields
 								</h3>
 							</div>
+							<div class="bg-yellow-50 border border-yellow-200 rounded-md p-4 mx-4">
+								<p class="text-yellow-800 text-sm">
+									Map your CSV columns to the expected fields. Unmapped columns will be ignored.
+								</p>
+							</div>
+
+							<div v-if="parsedFileData" class="grid grid-cols-4 gap-6">
+								<!-- CSV Columns -->
+								<div class="space-y-4 col-span-1">
+									<h4 class="font-medium">
+										CSV Columns ({{ parsedFileData.csvHeaders.length }})
+									</h4>
+									<div class="rounded-lg p-4 space-y-2 max-h-80 overflow-y-auto">
+										<div
+											v-for="(header, index) in parsedFileData.csvHeaders"
+											:key="index"
+											class="rounded px-3 py-2 border text-sm"
+										>
+											<div class="flex items-center justify-between">
+												<span class="font-medium">{{ header }}</span>
+												<span class="text-xs">
+													{{ getSampleValue(header) || 'No data' }}
+												</span>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<!-- Target Fields -->
+								<div class="space-y-4 col-span-3">
+									<h4 class="font-medium">
+										Target Fields
+									</h4>
+									<div class="space-y-3">
+										<div
+											v-for="field in targetFields"
+											:key="field.key"
+											class="border rounded-lg p-4"
+										>
+											<div class="space-y-2">
+												<div class="flex items-center justify-between">
+													<label class="font-medium">
+														{{ field.label }}
+														<span v-if="field.required" class="text-red-500">*</span>
+													</label>
+													<span class="text-xs">{{ field.type }}</span>
+												</div>
+
+												<select
+													v-model="fieldMappings[field.key]"
+													class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+												>
+													<option value="">
+														-- Select CSV Column --
+													</option>
+													<option
+														v-for="header in parsedFileData.csvHeaders"
+														:key="header"
+														:value="header"
+													>
+														{{ header }}
+													</option>
+												</select>
+
+												<p v-if="field.description" class="text-xs">
+													{{ field.description }}
+												</p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
 					</template>
 				</UStepper>

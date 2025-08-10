@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 const customFields: ITargetField[] = [
-	{ key: 'firstName', label: 'First Name', type: 'string', required: true },
+	{ key: 'firstName', label: 'First Name', type: 'string', required: true, description: 'The person\'s first name' },
 	{ key: 'lastName', label: 'Last Name', type: 'string', required: true },
-	{ key: 'email', label: 'Email', type: 'email', required: true }
+	{ key: 'email', label: 'Email', type: 'email', required: true, description: 'Valid email address' }
 	// ... more fields
 ];
 
