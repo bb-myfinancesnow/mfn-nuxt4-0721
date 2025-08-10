@@ -300,3 +300,35 @@ export function getNestedValue<T, R = unknown>(obj: T, path: string): R | undefi
 		.filter(Boolean)
 		.reduce((acc: any, key) => acc?.[key], obj);
 }
+
+export function dedupeAllProps<T>(arr: T[]): T[] {
+	const seen = new Set<string>();
+	return arr.filter((item) => {
+		const key = JSON.stringify(item);
+		if (seen.has(key)) return false;
+		seen.add(key);
+		return true;
+	});
+}
+
+export function stableStringify(value: any): string {
+	if (value && typeof value === 'object' && !Array.isArray(value)) {
+		// Sort keys for objects
+		const keys = Object.keys(value).sort();
+		return `{${keys.map((k) => JSON.stringify(k) + ':' + stableStringify(value[k])).join(',')}}`;
+	}
+	if (Array.isArray(value)) {
+		return `[${value.map((v) => stableStringify(v)).join(',')}]`;
+	}
+	return JSON.stringify(value);
+}
+
+export function dedupeAllPropsStable<T>(arr: T[]): T[] {
+	const seen = new Set<string>();
+	return arr.filter((item) => {
+		const key = stableStringify(item);
+		if (seen.has(key)) return false;
+		seen.add(key);
+		return true;
+	});
+}

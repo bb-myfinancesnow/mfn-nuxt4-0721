@@ -95,8 +95,44 @@ export const ImportCreateJournalLineSchema = z.object({
 	entityId: z.coerce.number().int().optional().nullable()
 });
 
+// .transform(({ amount: inputAmount, isDebit: inputIsDebit, ...val }) => {
+// 	let isDebit = inputIsDebit;
+// 	let amount = inputAmount;
+// 	if (inputAmount < 0) {
+// 		amount = inputAmount * -1;
+// 		isDebit = !inputIsDebit;
+// 	}
+
+// 	return {
+// 		isDebit,
+// 		amount,
+// 		...val
+// 	};
+// });
+
 export type TImportCreateJournalLineSchema = z.output<
 	typeof ImportCreateJournalLineSchema
+>;
+
+export const EntryImportJournalLineSchema = ImportCreateJournalLineSchema.extend({
+	externalId: z.string()
+}).transform(({ amount: inputAmount, isDebit: inputIsDebit, ...val }) => {
+	let isDebit = inputIsDebit;
+	let amount = inputAmount;
+	if (inputAmount < 0) {
+		amount = inputAmount * -1;
+		isDebit = !inputIsDebit;
+	}
+
+	return {
+		isDebit,
+		amount,
+		...val
+	};
+});
+
+export type TEntryImportJournalLineSchema = z.output<
+	typeof EntryImportJournalLineSchema
 >;
 
 export const ImportCreateJournalSchema = z.object({

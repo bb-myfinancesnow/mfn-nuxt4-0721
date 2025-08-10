@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-// const customFields: ITargetField[] = [
-// 	{ key: 'firstName', label: 'First Name', type: 'string', required: true, description: 'The person\'s first name' },
-// 	{ key: 'lastName', label: 'Last Name', type: 'string', required: true },
-// 	{ key: 'email', label: 'Email', type: 'email', required: true, description: 'Valid email address' }
-// ];
+import { CreateJournalImportJobDocument, SourceType, type CreateJournalImportJobMutation, type CreateJournalImportJobMutationVariables, type JournalCreateInput } from '~/generated/graphql';
+
+const { request } = useGql();
+const toast = useToast();
+
 const isLoading = ref(false);
 
 const journalImportFields: ITargetField[] = [
@@ -22,11 +22,17 @@ const journalImportFields: ITargetField[] = [
 
 const uploadError = ref('');
 const flatJournalData = ref<TFlatImportCreateJournalSchema[]>([]);
+const strHeaderData = ref<TImportCreateJournalSchema[]>([]);
+const submitJournalData = ref<JournalCreateInput[]>([]);
+const lineData = ref<TEntryImportJournalLineSchema[]>([]);
 
 const handleImportedData = async (data: IMappedRow[]) => {
 	isLoading.value = true;
 	uploadError.value = '';
 	flatJournalData.value = [];
+	strHeaderData.value = [];
+	lineData.value = [];
+	submitJournalData.value = [];
 	console.log('Imported data:', data);
 	await new Promise((r) => setTimeout(r, 3000));
 	// Process the imported data as needed
@@ -40,7 +46,44 @@ const handleImportedData = async (data: IMappedRow[]) => {
 		}
 	}
 
+	if (flatJournalData.value.length > 0) {
+		const headerArrSchema = ImportCreateJournalSchema.array();
+		const lineArrSchema = EntryImportJournalLineSchema.array();
+
+		const parsedHeaders = await headerArrSchema.parseAsync(flatJournalData.value);
+		const parsedLines = await lineArrSchema.parseAsync(flatJournalData.value);
+		lineData.value = parsedLines;
+
+		const dedupedStr = dedupeAllPropsStable(parsedHeaders);
+		strHeaderData.value = dedupedStr;
+
+		for await (const h of dedupedStr) {
+			const entries = parsedLines.filter((l) => l.externalId === h.externalId).map(({ externalId: _ext, ...l }) => l);
+
+			submitJournalData.value.push({
+				...h,
+				tranSource: SourceType.Import,
+				entries
+			});
+		}
+
+		await submitImportJournalJob(submitJournalData.value);
+	}
+
 	isLoading.value = false;
+};
+
+const submitImportJournalJob = async (input: JournalCreateInput[]) => {
+	try {
+		const res = await request<CreateJournalImportJobMutation, CreateJournalImportJobMutationVariables>(CreateJournalImportJobDocument, { input });
+		console.log(`submitImportJournalJob res: ${JSON.stringify(res, null, 2)}`);
+		toast.add({
+			title: 'Submitted Job',
+			description: `Submitted job ${res.addJournalImportJob.id} with ${res.addJournalImportJob.recordCount} records`
+		});
+	} catch (e) {
+		console.error(`submitImportJournalJob`, e);
+	}
 };
 </script>
 
@@ -54,7 +97,24 @@ const handleImportedData = async (data: IMappedRow[]) => {
 		/>
 		<div class="flex flex-row justify-between">
 			<div v-if="flatJournalData.length>0">
+				<div>flatJournalData: {{ flatJournalData.length }}</div>
 				<pre>{{ flatJournalData }}</pre>
+			</div>
+			<!-- <div v-if="flatJournalData.length>0">
+				<div>d: {{ d.length }}</div>
+				<pre>{{ d }}</pre>
+			</div> -->
+			<div v-if="flatJournalData.length>0">
+				<div>lineData: {{ lineData.length }}</div>
+				<pre>{{ lineData }}</pre>
+			</div>
+			<div v-if="flatJournalData.length>0">
+				<div>submitJournalData: {{ submitJournalData.length }}</div>
+				<pre>{{ submitJournalData }}</pre>
+			</div>
+			<div v-if="flatJournalData.length>0">
+				<div>strHeaderData: {{ strHeaderData.length }}</div>
+				<pre>{{ strHeaderData }}</pre>
 			</div>
 			<div
 				v-if="uploadError"
