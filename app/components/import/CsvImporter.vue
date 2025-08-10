@@ -1,4 +1,10 @@
+<!-- eslint-disable @typescript-eslint/no-unused-vars -->
 <script lang="ts" setup>
+import { h, resolveComponent } from 'vue';
+import type { SelectItem, StepperItem, TableColumn } from '@nuxt/ui';
+
+const ImportMapLabelCol = resolveComponent('ImportMapLabelCol');
+
 interface Props {
 	targetFields?: ITargetField[];
 }
@@ -15,18 +21,40 @@ const props = withDefaults(defineProps<Props>(), {
 	]
 });
 
+const toast = useToast();
+
 // Emits
 const emit = defineEmits<{
 	import: [data: IMappedRow[]];
 }>();
 
+const items = [
+	{
+		title: 'File Upload',
+		icon: 'i-lucide-file-up',
+		slot: 'fileupload' as const
+	},
+	{
+		title: 'Field Mapping',
+		slot: 'fieldmapping' as const
+	},
+	{
+		title: 'Preview & Import',
+		slot: 'preview' as const
+	},
+	{
+		title: 'Results',
+		slot: 'results' as const
+	}
+] satisfies StepperItem[];
+
+const stepper = useTemplateRef('stepper');
+
 // State
-const currentStep = ref(1);
+const isLoading = ref(false);
+const currentStep = ref(0);
 const isDragging = ref(false);
 const uploadError = ref('');
-const csvData = ref<any[]>([]);
-const csvHeaders = ref<string[]>([]);
-const fieldMappings = reactive<Record<string, string>>({});
 const importOptions = reactive<IImportOptions>({
 	skipDuplicates: false,
 	validateData: true
@@ -34,19 +62,22 @@ const importOptions = reactive<IImportOptions>({
 const isImporting = ref(false);
 const importSuccess = ref(false);
 
+const parsedFileData = ref<IParsedCsvFileResult>();
+const headerFieldMappings = ref<Record<string, string>>({});
+
 // Computed
 const mappingErrors = computed(() => {
 	const errors: string[] = [];
 
 	// Check required fields
 	props.targetFields.forEach((field) => {
-		if (field.required && !fieldMappings[field.key]) {
+		if (field.required && !headerFieldMappings.value[field.key]) {
 			errors.push(`Required field "${field.label}" must be mapped`);
 		}
 	});
 
 	// Check for duplicate mappings
-	const mappedColumns = Object.values(fieldMappings).filter(Boolean);
+	const mappedColumns = Object.values(headerFieldMappings.value).filter(Boolean);
 	const duplicates = mappedColumns.filter((col, index) =>
 		mappedColumns.indexOf(col) !== index
 	);
@@ -59,33 +90,33 @@ const mappingErrors = computed(() => {
 });
 
 const mappedData = computed(() => {
-	if (!csvData.value.length) return [];
+	if (!parsedFileData.value || !parsedFileData.value.csvData.length) return [];
 
-	return csvData.value.map((row) => {
+	return parsedFileData.value.csvData.map((row) => {
 		const mappedRow: IMappedRow = {};
 
-		Object.entries(fieldMappings).forEach(([fieldKey, csvColumn]) => {
+		Object.entries(headerFieldMappings.value).forEach(([fieldKey, csvColumn]) => {
 			if (csvColumn && row[csvColumn] !== undefined) {
 				const field = props.targetFields.find((f) => f.key === fieldKey);
-				let value = row[csvColumn];
+				const value = row[csvColumn];
 
 				// Type conversion based on field type
-				if (field && value !== null && value !== '') {
-					switch (field.type) {
-						case 'number':
-							value = parseFloat(value) || null;
-							break;
-						case 'boolean':
-							value = ['true', '1', 'yes', 'y'].includes(String(value).toLowerCase());
-							break;
-						case 'email':
-							// Basic email validation
-							value = String(value).toLowerCase().trim();
-							break;
-						default:
-							value = String(value).trim();
-					}
-				}
+				// if (field && value !== null && value !== '') {
+				// 	switch (field.type) {
+				// 		case 'number':
+				// 			value = parseFloat(value) || null;
+				// 			break;
+				// 		case 'boolean':
+				// 			value = ['true', '1', 'yes', 'y'].includes(String(value).toLowerCase());
+				// 			break;
+				// 		case 'email':
+				// 			// Basic email validation
+				// 			value = String(value).toLowerCase().trim();
+				// 			break;
+				// 		default:
+				// 			value = String(value).trim();
+				// 	}
+				// }
 
 				mappedRow[fieldKey] = value;
 			}
@@ -95,31 +126,86 @@ const mappedData = computed(() => {
 	});
 });
 
-// Methods
-const parseCSV = (csvText: string) => {
-	try {
-		const lines = csvText.split('\n').filter((line) => line.trim());
-		if (lines.length === 0 || !lines[0]) throw new Error('Empty CSV file');
-		if (lines.length === 1) throw new Error('File Contains Only Header');
-
-		const headers = lines[0].split(',').map((header) => header.trim().replace(/['"]/g, ''));
-		csvHeaders.value = headers;
-
-		const data = lines.slice(1).map((line) => {
-			const values = line.split(',').map((value) => value.trim().replace(/['"]/g, ''));
-			const row: Record<string, string> = {};
-			headers.forEach((header, index) => {
-				row[header] = values[index] || '';
-			});
-			return row;
-		});
-
-		csvData.value = data;
-		currentStep.value = 2;
-		uploadError.value = '';
-	} catch (error) {
-		uploadError.value = `Failed to parse CSV: ${error instanceof Error ? error.message : 'Unknown error'}`;
+const uploadBannerTitle = computed(() => {
+	if (!parsedFileData.value || parsedFileData.value.csvData.length === 0) {
+		return `No CSV Data Uploaded`;
+	} else {
+		return `Uploaded File with ${parsedFileData.value.csvData.length} rows`;
 	}
+});
+
+const nextButtonLabel = computed<string>(() => {
+	switch (currentStep.value) {
+		case 0:
+			return 'Advance to Mapping';
+		case 1:
+			return 'Preview Data';
+		case 2:
+			return 'Submit Import';
+		default:
+			return 'Next';
+	}
+});
+
+const prevButtonLabel = computed<string>(() => {
+	switch (currentStep.value) {
+		case 1:
+			return 'Back to Import';
+		case 2:
+			return 'Return to Mapping';
+		default:
+			return 'Previous';
+	}
+});
+
+// Methods
+const goNextStep = async () => {
+	isLoading.value = true;
+	await new Promise((r) => setTimeout(r, 1000));
+
+	if (currentStep.value === 0) {
+		if (!parsedFileData.value || parsedFileData.value.csvData.length === 0) {
+			toast.add({
+				title: 'Missing CSV File',
+				description: 'Cannot Advance without CSV Data',
+				icon: 'i-lucide-shield-alert',
+				color: 'error',
+				duration: 3000
+			});
+			await new Promise((r) => setTimeout(r, 3000));
+		} else if (uploadError.value) {
+			toast.add({
+				title: 'File Errors',
+				description: 'Cannot Advance with Import Errors',
+				icon: 'i-lucide-shield-alert',
+				color: 'error',
+				duration: 3000
+			});
+			await new Promise((r) => setTimeout(r, 3000));
+		} else {
+			if (Object.keys(headerFieldMappings.value).length === 0) {
+				autoMapFields();
+			}
+			currentStep.value = 1;
+		}
+	} else if (currentStep.value === 1) {
+		if (mappingErrors.value.length > 0) {
+			toast.add({
+				title: 'Mapping Errors',
+				description: `Cannot advance with ${mappingErrors.value.length} mapping errors`,
+				icon: 'i-lucide-shield-alert',
+				color: 'error',
+				duration: 3000
+			});
+			await new Promise((r) => setTimeout(r, 3000));
+		} else {
+			currentStep.value = 2;
+		}
+	} else if (currentStep.value === 2) {
+		currentStep.value = 3;
+		await performImport();
+	}
+	isLoading.value = false;
 };
 
 const onDrop = (event: DragEvent) => {
@@ -128,70 +214,83 @@ const onDrop = (event: DragEvent) => {
 
 	const files = event.dataTransfer?.files;
 	if (files && files[0]) {
-		handleFile(files[0]);
+		handleFileChange(files[0]);
 	}
 };
 
 const onFileSelect = (event: Event) => {
 	const target = event.target as HTMLInputElement;
 	if (target.files && target.files[0]) {
-		handleFile(target.files[0]);
+		handleFileChange(target.files[0]);
 	}
 };
 
-const handleFile = (file: File) => {
+const handleFileChange = async (file: File) => {
+	isLoading.value = true;
+	headerFieldMappings.value = {};
+	uploadError.value = '';
+	parsedFileData.value = undefined;
+
 	if (!file.name.toLowerCase().endsWith('.csv')) {
 		uploadError.value = 'Please select a CSV file';
+		isLoading.value = false;
 		return;
 	}
 
-	if (file.size > 10 * 1024 * 1024) {
-		uploadError.value = 'File size must be less than 10MB';
+	if (file.size > 30 * 1024 * 1024) {
+		uploadError.value = 'File size must be less than 30MB';
+		isLoading.value = false;
 		return;
 	}
 
-	const reader = new FileReader();
-	reader.onload = (e) => {
-		const text = e.target?.result as string;
-		parseCSV(text);
-	};
-	reader.onerror = () => {
-		uploadError.value = 'Failed to read file';
-	};
-	reader.readAsText(file);
+	try {
+		const res = await parseCsvFileData(file);
+
+		if (res.csvHeaders.length === 0) {
+			throw new Error(`File Missing Headers`);
+		}
+		if (res.csvData.length === 0) {
+			throw new Error('Empty CSV file');
+		}
+		uploadError.value = '';
+		parsedFileData.value = res;
+	} catch (err) {
+		console.error(`handleFileChange error`, err);
+		uploadError.value = `Failed to parse CSV: ${err instanceof Error ? err.message : 'Unknown error'}`;
+	} finally {
+		isLoading.value = false;
+	}
 };
 
 const getSampleValue = (header: string) => {
-	const sampleRow = csvData.value[0];
+	const sampleRow = parsedFileData.value?.csvData[0];
 	return sampleRow ? String(sampleRow[header] || '').substring(0, 20) : '';
 };
 
 const autoMapFields = () => {
 	props.targetFields.forEach((field) => {
 		// Try to find exact match first
-		let matchingHeader = csvHeaders.value.find((header) =>
+		let matchingHeader = parsedFileData.value?.csvHeaders.find((header) =>
 			header.toLowerCase() === field.key.toLowerCase()
 			|| header.toLowerCase() === field.label.toLowerCase()
 		);
 
 		// Try partial matches
 		if (!matchingHeader) {
-			matchingHeader = csvHeaders.value.find((header) =>
+			matchingHeader = parsedFileData.value?.csvHeaders.find((header) =>
 				header.toLowerCase().includes(field.key.toLowerCase())
 				|| field.key.toLowerCase().includes(header.toLowerCase())
 			);
 		}
 
 		if (matchingHeader) {
-			fieldMappings[field.key] = matchingHeader;
+			headerFieldMappings.value[field.key] = matchingHeader;
 		}
 	});
 };
 
-const validateAndProceed = () => {
-	if (mappingErrors.value.length === 0) {
-		currentStep.value = 3;
-	}
+const resetFieldMaps = () => {
+	headerFieldMappings.value = {};
 };
 
 const performImport = async () => {
@@ -203,7 +302,7 @@ const performImport = async () => {
 
 		emit('import', mappedData.value);
 		importSuccess.value = true;
-		currentStep.value = 4;
+		// currentStep.value = 4;
 	} catch (error) {
 		console.error(`performImport error`, error);
 		uploadError.value = 'Import failed. Please try again.';
@@ -213,354 +312,380 @@ const performImport = async () => {
 };
 
 const resetImporter = () => {
-	currentStep.value = 1;
-	csvData.value = [];
-	csvHeaders.value = [];
-	// eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-	Object.keys(fieldMappings).forEach((key) => delete fieldMappings[key]);
+	isLoading.value = true;
+	currentStep.value = 0;
+	// csvData.value = [];
+	// csvHeaders.value = [];
+	// Object.keys(fieldMappings).forEach((key) => delete fieldMappings[key]);
+	headerFieldMappings.value = {};
+	parsedFileData.value = undefined;
 	uploadError.value = '';
 	importSuccess.value = false;
 	isImporting.value = false;
+	isLoading.value = false;
 };
 
-// const getValidKey = (value: string | number | boolean | null | undefined): string | undefined => {
-// 	// Ensure the key is either a string or undefined (avoiding null)
-// 	if (value === null || value === undefined) {
-// 		return undefined;
-// 	}
-// 	return String(value); // Convert other types to string
-// };
+const mappingCols = ref<TableColumn<ITargetField>[]>([
+	{
+		accessorKey: 'label',
+		header: 'Label',
+		cell: ({ row }) => {
+			return h(ImportMapLabelCol, { field: row.original });
+		}
+	},
+	{
+		accessorKey: 'key',
+		header: 'Field'
+	},
+	{
+		accessorKey: 'type',
+		header: 'Type'
+	},
+	{
+		id: 'mapping',
+		header: 'Mapping'
+	}
+]);
+
+const fieldMapColOptions = computed<SelectItem[]>(() => {
+	// const opts: SelectItem[] = [{
+	// 	label: '-- Select CSV Column --',
+	// 	value: undefined
+	// }];
+	const opts: SelectItem[] = [];
+
+	if (parsedFileData.value && parsedFileData.value.csvHeaders.length) {
+		const headerOpts: SelectItem[] = parsedFileData.value.csvHeaders.map((header) => ({
+			label: header,
+			value: header
+		}));
+
+		opts.push(...headerOpts);
+	}
+
+	return opts;
+});
 </script>
 
 <template>
-	<div class="min-h-screen py-8">
-		<div class="max-w-4xl mx-auto p-6 space-y-6">
+	<div class="w-full min-h-screen pt-2 pb-8 space-y-6 px-2">
+		<div class="flex flex-row justify-between">
 			<h2 class="text-2xl font-bold">
-				CSV Importer
+				CSV Import Wizard
 			</h2>
-
-			<!-- Step 1: File Upload -->
-			<div v-if="currentStep === 1" class="space-y-4">
-				<h3 class="text-lg font-semibold">
-					Step 1: Upload CSV File
-				</h3>
-
-				<div
-					class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors"
-					:class="{ 'border-blue-400 bg-blue-50': isDragging }"
-					@drop="onDrop"
-					@dragover.prevent
-					@dragenter.prevent
-				>
-					<div class="space-y-4">
-						<svg
-							class="mx-auto h-12 w-12"
-							stroke="currentColor"
-							fill="none"
-							viewBox="0 0 48 48"
-						>
-							<path
-								d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							/>
-						</svg>
-						<div>
-							<p class="text-lg font-medium">
-								Drop your CSV file here, or
-								<label class="text-blue-600 hover:text-blue-500 cursor-pointer">
-									browse
-									<input
-										type="file"
-										class="sr-only"
-										accept=".csv,.txt"
-										@change="onFileSelect"
-									>
-								</label>
-							</p>
-							<p class="text-sm text-gray-500">
-								CSV files up to 10MB
-							</p>
-						</div>
-					</div>
-				</div>
-
-				<div v-if="uploadError" class="bg-red-50 border border-red-200 rounded-md p-4">
-					<p class="text-red-700">
-						{{ uploadError }}
-					</p>
-				</div>
-			</div>
-
-			<!-- Step 2: Field Mapping -->
-			<div v-if="currentStep === 2" class="space-y-6">
-				<div class="flex items-center justify-between">
-					<h3 class="text-lg font-semibold">
-						Step 2: Map CSV Fields
-					</h3>
-					<button
-						class="text-sm text-blue-600 hover:text-blue-500"
-						@click="currentStep = 1"
-					>
-						← Back to Upload
-					</button>
-				</div>
-
-				<div class="bg-yellow-50 border border-yellow-200 rounded-md p-4">
-					<p class="text-yellow-800 text-sm">
-						Map your CSV columns to the expected fields. Unmapped columns will be ignored.
-					</p>
-				</div>
-
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-					<!-- CSV Columns -->
-					<div class="space-y-4">
-						<h4 class="font-medium">
-							CSV Columns ({{ csvHeaders.length }})
-						</h4>
-						<div class="rounded-lg p-4 space-y-2 max-h-80 overflow-y-auto">
-							<div
-								v-for="(header, index) in csvHeaders"
-								:key="index"
-								class="rounded px-3 py-2 border text-sm"
-							>
-								<div class="flex items-center justify-between">
-									<span class="font-medium">{{ header }}</span>
-									<span class="text-xs">
-										{{ getSampleValue(header) || 'No data' }}
-									</span>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Target Fields -->
-					<div class="space-y-4">
-						<h4 class="font-medium">
-							Target Fields
-						</h4>
-						<div class="space-y-3">
-							<div
-								v-for="field in targetFields"
-								:key="field.key"
-								class="border rounded-lg p-4"
-							>
-								<div class="space-y-2">
-									<div class="flex items-center justify-between">
-										<label class="font-medium">
-											{{ field.label }}
-											<span v-if="field.required" class="text-red-500">*</span>
-										</label>
-										<span class="text-xs">{{ field.type }}</span>
-									</div>
-
-									<select
-										v-model="fieldMappings[field.key]"
-										class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-									>
-										<option value="">
-											-- Select CSV Column --
-										</option>
-										<option
-											v-for="header in csvHeaders"
-											:key="header"
-											:value="header"
-										>
-											{{ header }}
-										</option>
-									</select>
-
-									<p v-if="field.description" class="text-xs">
-										{{ field.description }}
-									</p>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Validation Errors -->
-				<div v-if="mappingErrors.length > 0" class="bg-red-50 border border-red-200 rounded-md p-4">
-					<h5 class="font-medium text-red-800 mb-2">
-						Mapping Issues:
-					</h5>
-					<ul class="list-disc list-inside text-sm text-red-700 space-y-1">
-						<li v-for="error in mappingErrors" :key="error">
-							{{ error }}
-						</li>
-					</ul>
-				</div>
-
-				<!-- Actions -->
-				<div class="flex justify-between">
-					<button
-						class="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200"
-						@click="autoMapFields"
-					>
-						Auto-map Fields
-					</button>
-
-					<button
-						:disabled="mappingErrors.length > 0"
-						class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-						@click="validateAndProceed"
-					>
-						Preview Data
-					</button>
-				</div>
-			</div>
-
-			<!-- Step 3: Data Preview -->
-			<div v-if="currentStep === 3" class="space-y-6">
-				<div class="flex items-center justify-between">
-					<h3 class="text-lg font-semibold">
-						Step 3: Preview & Import
-					</h3>
-					<div class="space-x-2">
-						<button
-							class="text-sm text-blue-600 hover:text-blue-500"
-							@click="currentStep = 2"
-						>
-							← Back to Mapping
-						</button>
-					</div>
-				</div>
-
-				<div class="bg-green-50 border border-green-200 rounded-md p-4">
-					<p class="text-green-800 text-sm">
-						Found {{ mappedData.length }} valid rows. Review the data below and click Import to proceed.
-					</p>
-				</div>
-
-				<!-- Data Preview Table -->
-				<div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-					<div class="overflow-x-auto max-h-96">
-						<table class="min-w-full divide-y divide-gray-300">
-							<thead class="bg-gray-50 sticky top-0">
-								<tr>
-									<th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
-										Row
-									</th>
-									<th
-										v-for="field in targetFields.filter(f => fieldMappings[f.key])"
-										:key="field.key"
-										class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide"
-									>
-										{{ field.label }}
-									</th>
-								</tr>
-							</thead>
-							<tbody class="bg-white divide-y divide-gray-200">
-								<tr
-									v-for="(row, index) in mappedData.slice(0, 10)"
-									:key="index"
-									class="hover:bg-gray-50"
-								>
-									<td class="px-3 py-2 text-sm text-gray-500">
-										{{ index + 1 }}
-									</td>
-									<td
-										v-for="field in targetFields.filter(f => fieldMappings[f.key])"
-										:key="field.key"
-										class="px-3 py-2 text-sm text-gray-900 max-w-xs truncate"
-										:title="getValidKey(row[field.key])"
-									>
-										{{ row[field.key] || '-' }}
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-
-					<div v-if="mappedData.length > 10" class="bg-gray-50 px-3 py-2 text-sm text-gray-500 text-center">
-						Showing first 10 rows of {{ mappedData.length }} total rows
-					</div>
-				</div>
-
-				<!-- Import Options -->
-				<div class="bg-white border border-gray-200 rounded-lg p-4">
-					<h5 class="font-medium text-gray-900 mb-3">
-						Import Options
-					</h5>
-					<div class="space-y-3">
-						<label class="flex items-center">
-							<input
-								v-model="importOptions.skipDuplicates"
-								type="checkbox"
-								class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-							>
-							<span class="ml-2 text-sm text-gray-700">Skip duplicate entries</span>
-						</label>
-
-						<label class="flex items-center">
-							<input
-								v-model="importOptions.validateData"
-								type="checkbox"
-								class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-							>
-							<span class="ml-2 text-sm text-gray-700">Validate data before import</span>
-						</label>
-					</div>
-				</div>
-
-				<!-- Final Import -->
-				<div class="flex justify-end space-x-3">
-					<button
-						class="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
-						@click="resetImporter"
-					>
-						Cancel
-					</button>
-
-					<button
-						:disabled="isImporting"
-						class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center"
-						@click="performImport"
-					>
-						<svg
-							v-if="isImporting"
-							class="animate-spin -ml-1 mr-3 h-4 w-4 text-white"
-							fill="none"
-							viewBox="0 0 24 24"
-						>
-							<circle
-								class="opacity-25"
-								cx="12"
-								cy="12"
-								r="10"
-								stroke="currentColor"
-								stroke-width="4"
-							/>
-							<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-						</svg>
-						{{ isImporting ? 'Importing...' : 'Import Data' }}
-					</button>
-				</div>
-			</div>
-
-			<!-- Success Message -->
-			<div v-if="importSuccess" class="bg-green-50 border border-green-200 rounded-md p-4">
-				<div class="flex">
-					<svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-						<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-					</svg>
-					<div class="ml-3">
-						<h3 class="text-sm font-medium text-green-800">
-							Import Successful!
-						</h3>
-						<p class="mt-1 text-sm text-green-700">
-							Successfully imported {{ mappedData.length }} records.
-						</p>
-						<button
-							class="mt-2 text-sm text-green-600 hover:text-green-500 underline"
-							@click="resetImporter"
-						>
-							Import Another File
-						</button>
-					</div>
-				</div>
-			</div>
+			<UButton
+				label="Reset"
+				color="error"
+				icon="i-lucide-eraser"
+				:disabled="isDragging||isImporting||isLoading"
+				:loading="isImporting||isLoading"
+				@click="resetImporter"
+			/>
 		</div>
+
+		<USeparator color="primary" type="solid" />
+		<UPageCard variant="subtle" :ui="{ body: 'w-full py-2', footer: 'w-full mt-4 mb-1 border-t-4' }">
+			<template #body>
+				<UStepper
+					ref="stepper"
+					v-model="currentStep"
+					disabled
+					:items="items"
+					:ui="{
+						header: 'border-2 rounded-2xl py-3 w-full mb-2'
+					}"
+				>
+					<template #fileupload>
+						<div class="space-y-4">
+							<h3 class="text-lg font-semibold">
+								Step 1: Upload CSV File
+							</h3>
+
+							<div
+								v-if="!parsedFileData||parsedFileData.csvData.length===0"
+								class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors"
+								:class="{ 'border-blue-400 bg-blue-50': isDragging }"
+								@drop="onDrop"
+								@dragover.prevent
+								@dragenter.prevent
+							>
+								<div class="space-y-4">
+									<svg
+										class="mx-auto h-12 w-12"
+										stroke="currentColor"
+										fill="none"
+										viewBox="0 0 48 48"
+									>
+										<path
+											d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+									<div>
+										<p class="text-lg font-medium">
+											Drop your CSV file here, or
+											<label class="text-blue-600 hover:text-blue-500 cursor-pointer">
+												browse
+												<input
+													type="file"
+													class="sr-only"
+													accept=".csv,.txt"
+													@change="onFileSelect"
+												>
+											</label>
+										</p>
+										<p class="text-sm text-gray-500">
+											CSV files up to 30MB
+										</p>
+									</div>
+								</div>
+							</div>
+							<UBanner
+								v-else
+								color="neutral"
+								icon="i-lucide-info"
+								:title="uploadBannerTitle"
+							/>
+							<div v-if="uploadError" class="bg-red-50 border border-red-200 rounded-md p-4">
+								<p class="text-red-700">
+									{{ uploadError }}
+								</p>
+							</div>
+						</div>
+					</template>
+					<template #fieldmapping>
+						<div class="space-y-6">
+							<div class="flex items-center justify-between">
+								<h3 class="text-lg font-semibold">
+									Step 2: Map CSV Fields
+								</h3>
+							</div>
+							<div class="flex flex-row justify-between content-stretch items-center bg-yellow-50 border border-yellow-200 rounded-md p-4 mx-4">
+								<p class="text-yellow-800 text-sm">
+									Map your CSV columns to the expected fields. Unmapped columns will be ignored.
+								</p>
+								<div class="flex flex-row justify-evenly space-x-2">
+									<UButton
+										label="Auto Map Fields"
+										color="neutral"
+										variant="soft"
+										:disabled="isDragging||isImporting||isLoading"
+										:loading="isImporting||isLoading"
+										@click="autoMapFields"
+									/>
+									<UButton
+										label="Reset Mapping"
+										color="error"
+										variant="outline"
+										:disabled="isDragging||isImporting||isLoading"
+										:loading="isImporting||isLoading"
+										@click="resetFieldMaps"
+									/>
+								</div>
+							</div>
+
+							<div v-if="parsedFileData" class="grid grid-cols-4 gap-6 border rounded-lg p-2 divide-x divide-gray-300">
+								<!-- CSV Columns -->
+								<div class="space-y-4 col-span-1">
+									<h4 class="font-medium">
+										CSV Columns ({{ parsedFileData.csvHeaders.length }})
+									</h4>
+									<div class="rounded-lg p-4 space-y-2 max-h-80 overflow-y-auto">
+										<div
+											v-for="(header, index) in parsedFileData.csvHeaders"
+											:key="index"
+											class="rounded px-3 py-2 border text-sm"
+										>
+											<div class="flex items-center justify-between">
+												<span class="font-medium">{{ header }}</span>
+												<span class="text-xs">
+													{{ getSampleValue(header) || 'No data' }}
+												</span>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<!-- Target Fields -->
+								<!-- <div class="space-y-4 col-span-2">
+									<h4 class="font-medium">
+										Target Fields
+									</h4>
+									<div class="space-y-3">
+										<div
+											v-for="field in targetFields"
+											:key="field.key"
+											class="border rounded-lg p-4"
+										>
+											<div class="space-y-2">
+												<div class="flex items-center justify-between">
+													<label class="font-medium">
+														{{ field.label }}
+														<span v-if="field.required" class="text-red-500">*</span>
+													</label>
+													<span class="text-xs">{{ field.type }}</span>
+												</div>
+
+												<select
+													v-model="headerFieldMappings[field.key]"
+													class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+												>
+													<option value="">
+														-- Select CSV Column --
+													</option>
+													<option
+														v-for="header in parsedFileData.csvHeaders"
+														:key="header"
+														:value="header"
+													>
+														{{ header }}
+													</option>
+												</select>
+
+												<p v-if="field.description" class="text-xs">
+													{{ field.description }}
+												</p>
+											</div>
+										</div>
+									</div>
+								</div> -->
+
+								<!-- Target Fields Table -->
+								<div class="space-y-4 col-span-3">
+									<h4 class="font-medium">
+										Target Fields
+									</h4>
+									<UTable :data="targetFields" :columns="mappingCols">
+										<template #mapping-cell="{ row }">
+											<!-- <div>{{ fieldMappings[row.original.key] }}</div> -->
+											<USelect
+												v-model="headerFieldMappings[row.original.key]"
+												:items="fieldMapColOptions"
+												placeholder="-- Select CSV Column --"
+												:ui="{ content: 'min-w-fit' }"
+												class="w-full"
+											/>
+										</template>
+									</UTable>
+								</div>
+							</div>
+							<!-- Validation Errors -->
+							<div v-if="mappingErrors.length > 0" class="bg-red-50 border border-red-200 rounded-md p-4">
+								<h5 class="font-medium text-red-800 mb-2">
+									Mapping Issues:
+								</h5>
+								<ul class="list-disc list-inside text-sm text-red-700 space-y-1">
+									<li v-for="error in mappingErrors" :key="error">
+										{{ error }}
+									</li>
+								</ul>
+							</div>
+						</div>
+					</template>
+					<template #preview>
+						<div class="space-y-6">
+							<div class="flex items-center justify-between">
+								<h3 class="text-lg font-semibold">
+									Step 3: Preview & Import
+								</h3>
+							</div>
+
+							<div class="bg-green-50 border border-green-200 rounded-md p-4">
+								<p class="text-green-800 text-sm">
+									Found {{ mappedData.length }} valid rows. Review the data below and click Import to proceed.
+								</p>
+							</div>
+
+							<!-- Import Options -->
+							<div class=" border-gray-200 rounded-lg p-4">
+								<h5 class="font-medium mb-3">
+									Import Options
+								</h5>
+								<div class="space-y-3">
+									<label class="flex items-center">
+										<input
+											v-model="importOptions.skipDuplicates"
+											type="checkbox"
+											class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+										>
+										<span class="ml-2 text-sm ">Skip duplicate entries</span>
+									</label>
+
+									<label class="flex items-center">
+										<input
+											v-model="importOptions.validateData"
+											type="checkbox"
+											class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+										>
+										<span class="ml-2 text-sm ">Validate data before import</span>
+									</label>
+								</div>
+							</div>
+
+							<!-- Data Preview Table -->
+							<div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+								<div class="overflow-x-auto max-h-96">
+									<UTable :data="mappedData" />
+								</div>
+							</div>
+						</div>
+					</template>
+
+					<template #results>
+						<div>
+							<!-- Success Message -->
+							<div v-if="importSuccess" class="bg-green-50 border border-green-200 rounded-md p-4">
+								<div class="flex">
+									<svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+									</svg>
+									<div class="ml-3">
+										<h3 class="text-sm font-medium text-green-800">
+											Import Successful!
+										</h3>
+										<p class="mt-1 text-sm text-green-700">
+											Successfully submitted import of {{ mappedData.length }} records.
+										</p>
+										<button
+											class="mt-2 text-sm text-green-600 hover:text-green-500 underline"
+											@click="resetImporter"
+										>
+											Import Another File
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</template>
+				</UStepper>
+			</template>
+
+			<template #footer>
+				<div v-if="currentStep!==3" class="flex flex-row justify-center space-x-3">
+					<UButton
+						v-if="stepper?.hasPrev"
+						size="xl"
+						leading-icon="i-lucide-arrow-left"
+						:label="prevButtonLabel"
+						variant="soft"
+						:disabled="!stepper?.hasPrev ||isLoading||isDragging||isImporting"
+						:loading="isLoading||isImporting"
+						@click="stepper?.prev()"
+					/>
+
+					<UButton
+						variant="soft"
+						size="xl"
+						trailing-icon="i-lucide-arrow-right"
+						:disabled="!stepper?.hasNext||isLoading||isDragging||isImporting"
+						:loading="isLoading||isImporting"
+						:label="nextButtonLabel"
+						@click="goNextStep"
+					/>
+				</div>
+			</template>
+		</UPageCard>
 	</div>
 </template>
