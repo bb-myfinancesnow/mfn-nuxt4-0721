@@ -264,7 +264,20 @@ const handleFileChange = async (file: File) => {
 
 const getSampleValue = (header: string) => {
 	const sampleRow = parsedFileData.value?.csvData[0];
-	return sampleRow ? String(sampleRow[header] || '').substring(0, 20) : '';
+
+	if (!sampleRow) {
+		return '';
+	} else {
+		const val = sampleRow[header];
+
+		if (typeof val === 'boolean') return String(val);
+		else if (typeof val === 'number') return val;
+		else {
+			return String(val).substring(0, 20);
+		}
+	}
+
+	// return sampleRow ? String(sampleRow[header] || '').substring(0, 20) : '';
 };
 
 const autoMapFields = () => {
@@ -492,7 +505,7 @@ const fieldMapColOptions = computed<SelectItem[]>(() => {
 									<h4 class="font-medium">
 										CSV Columns ({{ parsedFileData.csvHeaders.length }})
 									</h4>
-									<div class="rounded-lg p-4 space-y-2 max-h-80 overflow-y-auto">
+									<div class="rounded-lg p-4 space-y-2 max-h-full overflow-y-auto">
 										<div
 											v-for="(header, index) in parsedFileData.csvHeaders"
 											:key="index"
@@ -507,50 +520,6 @@ const fieldMapColOptions = computed<SelectItem[]>(() => {
 										</div>
 									</div>
 								</div>
-
-								<!-- Target Fields -->
-								<!-- <div class="space-y-4 col-span-2">
-									<h4 class="font-medium">
-										Target Fields
-									</h4>
-									<div class="space-y-3">
-										<div
-											v-for="field in targetFields"
-											:key="field.key"
-											class="border rounded-lg p-4"
-										>
-											<div class="space-y-2">
-												<div class="flex items-center justify-between">
-													<label class="font-medium">
-														{{ field.label }}
-														<span v-if="field.required" class="text-red-500">*</span>
-													</label>
-													<span class="text-xs">{{ field.type }}</span>
-												</div>
-
-												<select
-													v-model="headerFieldMappings[field.key]"
-													class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-												>
-													<option value="">
-														-- Select CSV Column --
-													</option>
-													<option
-														v-for="header in parsedFileData.csvHeaders"
-														:key="header"
-														:value="header"
-													>
-														{{ header }}
-													</option>
-												</select>
-
-												<p v-if="field.description" class="text-xs">
-													{{ field.description }}
-												</p>
-											</div>
-										</div>
-									</div>
-								</div> -->
 
 								<!-- Target Fields Table -->
 								<div class="space-y-4 col-span-3">
