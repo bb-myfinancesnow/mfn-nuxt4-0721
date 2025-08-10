@@ -1,5 +1,12 @@
 import Papa from 'papaparse';
 
+export enum EImportRecordType {
+	CreateJournals = 'CreateJournals',
+	UpsertJournals = 'UpsertJournals',
+	CreateGlAccounts = 'CreateGlAccounts',
+	UpsertGlAccounts = 'UpsertGlAccounts'
+}
+
 // Types
 export interface ITargetField {
 	key: string;

@@ -1,0 +1,5 @@
+mutation CreateJournalImportJob($input: [JournalCreateInput!]!) {
+	addJournalImportJob(input: $input) {
+		...JobResultInfo
+	}
+}

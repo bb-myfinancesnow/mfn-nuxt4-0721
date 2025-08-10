@@ -1513,6 +1513,7 @@ export type LoanWhereUniqueInput = {
 };
 
 export type Mutation = {
+	addJournalImportJob: NewJobResultModel;
 	addTillerGenImportJob: NewJobResultModel;
 	bulkUpdateScheduleLogs: CountResultModel;
 	clearPeriods: CountResultModel;
@@ -1549,6 +1550,10 @@ export type Mutation = {
 	updateEntity: Entity;
 	updateJournal: JournalResultModel;
 	updateTranSchedule: TranScheduleResultModel;
+};
+
+export type MutationAddJournalImportJobArgs = {
+	input: Array<JournalCreateInput>;
 };
 
 export type MutationAddTillerGenImportJobArgs = {
@@ -2949,6 +2954,8 @@ export type BookDataFragment = { id: number; name: string; system: boolean; crea
 
 export type BookLedgerInfoFragment = { id: number; name: string; system: boolean; _count: { journals: number } };
 
+export type JobResultInfoFragment = { id: string; queue: string; recordCount: number };
+
 export type JournalRecInfoFragment = { id: string; tranNumber: number; tranDate: string };
 
 export type JournalHeaderDetailFragment = { id: string; createdAt: string; updatedAt: string; tranNumber: number; tranDate: string; bookId?: number | null; description: string; tranSource: SourceType; reversalDate?: string | null; externalId?: string | null; createdFromTillerTranId?: number | null; idReversalOf?: string | null; postingMonth: number; postingYear: number; book?: BookLedgerInfoFragment | null; postingPeriod: { id: number; locked: boolean; label: string }; _count: { entries: number; migrationLoanChanges: number; templateForTranSchedules: number } };
@@ -3030,6 +3037,12 @@ export type UpdateBookMutationVariables = Exact<{
 }>;
 
 export type UpdateBookMutation = { updateBook: BookDataFragment };
+
+export type CreateJournalImportJobMutationVariables = Exact<{
+	input: Array<JournalCreateInput> | JournalCreateInput;
+}>;
+
+export type CreateJournalImportJobMutation = { addJournalImportJob: JobResultInfoFragment };
 
 export type CreateNewJournalMutationVariables = Exact<{
 	data: JournalCreateInput;
@@ -3257,6 +3270,13 @@ export const BookDataFragmentDoc = gql`
   _count {
     journals
   }
+}
+    `;
+export const JobResultInfoFragmentDoc = gql`
+    fragment JobResultInfo on NewJobResultModel {
+  id
+  queue
+  recordCount
 }
     `;
 export const BookLedgerInfoFragmentDoc = gql`
@@ -3623,6 +3643,13 @@ export const UpdateBookDocument = gql`
   }
 }
     ${BookDataFragmentDoc}`;
+export const CreateJournalImportJobDocument = gql`
+    mutation CreateJournalImportJob($input: [JournalCreateInput!]!) {
+  addJournalImportJob(input: $input) {
+    ...JobResultInfo
+  }
+}
+    ${JobResultInfoFragmentDoc}`;
 export const CreateNewJournalDocument = gql`
     mutation CreateNewJournal($data: JournalCreateInput!) {
   createJournal(data: $data) {
@@ -3960,6 +3987,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
 		},
 		UpdateBook(variables: UpdateBookMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<UpdateBookMutation> {
 			return withWrapper((wrappedRequestHeaders) => client.request<UpdateBookMutation>({ document: UpdateBookDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'UpdateBook', 'mutation', variables);
+		},
+		CreateJournalImportJob(variables: CreateJournalImportJobMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<CreateJournalImportJobMutation> {
+			return withWrapper((wrappedRequestHeaders) => client.request<CreateJournalImportJobMutation>({ document: CreateJournalImportJobDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'CreateJournalImportJob', 'mutation', variables);
 		},
 		CreateNewJournal(variables: CreateNewJournalMutationVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<CreateNewJournalMutation> {
 			return withWrapper((wrappedRequestHeaders) => client.request<CreateNewJournalMutation>({ document: CreateNewJournalDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'CreateNewJournal', 'mutation', variables);

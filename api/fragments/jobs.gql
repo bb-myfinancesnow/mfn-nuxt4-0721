@@ -1,0 +1,5 @@
+fragment JobResultInfo on NewJobResultModel {
+	id
+	queue
+	recordCount
+}
