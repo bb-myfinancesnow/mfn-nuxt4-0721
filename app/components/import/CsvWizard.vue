@@ -55,9 +55,6 @@ const isLoading = ref(false);
 const currentStep = ref(0);
 const isDragging = ref(false);
 const uploadError = ref('');
-// const csvData = ref<any[]>([]);
-// const csvHeaders = ref<string[]>([]);
-// const fieldMappings = reactive<Record<string, string>>({});
 const importOptions = reactive<IImportOptions>({
 	skipDuplicates: false,
 	validateData: true
@@ -143,6 +140,8 @@ const nextButtonLabel = computed<string>(() => {
 			return 'Advance to Mapping';
 		case 1:
 			return 'Preview Data';
+		case 2:
+			return 'Submit Import';
 		default:
 			return 'Next';
 	}
@@ -184,6 +183,9 @@ const goNextStep = async () => {
 			});
 			await new Promise((r) => setTimeout(r, 3000));
 		} else {
+			if (Object.keys(headerFieldMappings.value).length === 0) {
+				autoMapFields();
+			}
 			currentStep.value = 1;
 		}
 	} else if (currentStep.value === 1) {
@@ -199,6 +201,9 @@ const goNextStep = async () => {
 		} else {
 			currentStep.value = 2;
 		}
+	} else if (currentStep.value === 2) {
+		currentStep.value = 3;
+		await performImport();
 	}
 	isLoading.value = false;
 };
@@ -288,12 +293,6 @@ const resetFieldMaps = () => {
 	headerFieldMappings.value = {};
 };
 
-const validateAndProceed = () => {
-	if (mappingErrors.value.length === 0) {
-		currentStep.value = 3;
-	}
-};
-
 const performImport = async () => {
 	isImporting.value = true;
 
@@ -303,7 +302,7 @@ const performImport = async () => {
 
 		emit('import', mappedData.value);
 		importSuccess.value = true;
-		currentStep.value = 4;
+		// currentStep.value = 4;
 	} catch (error) {
 		console.error(`performImport error`, error);
 		uploadError.value = 'Import failed. Please try again.';
@@ -585,11 +584,86 @@ const fieldMapColOptions = computed<SelectItem[]>(() => {
 							</div>
 						</div>
 					</template>
+					<template #preview>
+						<div class="space-y-6">
+							<div class="flex items-center justify-between">
+								<h3 class="text-lg font-semibold">
+									Step 3: Preview & Import
+								</h3>
+							</div>
+
+							<div class="bg-green-50 border border-green-200 rounded-md p-4">
+								<p class="text-green-800 text-sm">
+									Found {{ mappedData.length }} valid rows. Review the data below and click Import to proceed.
+								</p>
+							</div>
+
+							<!-- Import Options -->
+							<div class=" border-gray-200 rounded-lg p-4">
+								<h5 class="font-medium mb-3">
+									Import Options
+								</h5>
+								<div class="space-y-3">
+									<label class="flex items-center">
+										<input
+											v-model="importOptions.skipDuplicates"
+											type="checkbox"
+											class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+										>
+										<span class="ml-2 text-sm ">Skip duplicate entries</span>
+									</label>
+
+									<label class="flex items-center">
+										<input
+											v-model="importOptions.validateData"
+											type="checkbox"
+											class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+										>
+										<span class="ml-2 text-sm ">Validate data before import</span>
+									</label>
+								</div>
+							</div>
+
+							<!-- Data Preview Table -->
+							<div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+								<div class="overflow-x-auto max-h-96">
+									<UTable :data="mappedData" />
+								</div>
+							</div>
+						</div>
+					</template>
+
+					<template #results>
+						<div>
+							<!-- Success Message -->
+							<div v-if="importSuccess" class="bg-green-50 border border-green-200 rounded-md p-4">
+								<div class="flex">
+									<svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+									</svg>
+									<div class="ml-3">
+										<h3 class="text-sm font-medium text-green-800">
+											Import Successful!
+										</h3>
+										<p class="mt-1 text-sm text-green-700">
+											Successfully submitted import of {{ mappedData.length }} records.
+										</p>
+										<button
+											class="mt-2 text-sm text-green-600 hover:text-green-500 underline"
+											@click="resetImporter"
+										>
+											Import Another File
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</template>
 				</UStepper>
 			</template>
 
 			<template #footer>
-				<div class="flex flex-row justify-center space-x-3">
+				<div v-if="currentStep!==3" class="flex flex-row justify-center space-x-3">
 					<UButton
 						v-if="stepper?.hasPrev"
 						size="xl"

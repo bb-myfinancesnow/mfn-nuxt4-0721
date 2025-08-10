@@ -1,58 +1,22 @@
 <script lang="ts" setup>
-import type { StepperItem } from '@nuxt/ui';
-
-const isLoading = ref(false);
-
-const items: StepperItem[] = [
-	{
-		title: 'File Upload',
-		// description: 'Choose your file here',
-		icon: 'i-lucide-file-up',
-		disabled: true,
-		value: 0,
-		slot: 'fileupload' as const
-	},
-	{
-		title: 'Field Mapping',
-		// description: 'Set your preferred shipping method',
-		// icon: 'i-lucide-truck',
-		disabled: true,
-		value: 1
-	},
-	{
-		title: 'Preview',
-		// description: 'Confirm your order',
-		disabled: true,
-		value: 2
-	},
-	{
-		title: 'Process',
-		// description: 'Confirm your order',
-		disabled: true,
-		value: 3
-	}
+const customFields: ITargetField[] = [
+	{ key: 'firstName', label: 'First Name', type: 'string', required: true, description: 'The person\'s first name' },
+	{ key: 'lastName', label: 'Last Name', type: 'string', required: true },
+	{ key: 'email', label: 'Email', type: 'email', required: true, description: 'Valid email address' }
+	// ... more fields
 ];
 
-const activeStep = ref(0);
+const handleImportedData = (data: IMappedRow[]) => {
+	console.log('Imported data:', data);
+	// Process the imported data as needed
+};
 </script>
 
 <template>
-	<UStepper
-		ref="stepper"
-		v-model="activeStep"
-		:items="items"
-		class="w-full"
-	>
-		<!-- <template #content="{ item }">
-			<div class="aspect-video">
-				This is the {{ item?.title }} step.
-			</div>
-		</template> -->
-		<template #fileupload>
-			<ImportPrimeCsv
-				card-title="Choose Journal File"
-				:is-parent-disabled="isLoading"
-			/>
-		</template>
-	</UStepper>
+	<div>
+		<ImportCsvWizard
+			:target-fields="customFields"
+			@import="handleImportedData"
+		/>
+	</div>
 </template>

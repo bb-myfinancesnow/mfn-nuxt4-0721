@@ -14,7 +14,7 @@ const handleImportedData = (data: IMappedRow[]) => {
 
 <template>
 	<div>
-		<ImportCsvWizard
+		<ImportCsvImporter
 			:target-fields="customFields"
 			@import="handleImportedData"
 		/>
