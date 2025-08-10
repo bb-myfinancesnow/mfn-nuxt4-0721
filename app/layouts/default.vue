@@ -225,9 +225,20 @@ const navLinks = ref<NavigationMenuItem[][]>([
 			label: 'Setup',
 			icon: 'i-lucide-settings',
 			type: 'trigger',
+			to: '/dash/setup',
+			exact: true,
 			children: [
 				{
-					label: 'General',
+					label: 'Setup Home',
+					to: '/dash/setup',
+					exact: true,
+					onSelect: () => {
+						open.value = false;
+					}
+				},
+				{
+					label: 'Jobs',
+					to: '/dash/setup/jobs',
 					onSelect: () => {
 						open.value = false;
 					}
