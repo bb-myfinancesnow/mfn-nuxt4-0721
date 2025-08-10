@@ -17,6 +17,14 @@ export const BaseIntIdDatesSchema = z.object({
 
 export type TBaseIntIdDatesSchema = z.infer<typeof BaseIntIdDatesSchema>;
 
+export const BaseStringIdDatesSchema = z.object({
+	id: z.string(),
+	createdAt: z.coerce.date(),
+	updatedAt: z.coerce.date()
+});
+
+export type TBaseStringIdDatesSchema = z.infer<typeof BaseStringIdDatesSchema>;
+
 export const BookRecordSchema = z.object({
 	createdAt: z.coerce.date(),
 	id: z.number().int(),
