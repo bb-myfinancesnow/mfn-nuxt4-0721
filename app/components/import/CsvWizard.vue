@@ -18,34 +18,57 @@ const props = withDefaults(defineProps<Props>(), {
 	]
 });
 
+const toast = useToast();
+
 // Emits
 const emit = defineEmits<{
 	import: [data: IMappedRow[]];
 }>();
 
-const items = ref<StepperItem[]>([
+// const items = ref<StepperItem[]>([
+// 	{
+// 		title: 'File Upload',
+// 		// description: 'Choose your file here',
+// 		icon: 'i-lucide-file-up',
+// 		slot: 'fileupload' as const
+// 	},
+// 	{
+// 		title: 'Field Mapping'
+// 		// description: 'Map File Columns to Records'
+// 	},
+// 	{
+// 		title: 'Preview & Import'
+// 		// description: 'Confirm your order'
+// 	},
+// 	{
+// 		title: 'Results'
+// 	}
+// ]);
+
+const items = [
 	{
 		title: 'File Upload',
-		// description: 'Choose your file here',
 		icon: 'i-lucide-file-up',
 		slot: 'fileupload' as const
 	},
 	{
-		title: 'Field Mapping'
-		// description: 'Map File Columns to Records'
+		title: 'Field Mapping',
+		slot: 'fieldmapping' as const
 	},
 	{
-		title: 'Preview & Import'
-		// description: 'Confirm your order'
+		title: 'Preview & Import',
+		slot: 'preview' as const
 	},
 	{
-		title: 'Results'
+		title: 'Results',
+		slot: 'results' as const
 	}
-]);
+] satisfies StepperItem[];
 
 const stepper = useTemplateRef('stepper');
 
 // State
+const isLoading = ref(false);
 const currentStep = ref(0);
 const isDragging = ref(false);
 const uploadError = ref('');
@@ -120,7 +143,45 @@ const mappedData = computed(() => {
 	});
 });
 
+const uploadBannerTitle = computed(() => {
+	if (!csvData.value || csvData.value.length === 0) {
+		return `No CSV Data Uploaded`;
+	} else {
+		return `Uploaded File with ${csvData.value.length} rows`;
+	}
+});
+
 // Methods
+const goNextStep = async () => {
+	isLoading.value = true;
+	await new Promise((r) => setTimeout(r, 1000));
+
+	if (currentStep.value === 0) {
+		if (!csvData.value || csvData.value.length === 0) {
+			toast.add({
+				title: 'Missing CSV File',
+				description: 'Cannot Advance without CSV Data',
+				icon: 'i-lucide-shield-alert',
+				color: 'error',
+				duration: 3000
+			});
+			await new Promise((r) => setTimeout(r, 3000));
+		} else if (uploadError.value) {
+			toast.add({
+				title: 'File Errors',
+				description: 'Cannot Advance with Import Errors',
+				icon: 'i-lucide-shield-alert',
+				color: 'error',
+				duration: 3000
+			});
+			await new Promise((r) => setTimeout(r, 3000));
+		} else {
+			currentStep.value = 1;
+		}
+	}
+	isLoading.value = false;
+};
+
 const parseCSV = (csvText: string) => {
 	try {
 		const lines = csvText.split('\n').filter((line) => line.trim());
@@ -140,7 +201,7 @@ const parseCSV = (csvText: string) => {
 		});
 
 		csvData.value = data;
-		currentStep.value = 1;
+		// currentStep.value = 1;
 		uploadError.value = '';
 	} catch (error) {
 		uploadError.value = `Failed to parse CSV: ${error instanceof Error ? error.message : 'Unknown error'}`;
@@ -238,6 +299,7 @@ const performImport = async () => {
 };
 
 const resetImporter = () => {
+	isLoading.value = true;
 	currentStep.value = 0;
 	csvData.value = [];
 	csvHeaders.value = [];
@@ -246,10 +308,139 @@ const resetImporter = () => {
 	uploadError.value = '';
 	importSuccess.value = false;
 	isImporting.value = false;
+	isLoading.value = false;
 };
 </script>
 
 <template>
+	<div class="w-full min-h-screen pt-2 pb-8 space-y-6 px-2">
+		<div class="flex flex-row justify-between">
+			<h2 class="text-2xl font-bold">
+				CSV Import Wizard
+			</h2>
+			<UButton
+				label="Reset"
+				color="error"
+				icon="i-lucide-eraser"
+				:disabled="isDragging||isImporting||isLoading"
+				:loading="isImporting||isLoading"
+				@click="resetImporter"
+			/>
+		</div>
+
+		<USeparator color="primary" type="solid" />
+		<UPageCard variant="subtle" :ui="{ body: 'w-full py-2', footer: 'w-full mt-4 mb-1 border-t-4' }">
+			<template #body>
+				<UStepper
+					ref="stepper"
+					v-model="currentStep"
+					disabled
+					:items="items"
+					:ui="{
+						header: 'border-2 rounded-2xl py-3 w-full mb-2'
+					}"
+				>
+					<template #fileupload>
+						<div class="space-y-4">
+							<h3 class="text-lg font-semibold">
+								Step 1: Upload CSV File
+							</h3>
+
+							<div
+								v-if="!csvData||csvData.length===0"
+								class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors"
+								:class="{ 'border-blue-400 bg-blue-50': isDragging }"
+								@drop="onDrop"
+								@dragover.prevent
+								@dragenter.prevent
+							>
+								<div class="space-y-4">
+									<svg
+										class="mx-auto h-12 w-12"
+										stroke="currentColor"
+										fill="none"
+										viewBox="0 0 48 48"
+									>
+										<path
+											d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+									<div>
+										<p class="text-lg font-medium">
+											Drop your CSV file here, or
+											<label class="text-blue-600 hover:text-blue-500 cursor-pointer">
+												browse
+												<input
+													type="file"
+													class="sr-only"
+													accept=".csv,.txt"
+													@change="onFileSelect"
+												>
+											</label>
+										</p>
+										<p class="text-sm text-gray-500">
+											CSV files up to 10MB
+										</p>
+									</div>
+								</div>
+							</div>
+							<UBanner
+								v-else
+								color="neutral"
+								icon="i-lucide-info"
+								:title="uploadBannerTitle"
+							/>
+							<div v-if="uploadError" class="bg-red-50 border border-red-200 rounded-md p-4">
+								<p class="text-red-700">
+									{{ uploadError }}
+								</p>
+							</div>
+						</div>
+					</template>
+					<template #fieldmapping>
+						<div class="space-y-6">
+							<div class="flex items-center justify-between">
+								<h3 class="text-lg font-semibold">
+									Step 2: Map CSV Fields
+								</h3>
+							</div>
+						</div>
+					</template>
+				</UStepper>
+			</template>
+
+			<template #footer>
+				<div class="flex flex-row justify-center space-x-3">
+					<UButton
+						v-if="stepper?.hasPrev"
+						size="xl"
+						leading-icon="i-lucide-arrow-left"
+						label="Prev"
+						variant="soft"
+						:disabled="!stepper?.hasPrev ||isLoading||isDragging||isImporting"
+						:loading="isLoading||isImporting"
+						@click="stepper?.prev()"
+					/>
+
+					<UButton
+						variant="soft"
+						size="xl"
+						trailing-icon="i-lucide-arrow-right"
+						:disabled="!stepper?.hasNext||isLoading||isDragging||isImporting"
+						:loading="isLoading||isImporting"
+						label="Next"
+						@click="goNextStep"
+					/>
+				</div>
+			</template>
+		</UPageCard>
+	</div>
+</template>
+
+<!-- <template>
 	<div class="w-full min-h-screen pt-2 pb-8 space-y-6 px-2">
 		<h2 class="text-2xl font-bold">
 			CSV Import Wizard
@@ -316,4 +507,4 @@ const resetImporter = () => {
 			</template>
 		</UStepper>
 	</div>
-</template>
+</template> -->
