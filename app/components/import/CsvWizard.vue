@@ -1,6 +1,9 @@
 <!-- eslint-disable @typescript-eslint/no-unused-vars -->
 <script lang="ts" setup>
-import type { StepperItem } from '@nuxt/ui';
+import { h, resolveComponent } from 'vue';
+import type { StepperItem, TableColumn } from '@nuxt/ui';
+
+const ImportMapLabelCol = resolveComponent('ImportMapLabelCol');
 
 interface Props {
 	targetFields?: ITargetField[];
@@ -24,26 +27,6 @@ const toast = useToast();
 const emit = defineEmits<{
 	import: [data: IMappedRow[]];
 }>();
-
-// const items = ref<StepperItem[]>([
-// 	{
-// 		title: 'File Upload',
-// 		// description: 'Choose your file here',
-// 		icon: 'i-lucide-file-up',
-// 		slot: 'fileupload' as const
-// 	},
-// 	{
-// 		title: 'Field Mapping'
-// 		// description: 'Map File Columns to Records'
-// 	},
-// 	{
-// 		title: 'Preview & Import'
-// 		// description: 'Confirm your order'
-// 	},
-// 	{
-// 		title: 'Results'
-// 	}
-// ]);
 
 const items = [
 	{
@@ -298,6 +281,20 @@ const resetImporter = () => {
 	isImporting.value = false;
 	isLoading.value = false;
 };
+
+const mappingCols = ref<TableColumn<ITargetField>[]>([
+	{
+		accessorKey: 'label',
+		header: 'Label',
+		cell: ({ row }) => {
+			return h(ImportMapLabelCol, { field: row.original });
+		}
+	},
+	{
+		accessorKey: 'type',
+		header: 'Type'
+	}
+]);
 </script>
 
 <template>
@@ -401,7 +398,7 @@ const resetImporter = () => {
 								</p>
 							</div>
 
-							<div v-if="parsedFileData" class="grid grid-cols-4 gap-6">
+							<div v-if="parsedFileData" class="grid grid-cols-6 gap-6">
 								<!-- CSV Columns -->
 								<div class="space-y-4 col-span-1">
 									<h4 class="font-medium">
@@ -424,7 +421,7 @@ const resetImporter = () => {
 								</div>
 
 								<!-- Target Fields -->
-								<div class="space-y-4 col-span-3">
+								<div class="space-y-4 col-span-2">
 									<h4 class="font-medium">
 										Target Fields
 									</h4>
@@ -465,6 +462,14 @@ const resetImporter = () => {
 											</div>
 										</div>
 									</div>
+								</div>
+
+								<!-- Target Fields Table -->
+								<div class="space-y-4 col-span-3">
+									<h4 class="font-medium">
+										Target Fields
+									</h4>
+									<UTable :data="targetFields" :columns="mappingCols" />
 								</div>
 							</div>
 						</div>
