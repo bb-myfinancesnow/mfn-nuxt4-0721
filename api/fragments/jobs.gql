@@ -3,3 +3,43 @@ fragment JobResultInfo on NewJobResultModel {
 	queue
 	recordCount
 }
+
+fragment BulkJobSubRecord on BulkImportJobSubmission {
+	id
+	createdAt
+	updatedAt
+	queue
+	recordTotal
+	startedAt
+	finishedAt
+	status
+	successCount
+	jobError
+	errorCount
+	attempts
+	_count {
+		records
+	}
+}
+
+fragment BulkImportRecordInfo on BulkImportRecord {
+	id
+	submissionId
+	isSuccess
+	payload
+	recordError
+	resultMessage
+	result
+}
+
+fragment BulkImportRecordDetail on BulkImportRecord {
+	id
+	createdAt
+	updatedAt
+	submissionId
+	isSuccess
+	payload
+	recordError
+	resultMessage
+	result
+}

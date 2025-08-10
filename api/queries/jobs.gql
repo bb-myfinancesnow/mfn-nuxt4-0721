@@ -1,0 +1,56 @@
+query SearchBulkJobSubRecords(
+	$where: BulkImportJobSubmissionWhereInput
+	$orderBy: [BulkImportJobSubmissionOrderByWithRelationInput!]
+	$skip: Int
+	$take: Int
+	$cursor: BulkImportJobSubmissionWhereUniqueInput
+) {
+	bulkImportJobSubmissions(
+		where: $where
+		orderBy: $orderBy
+		skip: $skip
+		take: $take
+		cursor: $cursor
+	) {
+		...BulkJobSubRecord
+	}
+}
+
+query SearchBulkJobSubmitDetails(
+	$where: BulkImportJobSubmissionWhereInput
+	$orderBy: [BulkImportJobSubmissionOrderByWithRelationInput!]
+	$skip: Int
+	$take: Int
+	$cursor: BulkImportJobSubmissionWhereUniqueInput
+) {
+	bulkImportJobSubmissions(
+		where: $where
+		orderBy: $orderBy
+		skip: $skip
+		take: $take
+		cursor: $cursor
+	) {
+		...BulkJobSubRecord
+		records {
+			...BulkImportRecordInfo
+		}
+	}
+}
+
+query SearchBulkRecordDetails(
+	$where: BulkImportRecordWhereInput
+	$orderBy: [BulkImportRecordOrderByWithRelationInput!]
+	$skip: Int
+	$take: Int
+	$cursor: BulkImportRecordWhereUniqueInput
+) {
+	bulkImportRecords(
+		where: $where
+		orderBy: $orderBy
+		skip: $skip
+		take: $take
+		cursor: $cursor
+	) {
+		...BulkImportRecordDetail
+	}
+}

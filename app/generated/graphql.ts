@@ -2956,6 +2956,12 @@ export type BookLedgerInfoFragment = { id: number; name: string; system: boolean
 
 export type JobResultInfoFragment = { id: string; queue: string; recordCount: number };
 
+export type BulkJobSubRecordFragment = { id: string; createdAt: string; updatedAt: string; queue: string; recordTotal: number; startedAt?: string | null; finishedAt?: string | null; status: JobStatus; successCount: number; jobError?: string | null; errorCount: number; attempts: number; _count: { records: number } };
+
+export type BulkImportRecordInfoFragment = { id: string; submissionId: string; isSuccess: boolean; payload: Record<string, unknown>; recordError?: string | null; resultMessage?: string | null; result?: Record<string, unknown> | null };
+
+export type BulkImportRecordDetailFragment = { id: string; createdAt: string; updatedAt: string; submissionId: string; isSuccess: boolean; payload: Record<string, unknown>; recordError?: string | null; resultMessage?: string | null; result?: Record<string, unknown> | null };
+
 export type JournalRecInfoFragment = { id: string; tranNumber: number; tranDate: string };
 
 export type JournalHeaderDetailFragment = { id: string; createdAt: string; updatedAt: string; tranNumber: number; tranDate: string; bookId?: number | null; description: string; tranSource: SourceType; reversalDate?: string | null; externalId?: string | null; createdFromTillerTranId?: number | null; idReversalOf?: string | null; postingMonth: number; postingYear: number; book?: BookLedgerInfoFragment | null; postingPeriod: { id: number; locked: boolean; label: string }; _count: { entries: number; migrationLoanChanges: number; templateForTranSchedules: number } };
@@ -3128,6 +3134,39 @@ export type BookLedgerInfoListQueryVariables = Exact<{
 
 export type BookLedgerInfoListQuery = { books: Array<BookLedgerInfoFragment> };
 
+export type SearchBulkJobSubRecordsQueryVariables = Exact<{
+	where?: InputMaybe<BulkImportJobSubmissionWhereInput>;
+	orderBy?: InputMaybe<Array<BulkImportJobSubmissionOrderByWithRelationInput> | BulkImportJobSubmissionOrderByWithRelationInput>;
+	skip?: InputMaybe<Scalars['Int']['input']>;
+	take?: InputMaybe<Scalars['Int']['input']>;
+	cursor?: InputMaybe<BulkImportJobSubmissionWhereUniqueInput>;
+}>;
+
+export type SearchBulkJobSubRecordsQuery = { bulkImportJobSubmissions: Array<BulkJobSubRecordFragment> };
+
+export type SearchBulkJobSubmitDetailsQueryVariables = Exact<{
+	where?: InputMaybe<BulkImportJobSubmissionWhereInput>;
+	orderBy?: InputMaybe<Array<BulkImportJobSubmissionOrderByWithRelationInput> | BulkImportJobSubmissionOrderByWithRelationInput>;
+	skip?: InputMaybe<Scalars['Int']['input']>;
+	take?: InputMaybe<Scalars['Int']['input']>;
+	cursor?: InputMaybe<BulkImportJobSubmissionWhereUniqueInput>;
+}>;
+
+export type SearchBulkJobSubmitDetailsQuery = { bulkImportJobSubmissions: Array<(
+    { records?: Array<BulkImportRecordInfoFragment> | null }
+    & BulkJobSubRecordFragment
+  )>; };
+
+export type SearchBulkRecordDetailsQueryVariables = Exact<{
+	where?: InputMaybe<BulkImportRecordWhereInput>;
+	orderBy?: InputMaybe<Array<BulkImportRecordOrderByWithRelationInput> | BulkImportRecordOrderByWithRelationInput>;
+	skip?: InputMaybe<Scalars['Int']['input']>;
+	take?: InputMaybe<Scalars['Int']['input']>;
+	cursor?: InputMaybe<BulkImportRecordWhereUniqueInput>;
+}>;
+
+export type SearchBulkRecordDetailsQuery = { bulkImportRecords: Array<BulkImportRecordDetailFragment> };
+
 export type SearchJournalDetailsQueryVariables = Exact<{
 	where?: InputMaybe<JournalWhereInput>;
 	orderBy?: InputMaybe<Array<JournalOrderByWithRelationInput> | JournalOrderByWithRelationInput>;
@@ -3277,6 +3316,49 @@ export const JobResultInfoFragmentDoc = gql`
   id
   queue
   recordCount
+}
+    `;
+export const BulkJobSubRecordFragmentDoc = gql`
+    fragment BulkJobSubRecord on BulkImportJobSubmission {
+  id
+  createdAt
+  updatedAt
+  queue
+  recordTotal
+  startedAt
+  finishedAt
+  status
+  successCount
+  jobError
+  errorCount
+  attempts
+  _count {
+    records
+  }
+}
+    `;
+export const BulkImportRecordInfoFragmentDoc = gql`
+    fragment BulkImportRecordInfo on BulkImportRecord {
+  id
+  submissionId
+  isSuccess
+  payload
+  recordError
+  resultMessage
+  result
+}
+    `;
+export const BulkImportRecordDetailFragmentDoc = gql`
+    fragment BulkImportRecordDetail on BulkImportRecord {
+  id
+  createdAt
+  updatedAt
+  submissionId
+  isSuccess
+  payload
+  recordError
+  resultMessage
+  result
 }
     `;
 export const BookLedgerInfoFragmentDoc = gql`
@@ -3770,6 +3852,49 @@ export const BookLedgerInfoListDocument = gql`
   }
 }
     ${BookLedgerInfoFragmentDoc}`;
+export const SearchBulkJobSubRecordsDocument = gql`
+    query SearchBulkJobSubRecords($where: BulkImportJobSubmissionWhereInput, $orderBy: [BulkImportJobSubmissionOrderByWithRelationInput!], $skip: Int, $take: Int, $cursor: BulkImportJobSubmissionWhereUniqueInput) {
+  bulkImportJobSubmissions(
+    where: $where
+    orderBy: $orderBy
+    skip: $skip
+    take: $take
+    cursor: $cursor
+  ) {
+    ...BulkJobSubRecord
+  }
+}
+    ${BulkJobSubRecordFragmentDoc}`;
+export const SearchBulkJobSubmitDetailsDocument = gql`
+    query SearchBulkJobSubmitDetails($where: BulkImportJobSubmissionWhereInput, $orderBy: [BulkImportJobSubmissionOrderByWithRelationInput!], $skip: Int, $take: Int, $cursor: BulkImportJobSubmissionWhereUniqueInput) {
+  bulkImportJobSubmissions(
+    where: $where
+    orderBy: $orderBy
+    skip: $skip
+    take: $take
+    cursor: $cursor
+  ) {
+    ...BulkJobSubRecord
+    records {
+      ...BulkImportRecordInfo
+    }
+  }
+}
+    ${BulkJobSubRecordFragmentDoc}
+${BulkImportRecordInfoFragmentDoc}`;
+export const SearchBulkRecordDetailsDocument = gql`
+    query SearchBulkRecordDetails($where: BulkImportRecordWhereInput, $orderBy: [BulkImportRecordOrderByWithRelationInput!], $skip: Int, $take: Int, $cursor: BulkImportRecordWhereUniqueInput) {
+  bulkImportRecords(
+    where: $where
+    orderBy: $orderBy
+    skip: $skip
+    take: $take
+    cursor: $cursor
+  ) {
+    ...BulkImportRecordDetail
+  }
+}
+    ${BulkImportRecordDetailFragmentDoc}`;
 export const SearchJournalDetailsDocument = gql`
     query SearchJournalDetails($where: JournalWhereInput, $orderBy: [JournalOrderByWithRelationInput!], $skip: Int, $take: Int, $cursor: JournalWhereUniqueInput) {
   journals(
@@ -4029,6 +4154,15 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
 		},
 		BookLedgerInfoList(variables?: BookLedgerInfoListQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<BookLedgerInfoListQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<BookLedgerInfoListQuery>({ document: BookLedgerInfoListDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'BookLedgerInfoList', 'query', variables);
+		},
+		SearchBulkJobSubRecords(variables?: SearchBulkJobSubRecordsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchBulkJobSubRecordsQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<SearchBulkJobSubRecordsQuery>({ document: SearchBulkJobSubRecordsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchBulkJobSubRecords', 'query', variables);
+		},
+		SearchBulkJobSubmitDetails(variables?: SearchBulkJobSubmitDetailsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchBulkJobSubmitDetailsQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<SearchBulkJobSubmitDetailsQuery>({ document: SearchBulkJobSubmitDetailsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchBulkJobSubmitDetails', 'query', variables);
+		},
+		SearchBulkRecordDetails(variables?: SearchBulkRecordDetailsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchBulkRecordDetailsQuery> {
+			return withWrapper((wrappedRequestHeaders) => client.request<SearchBulkRecordDetailsQuery>({ document: SearchBulkRecordDetailsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchBulkRecordDetails', 'query', variables);
 		},
 		SearchJournalDetails(variables?: SearchJournalDetailsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit['signal']): Promise<SearchJournalDetailsQuery> {
 			return withWrapper((wrappedRequestHeaders) => client.request<SearchJournalDetailsQuery>({ document: SearchJournalDetailsDocument, variables, requestHeaders: { ...requestHeaders, ...wrappedRequestHeaders }, signal }), 'SearchJournalDetails', 'query', variables);
