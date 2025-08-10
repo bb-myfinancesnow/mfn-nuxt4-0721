@@ -1,7 +1,7 @@
 <!-- eslint-disable @typescript-eslint/no-unused-vars -->
 <script lang="ts" setup>
 import { h, resolveComponent } from 'vue';
-import type { StepperItem, TableColumn } from '@nuxt/ui';
+import type { SelectItem, StepperItem, TableColumn } from '@nuxt/ui';
 
 const ImportMapLabelCol = resolveComponent('ImportMapLabelCol');
 
@@ -66,6 +66,7 @@ const isImporting = ref(false);
 const importSuccess = ref(false);
 
 const parsedFileData = ref<IParsedCsvFileResult>();
+const headerFieldMappings = ref<Record<string, string>>({});
 
 // Computed
 const mappingErrors = computed(() => {
@@ -244,6 +245,12 @@ const autoMapFields = () => {
 	});
 };
 
+const resetFieldMaps = () => {
+	// Object.assign(fieldMappings, {});
+	// eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+	Object.keys(fieldMappings).forEach((key) => delete fieldMappings[key]);
+};
+
 const validateAndProceed = () => {
 	if (mappingErrors.value.length === 0) {
 		currentStep.value = 3;
@@ -291,10 +298,37 @@ const mappingCols = ref<TableColumn<ITargetField>[]>([
 		}
 	},
 	{
+		accessorKey: 'key',
+		header: 'Field'
+	},
+	{
 		accessorKey: 'type',
 		header: 'Type'
+	},
+	{
+		id: 'mapping',
+		header: 'Mapping'
 	}
 ]);
+
+const fieldMapColOptions = computed<SelectItem[]>(() => {
+	// const opts: SelectItem[] = [{
+	// 	label: '-- Select CSV Column --',
+	// 	value: undefined
+	// }];
+	const opts: SelectItem[] = [];
+
+	if (parsedFileData.value && parsedFileData.value.csvHeaders.length) {
+		const headerOpts: SelectItem[] = parsedFileData.value.csvHeaders.map((header) => ({
+			label: header,
+			value: header
+		}));
+
+		opts.push(...headerOpts);
+	}
+
+	return opts;
+});
 </script>
 
 <template>
@@ -392,10 +426,28 @@ const mappingCols = ref<TableColumn<ITargetField>[]>([
 									Step 2: Map CSV Fields
 								</h3>
 							</div>
-							<div class="bg-yellow-50 border border-yellow-200 rounded-md p-4 mx-4">
+							<div class="flex flex-row justify-between content-stretch items-center bg-yellow-50 border border-yellow-200 rounded-md p-4 mx-4">
 								<p class="text-yellow-800 text-sm">
 									Map your CSV columns to the expected fields. Unmapped columns will be ignored.
 								</p>
+								<div class="flex flex-row justify-evenly space-x-2">
+									<UButton
+										label="Auto Map Fields"
+										color="neutral"
+										variant="soft"
+										:disabled="isDragging||isImporting||isLoading"
+										:loading="isImporting||isLoading"
+										@click="autoMapFields"
+									/>
+									<UButton
+										label="Reset Mapping"
+										color="error"
+										variant="outline"
+										:disabled="isDragging||isImporting||isLoading"
+										:loading="isImporting||isLoading"
+										@click="resetFieldMaps"
+									/>
+								</div>
 							</div>
 
 							<div v-if="parsedFileData" class="grid grid-cols-6 gap-6">
@@ -469,7 +521,12 @@ const mappingCols = ref<TableColumn<ITargetField>[]>([
 									<h4 class="font-medium">
 										Target Fields
 									</h4>
-									<UTable :data="targetFields" :columns="mappingCols" />
+									<UTable :data="targetFields" :columns="mappingCols">
+										<template #mapping-cell="{ row }">
+											<!-- <div>{{ fieldMappings[row.original.key] }}</div> -->
+											<USelect v-model="fieldMappings[row.original.key]" :items="fieldMapColOptions" placeholder="-- Select CSV Column --" />
+										</template>
+									</UTable>
 								</div>
 							</div>
 						</div>
