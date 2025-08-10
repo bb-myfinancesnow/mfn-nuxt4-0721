@@ -57,7 +57,7 @@ const isDragging = ref(false);
 const uploadError = ref('');
 // const csvData = ref<any[]>([]);
 // const csvHeaders = ref<string[]>([]);
-const fieldMappings = reactive<Record<string, string>>({});
+// const fieldMappings = reactive<Record<string, string>>({});
 const importOptions = reactive<IImportOptions>({
 	skipDuplicates: false,
 	validateData: true
@@ -74,13 +74,13 @@ const mappingErrors = computed(() => {
 
 	// Check required fields
 	props.targetFields.forEach((field) => {
-		if (field.required && !fieldMappings[field.key]) {
+		if (field.required && !headerFieldMappings.value[field.key]) {
 			errors.push(`Required field "${field.label}" must be mapped`);
 		}
 	});
 
 	// Check for duplicate mappings
-	const mappedColumns = Object.values(fieldMappings).filter(Boolean);
+	const mappedColumns = Object.values(headerFieldMappings.value).filter(Boolean);
 	const duplicates = mappedColumns.filter((col, index) =>
 		mappedColumns.indexOf(col) !== index
 	);
@@ -98,7 +98,7 @@ const mappedData = computed(() => {
 	return parsedFileData.value.csvData.map((row) => {
 		const mappedRow: IMappedRow = {};
 
-		Object.entries(fieldMappings).forEach(([fieldKey, csvColumn]) => {
+		Object.entries(headerFieldMappings.value).forEach(([fieldKey, csvColumn]) => {
 			if (csvColumn && row[csvColumn] !== undefined) {
 				const field = props.targetFields.find((f) => f.key === fieldKey);
 				const value = row[csvColumn];
@@ -240,15 +240,13 @@ const autoMapFields = () => {
 		}
 
 		if (matchingHeader) {
-			fieldMappings[field.key] = matchingHeader;
+			headerFieldMappings.value[field.key] = matchingHeader;
 		}
 	});
 };
 
 const resetFieldMaps = () => {
-	// Object.assign(fieldMappings, {});
-	// eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-	Object.keys(fieldMappings).forEach((key) => delete fieldMappings[key]);
+	headerFieldMappings.value = {};
 };
 
 const validateAndProceed = () => {
@@ -280,8 +278,8 @@ const resetImporter = () => {
 	currentStep.value = 0;
 	// csvData.value = [];
 	// csvHeaders.value = [];
-	// eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-	Object.keys(fieldMappings).forEach((key) => delete fieldMappings[key]);
+	// Object.keys(fieldMappings).forEach((key) => delete fieldMappings[key]);
+	headerFieldMappings.value = {};
 	parsedFileData.value = undefined;
 	uploadError.value = '';
 	importSuccess.value = false;
@@ -450,7 +448,7 @@ const fieldMapColOptions = computed<SelectItem[]>(() => {
 								</div>
 							</div>
 
-							<div v-if="parsedFileData" class="grid grid-cols-6 gap-6">
+							<div v-if="parsedFileData" class="grid grid-cols-4 gap-6 border rounded-lg p-2 divide-x divide-gray-300">
 								<!-- CSV Columns -->
 								<div class="space-y-4 col-span-1">
 									<h4 class="font-medium">
@@ -473,7 +471,7 @@ const fieldMapColOptions = computed<SelectItem[]>(() => {
 								</div>
 
 								<!-- Target Fields -->
-								<div class="space-y-4 col-span-2">
+								<!-- <div class="space-y-4 col-span-2">
 									<h4 class="font-medium">
 										Target Fields
 									</h4>
@@ -493,7 +491,7 @@ const fieldMapColOptions = computed<SelectItem[]>(() => {
 												</div>
 
 												<select
-													v-model="fieldMappings[field.key]"
+													v-model="headerFieldMappings[field.key]"
 													class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 												>
 													<option value="">
@@ -514,7 +512,7 @@ const fieldMapColOptions = computed<SelectItem[]>(() => {
 											</div>
 										</div>
 									</div>
-								</div>
+								</div> -->
 
 								<!-- Target Fields Table -->
 								<div class="space-y-4 col-span-3">
@@ -524,10 +522,27 @@ const fieldMapColOptions = computed<SelectItem[]>(() => {
 									<UTable :data="targetFields" :columns="mappingCols">
 										<template #mapping-cell="{ row }">
 											<!-- <div>{{ fieldMappings[row.original.key] }}</div> -->
-											<USelect v-model="fieldMappings[row.original.key]" :items="fieldMapColOptions" placeholder="-- Select CSV Column --" />
+											<USelect
+												v-model="headerFieldMappings[row.original.key]"
+												:items="fieldMapColOptions"
+												placeholder="-- Select CSV Column --"
+												:ui="{ content: 'min-w-fit' }"
+												class="w-full"
+											/>
 										</template>
 									</UTable>
 								</div>
+							</div>
+							<!-- Validation Errors -->
+							<div v-if="mappingErrors.length > 0" class="bg-red-50 border border-red-200 rounded-md p-4">
+								<h5 class="font-medium text-red-800 mb-2">
+									Mapping Issues:
+								</h5>
+								<ul class="list-disc list-inside text-sm text-red-700 space-y-1">
+									<li v-for="error in mappingErrors" :key="error">
+										{{ error }}
+									</li>
+								</ul>
 							</div>
 						</div>
 					</template>
