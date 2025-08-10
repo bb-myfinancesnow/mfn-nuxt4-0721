@@ -72,8 +72,8 @@ const isLoading = ref(false);
 const currentStep = ref(0);
 const isDragging = ref(false);
 const uploadError = ref('');
-const csvData = ref<any[]>([]);
-const csvHeaders = ref<string[]>([]);
+// const csvData = ref<any[]>([]);
+// const csvHeaders = ref<string[]>([]);
 const fieldMappings = reactive<Record<string, string>>({});
 const importOptions = reactive<IImportOptions>({
 	skipDuplicates: false,
@@ -81,6 +81,8 @@ const importOptions = reactive<IImportOptions>({
 });
 const isImporting = ref(false);
 const importSuccess = ref(false);
+
+const parsedFileData = ref<IParsedCsvFileResult>();
 
 // Computed
 const mappingErrors = computed(() => {
@@ -107,33 +109,33 @@ const mappingErrors = computed(() => {
 });
 
 const mappedData = computed(() => {
-	if (!csvData.value.length) return [];
+	if (!parsedFileData.value || !parsedFileData.value.csvData.length) return [];
 
-	return csvData.value.map((row) => {
+	return parsedFileData.value.csvData.map((row) => {
 		const mappedRow: IMappedRow = {};
 
 		Object.entries(fieldMappings).forEach(([fieldKey, csvColumn]) => {
 			if (csvColumn && row[csvColumn] !== undefined) {
 				const field = props.targetFields.find((f) => f.key === fieldKey);
-				let value = row[csvColumn];
+				const value = row[csvColumn];
 
 				// Type conversion based on field type
-				if (field && value !== null && value !== '') {
-					switch (field.type) {
-						case 'number':
-							value = parseFloat(value) || null;
-							break;
-						case 'boolean':
-							value = ['true', '1', 'yes', 'y'].includes(String(value).toLowerCase());
-							break;
-						case 'email':
-							// Basic email validation
-							value = String(value).toLowerCase().trim();
-							break;
-						default:
-							value = String(value).trim();
-					}
-				}
+				// if (field && value !== null && value !== '') {
+				// 	switch (field.type) {
+				// 		case 'number':
+				// 			value = parseFloat(value) || null;
+				// 			break;
+				// 		case 'boolean':
+				// 			value = ['true', '1', 'yes', 'y'].includes(String(value).toLowerCase());
+				// 			break;
+				// 		case 'email':
+				// 			// Basic email validation
+				// 			value = String(value).toLowerCase().trim();
+				// 			break;
+				// 		default:
+				// 			value = String(value).trim();
+				// 	}
+				// }
 
 				mappedRow[fieldKey] = value;
 			}
@@ -144,10 +146,10 @@ const mappedData = computed(() => {
 });
 
 const uploadBannerTitle = computed(() => {
-	if (!csvData.value || csvData.value.length === 0) {
+	if (!parsedFileData.value || parsedFileData.value.csvData.length === 0) {
 		return `No CSV Data Uploaded`;
 	} else {
-		return `Uploaded File with ${csvData.value.length} rows`;
+		return `Uploaded File with ${parsedFileData.value.csvData.length} rows`;
 	}
 });
 
@@ -157,7 +159,7 @@ const goNextStep = async () => {
 	await new Promise((r) => setTimeout(r, 1000));
 
 	if (currentStep.value === 0) {
-		if (!csvData.value || csvData.value.length === 0) {
+		if (!parsedFileData.value || parsedFileData.value.csvData.length === 0) {
 			toast.add({
 				title: 'Missing CSV File',
 				description: 'Cannot Advance without CSV Data',
@@ -182,87 +184,72 @@ const goNextStep = async () => {
 	isLoading.value = false;
 };
 
-const parseCSV = (csvText: string) => {
-	try {
-		const lines = csvText.split('\n').filter((line) => line.trim());
-		if (lines.length === 0 || !lines[0]) throw new Error('Empty CSV file');
-		if (lines.length === 1) throw new Error('File Contains Only Header');
-
-		const headers = lines[0].split(',').map((header) => header.trim().replace(/['"]/g, ''));
-		csvHeaders.value = headers;
-
-		const data = lines.slice(1).map((line) => {
-			const values = line.split(',').map((value) => value.trim().replace(/['"]/g, ''));
-			const row: Record<string, string> = {};
-			headers.forEach((header, index) => {
-				row[header] = values[index] || '';
-			});
-			return row;
-		});
-
-		csvData.value = data;
-		// currentStep.value = 1;
-		uploadError.value = '';
-	} catch (error) {
-		uploadError.value = `Failed to parse CSV: ${error instanceof Error ? error.message : 'Unknown error'}`;
-	}
-};
-
 const onDrop = (event: DragEvent) => {
 	event.preventDefault();
 	isDragging.value = false;
 
 	const files = event.dataTransfer?.files;
 	if (files && files[0]) {
-		handleFile(files[0]);
+		handleFileChange(files[0]);
 	}
 };
 
 const onFileSelect = (event: Event) => {
 	const target = event.target as HTMLInputElement;
 	if (target.files && target.files[0]) {
-		handleFile(target.files[0]);
+		handleFileChange(target.files[0]);
 	}
 };
 
-const handleFile = (file: File) => {
+const handleFileChange = async (file: File) => {
+	isLoading.value = true;
 	if (!file.name.toLowerCase().endsWith('.csv')) {
 		uploadError.value = 'Please select a CSV file';
+		isLoading.value = false;
 		return;
 	}
 
-	if (file.size > 10 * 1024 * 1024) {
-		uploadError.value = 'File size must be less than 10MB';
+	if (file.size > 30 * 1024 * 1024) {
+		uploadError.value = 'File size must be less than 30MB';
+		isLoading.value = false;
 		return;
 	}
 
-	const reader = new FileReader();
-	reader.onload = (e) => {
-		const text = e.target?.result as string;
-		parseCSV(text);
-	};
-	reader.onerror = () => {
-		uploadError.value = 'Failed to read file';
-	};
-	reader.readAsText(file);
+	try {
+		const res = await parseCsvFileData(file);
+
+		if (res.csvHeaders.length === 0) {
+			throw new Error(`File Missing Headers`);
+		}
+		if (res.csvData.length === 0) {
+			throw new Error('Empty CSV file');
+		}
+		uploadError.value = '';
+		parsedFileData.value = res;
+	} catch (err) {
+		console.error(`handleFileChange error`, err);
+		uploadError.value = `Failed to parse CSV: ${err instanceof Error ? err.message : 'Unknown error'}`;
+	} finally {
+		isLoading.value = false;
+	}
 };
 
 const getSampleValue = (header: string) => {
-	const sampleRow = csvData.value[0];
+	const sampleRow = parsedFileData.value?.csvData[0];
 	return sampleRow ? String(sampleRow[header] || '').substring(0, 20) : '';
 };
 
 const autoMapFields = () => {
 	props.targetFields.forEach((field) => {
 		// Try to find exact match first
-		let matchingHeader = csvHeaders.value.find((header) =>
+		let matchingHeader = parsedFileData.value?.csvHeaders.find((header) =>
 			header.toLowerCase() === field.key.toLowerCase()
 			|| header.toLowerCase() === field.label.toLowerCase()
 		);
 
 		// Try partial matches
 		if (!matchingHeader) {
-			matchingHeader = csvHeaders.value.find((header) =>
+			matchingHeader = parsedFileData.value?.csvHeaders.find((header) =>
 				header.toLowerCase().includes(field.key.toLowerCase())
 				|| field.key.toLowerCase().includes(header.toLowerCase())
 			);
@@ -301,10 +288,11 @@ const performImport = async () => {
 const resetImporter = () => {
 	isLoading.value = true;
 	currentStep.value = 0;
-	csvData.value = [];
-	csvHeaders.value = [];
+	// csvData.value = [];
+	// csvHeaders.value = [];
 	// eslint-disable-next-line @typescript-eslint/no-dynamic-delete
 	Object.keys(fieldMappings).forEach((key) => delete fieldMappings[key]);
+	parsedFileData.value = undefined;
 	uploadError.value = '';
 	importSuccess.value = false;
 	isImporting.value = false;
@@ -347,7 +335,7 @@ const resetImporter = () => {
 							</h3>
 
 							<div
-								v-if="!csvData||csvData.length===0"
+								v-if="!parsedFileData||parsedFileData.csvData.length===0"
 								class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors"
 								:class="{ 'border-blue-400 bg-blue-50': isDragging }"
 								@drop="onDrop"
