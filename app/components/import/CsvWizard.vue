@@ -137,6 +137,28 @@ const uploadBannerTitle = computed(() => {
 	}
 });
 
+const nextButtonLabel = computed<string>(() => {
+	switch (currentStep.value) {
+		case 0:
+			return 'Advance to Mapping';
+		case 1:
+			return 'Preview Data';
+		default:
+			return 'Next';
+	}
+});
+
+const prevButtonLabel = computed<string>(() => {
+	switch (currentStep.value) {
+		case 1:
+			return 'Back to Import';
+		case 2:
+			return 'Return to Mapping';
+		default:
+			return 'Previous';
+	}
+});
+
 // Methods
 const goNextStep = async () => {
 	isLoading.value = true;
@@ -164,6 +186,19 @@ const goNextStep = async () => {
 		} else {
 			currentStep.value = 1;
 		}
+	} else if (currentStep.value === 1) {
+		if (mappingErrors.value.length > 0) {
+			toast.add({
+				title: 'Mapping Errors',
+				description: `Cannot advance with ${mappingErrors.value.length} mapping errors`,
+				icon: 'i-lucide-shield-alert',
+				color: 'error',
+				duration: 3000
+			});
+			await new Promise((r) => setTimeout(r, 3000));
+		} else {
+			currentStep.value = 2;
+		}
 	}
 	isLoading.value = false;
 };
@@ -187,6 +222,10 @@ const onFileSelect = (event: Event) => {
 
 const handleFileChange = async (file: File) => {
 	isLoading.value = true;
+	headerFieldMappings.value = {};
+	uploadError.value = '';
+	parsedFileData.value = undefined;
+
 	if (!file.name.toLowerCase().endsWith('.csv')) {
 		uploadError.value = 'Please select a CSV file';
 		isLoading.value = false;
@@ -399,7 +438,7 @@ const fieldMapColOptions = computed<SelectItem[]>(() => {
 											</label>
 										</p>
 										<p class="text-sm text-gray-500">
-											CSV files up to 10MB
+											CSV files up to 30MB
 										</p>
 									</div>
 								</div>
@@ -555,7 +594,7 @@ const fieldMapColOptions = computed<SelectItem[]>(() => {
 						v-if="stepper?.hasPrev"
 						size="xl"
 						leading-icon="i-lucide-arrow-left"
-						label="Prev"
+						:label="prevButtonLabel"
 						variant="soft"
 						:disabled="!stepper?.hasPrev ||isLoading||isDragging||isImporting"
 						:loading="isLoading||isImporting"
@@ -568,7 +607,7 @@ const fieldMapColOptions = computed<SelectItem[]>(() => {
 						trailing-icon="i-lucide-arrow-right"
 						:disabled="!stepper?.hasNext||isLoading||isDragging||isImporting"
 						:loading="isLoading||isImporting"
-						label="Next"
+						:label="nextButtonLabel"
 						@click="goNextStep"
 					/>
 				</div>
@@ -576,72 +615,3 @@ const fieldMapColOptions = computed<SelectItem[]>(() => {
 		</UPageCard>
 	</div>
 </template>
-
-<!-- <template>
-	<div class="w-full min-h-screen pt-2 pb-8 space-y-6 px-2">
-		<h2 class="text-2xl font-bold">
-			CSV Import Wizard
-		</h2>
-		<UStepper
-			ref="stepper"
-			v-model="currentStep"
-			disabled
-			:items="items"
-		>
-			<template #fileupload>
-				<div class="space-y-4">
-					<h3 class="text-lg font-semibold">
-						Step 1: Upload CSV File
-					</h3>
-
-					<div
-						class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors"
-						:class="{ 'border-blue-400 bg-blue-50': isDragging }"
-						@drop="onDrop"
-						@dragover.prevent
-						@dragenter.prevent
-					>
-						<div class="space-y-4">
-							<svg
-								class="mx-auto h-12 w-12"
-								stroke="currentColor"
-								fill="none"
-								viewBox="0 0 48 48"
-							>
-								<path
-									d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
-							</svg>
-							<div>
-								<p class="text-lg font-medium">
-									Drop your CSV file here, or
-									<label class="text-blue-600 hover:text-blue-500 cursor-pointer">
-										browse
-										<input
-											type="file"
-											class="sr-only"
-											accept=".csv,.txt"
-											@change="onFileSelect"
-										>
-									</label>
-								</p>
-								<p class="text-sm text-gray-500">
-									CSV files up to 10MB
-								</p>
-							</div>
-						</div>
-					</div>
-
-					<div v-if="uploadError" class="bg-red-50 border border-red-200 rounded-md p-4">
-						<p class="text-red-700">
-							{{ uploadError }}
-						</p>
-					</div>
-				</div>
-			</template>
-		</UStepper>
-	</div>
-</template> -->
