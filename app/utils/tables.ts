@@ -1,6 +1,6 @@
 import type { ColumnProps } from 'primevue/column';
 import type { ColumnModel } from '@syncfusion/ej2-grids';
-import { SourceType } from '~/generated/graphql';
+import { JobStatus, SourceType } from '~/generated/graphql';
 
 export const PrimePageLengthOptions = [5, 10, 25, 50, 100] as const;
 
@@ -23,7 +23,8 @@ export type TPrimeColumnType
 		| 'dropdown'
 		| 'entityTypes'
 		| 'accountTypeCategories'
-		| 'tranSources';
+		| 'tranSources'
+		| 'jobStatuses';
 
 export interface IPrimeColumnProps extends ColumnProps {
 	colId: string;
@@ -59,6 +60,10 @@ export interface ISyncFusionGridColModel extends ColumnModel {
 	colId: string;
 }
 
+export const tranSourceVals = Object.values(SourceType);
+
+export const jobStatusVals = Object.values(JobStatus);
+
 export const convertPrimeColType = (
 	val: TPrimeColumnType | undefined | string
 ): TBasePrimeColumnType => {
@@ -76,7 +81,8 @@ export const checkShowsFilterMatchMode = (
 		'multiselect',
 		'entityTypes',
 		'accountTypeCategories',
-		'tranSources'
+		'tranSources',
+		'jobStatuses'
 	];
 
 	if (val && falseResTypes.includes(val)) return false;
