@@ -44,7 +44,7 @@ import {
 export default defineNuxtPlugin(async (nuxtApp) => {
 	const config = useRuntimeConfig();
 	const licenseKey = config.public.syncFusionLicense;
-
+	console.log(` licenseKey ${licenseKey}`);
 	registerLicense(licenseKey);
 
 	nuxtApp.vueApp.use(PivotViewPlugin);
