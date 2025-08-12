@@ -192,11 +192,99 @@ export const useReportPivot = () => {
 	const collapseAll = (allRows: ILedgerPivotRow[]): ILedgerPivotRow[] => {
 		return allRows.map((row) => ({ ...row, isExpanded: row.level === 0 }));
 	};
+
+	function buildColumnHeaders(tree: any, level = 0, path: string[] = []): TReportLedgerColumnHeader[][] {
+		if (!tree || typeof tree !== 'object') return [];
+
+		const headers: IPivotColumnHeader[][] = [];
+		const currentLevel: IPivotColumnHeader[] = [];
+
+		Object.keys(tree).sort().forEach((key) => {
+			const currentPath = [...path, key];
+			const childHeaders = buildColumnHeaders(tree[key], level + 1, currentPath);
+
+			let colspan = 1;
+			if (childHeaders.length > 0) {
+				colspan = childHeaders[0]!.length;
+			}
+
+			currentLevel.push({
+				key: currentPath.join('|'),
+				label: key,
+				colspan
+			});
+
+			// Merge child headers
+			childHeaders.forEach((childLevel, index) => {
+				if (!headers[index]) headers[index] = [];
+				headers[index].push(...childLevel);
+			});
+		});
+
+		return [currentLevel, ...headers];
+	}
+
+	const buildLedgerReportColTree = (data: ILedgerPivotRowData[], fields: string[]) => {
+		const tree: any = {};
+
+		data.forEach((row) => {
+			let current = tree;
+			fields.forEach((field, index) => {
+				const value = String(row[field as keyof ILedgerPivotRowData]);
+				if (!current[value]) {
+					current[value] = index === fields.length - 1 ? null : {};
+				}
+				if (index < fields.length - 1) {
+					current = current[value];
+				}
+			});
+		});
+
+		return tree;
+	};
+
+	const rowFields = ref<string[]>(['accountClass', 'glAccountType']);
+	const columnFields = ref<string[]>(['periodQuarter', 'periodId', 'periodLabel']);
+	const selectedValueField = ref<string>('entryAmount');
+	const aggregationFunction = ref<TAggregationFunction>('sum');
+
+	const activeRowFields = computed(() => rowFields.value.filter((f) => f !== ''));
+	const activeColumnFields = computed(() => columnFields.value.filter((f) => f !== ''));
+
+	const createReportPivotTable = (data: TFlatJournalEntryLedgerRecSchema[]) => {
+		if (activeRowFields.value.length === 0 || activeColumnFields.value.length === 0 || !selectedValueField.value) {
+			return null;
+		}
+
+		const tableData = data.map((e) => flatEntryToLedgerPivotRow(e));
+
+		const pivot: IReportLedgerPivotData = {
+			rows: {},
+			columnHeaders: [],
+			leafColumns: [],
+			columnTotals: {},
+			grandTotal: 0
+		};
+
+		const columnTree = buildLedgerReportColTree(tableData, activeColumnFields.value);
+
+		console.log(`columnTree: ${JSON.stringify(columnTree, null, 2)}`);
+
+		pivot.columnHeaders = buildColumnHeaders(columnTree);
+		return pivot;
+	};
 	return {
 		createPivotTable,
 		getVisibleRows,
 		toggleRowExpansion,
 		expandAll,
-		collapseAll
+		collapseAll,
+		createReportPivotTable,
+		rowFields,
+		columnFields,
+		selectedValueField,
+		aggregationFunction,
+		activeRowFields,
+		activeColumnFields
 	};
 };

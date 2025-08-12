@@ -62,6 +62,15 @@ export interface INestedRowData {
 	children?: { [key: string]: INestedRowData };
 }
 
+export interface INestedReportRowData {
+	[key: string]: INestedReportRowData | number | boolean | undefined | null | AccountTypeClass;
+	_total?: number;
+	_isLeaf?: boolean;
+	_expanded?: boolean;
+	_level?: number;
+	children?: { [key: string]: INestedReportRowData };
+}
+
 export interface IPivotData {
 	rows: { [key: string]: INestedRowData };
 	columnHeaders: IPivotColumnHeader[][];
@@ -145,6 +154,45 @@ export interface ILedgerPivotTable {
 	rows: ILedgerPivotRow[];
 	totals: PivotCell[];
 	grandTotal: PivotCell;
+}
+
+// export interface IReportLedgerColumnHeader {
+// 	key: string;
+// 	label: string;
+// 	colspan: number;
+// 	sortCol: string;
+// }
+
+export type TReportLedgerColumnHeader = {
+	key: string;
+	label: string;
+	colspan: number;
+	// sortCol: string;
+};
+
+export interface IReportLedgerPivotTable {
+	// headers: string[];
+	// rows: ILedgerPivotRow[];
+	// totals: PivotCell[];
+	// grandTotal: PivotCell;
+	rows: { [key: string]: INestedReportRowData };
+	columnHeaders: TReportLedgerColumnHeader[][];
+	leafColumns: { key: string; path: string[] }[];
+	columnTotals: { [key: string]: number };
+	grandTotal: number;
+}
+
+// export type TReportLedgerConfig = {
+// 	columnOptions:IReportLedgerColumnHeader[]
+
+// }
+
+export interface IReportLedgerPivotData {
+	rows: { [key: string]: INestedReportRowData };
+	columnHeaders: TReportLedgerColumnHeader[][];
+	leafColumns: { key: string; path: string[] }[];
+	columnTotals: { [key: string]: number };
+	grandTotal: number;
 }
 
 export const flatEntryToLedgerPivotRow = (entry: TFlatJournalEntryLedgerRecSchema): ILedgerPivotRowData => {

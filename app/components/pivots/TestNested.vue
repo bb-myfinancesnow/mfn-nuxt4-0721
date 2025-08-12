@@ -238,6 +238,16 @@
 				</button>
 			</div>
 		</div>
+		<div v-if="pivotData" class="flex flex-row justify-between">
+			<div>
+				rows:
+				<pre>{{ pivotData.rows }}</pre>
+			</div>
+			<div>
+				columnHeaders:
+				<pre>{{ pivotData.columnHeaders }}</pre>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -283,6 +293,8 @@ const pivotData = computed((): IPivotData | null => {
 
 	// Build column structure
 	const columnTree = buildColumnTree(data.value, activeColumnFields.value);
+	console.log(` tet columnTree: ${JSON.stringify(columnTree, null, 2)}`);
+
 	pivot.columnHeaders = buildColumnHeaders(columnTree);
 	pivot.leafColumns = getLeafColumns(columnTree);
 

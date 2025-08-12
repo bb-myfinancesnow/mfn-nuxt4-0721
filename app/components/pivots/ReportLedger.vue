@@ -177,7 +177,8 @@ const {
 	getVisibleRows,
 	toggleRowExpansion,
 	expandAll,
-	collapseAll
+	collapseAll,
+	createReportPivotTable
 } = useReportPivot();
 
 // Reactive state
@@ -193,7 +194,7 @@ const pivotTable = ref<ILedgerPivotTable>({
 
 const config = ref<PivotConfig>({
 	rows: ['accountClass', 'glAccountType'],
-	columns: ['periodId'],
+	columns: ['periodQuarter', 'periodId', 'periodLabel'],
 	values: ['entryAmount'],
 	aggregation: 'sum'
 });
@@ -218,7 +219,8 @@ const refreshPivot = () => {
 			= 'Please select at least one field for rows, columns, and values';
 		return;
 	}
-
+	const t = createReportPivotTable(props.ledgerEntries);
+	console.log(`createReportPivotTable: ${JSON.stringify(t, null, 2)}`);
 	const data = props.ledgerEntries.map((e) => flatEntryToLedgerPivotRow(e));
 	const table = createPivotTable(data, config.value);
 	pivotTable.value = table;
