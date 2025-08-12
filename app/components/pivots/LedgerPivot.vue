@@ -1,5 +1,69 @@
 <template>
 	<div>
+		<!-- <UCollapsible>
+			<UButton
+				label="Open Pivot Setup"
+				color="neutral"
+				variant="subtle"
+				trailing-icon="i-lucide-chevron-down"
+				:disabled="eitherLoading"
+				:loading="isLoading"
+				block
+			/>
+<template #content></template>
+
+		</UCollapsible> -->
+		<UCollapsible>
+			<UButton
+				label="Open Pivot Setup Review"
+				color="neutral"
+				variant="subtle"
+				trailing-icon="i-lucide-chevron-down"
+				:disabled="eitherLoading"
+				:loading="isLoading"
+				block
+			/>
+
+			<template #content>
+				<div class="flex flex-row justify-between">
+					<div>
+						<div>ledger pivot: {{ String(eitherLoading) }}</div>
+						<div>ledgerEntries count: {{ ledgerEntries.length }}</div>
+						<div>data count: {{ data.length }}</div>
+						<div>showSubtotals: {{ String(showSubtotals) }}</div>
+						<div>expandAll: {{ String(expandAll) }}</div>
+						<div>aggregationFunction: {{ aggregationFunction }}</div>
+					</div>
+					<div>
+						activeRowFields:
+						<pre>{{ activeRowFields }}</pre>
+					</div>
+					<div>
+						activeColumnFields:
+						<pre>{{ activeColumnFields }}</pre>
+					</div>
+					<div>
+						expandedRows:
+						<pre>{{ expandedRows }}</pre>
+					</div>
+				</div>
+			</template>
+		</UCollapsible>
+		<!-- <UCollapsible>
+			<UButton
+				label="Open Pivot"
+				color="neutral"
+				variant="subtle"
+				trailing-icon="i-lucide-chevron-down"
+				:disabled="eitherLoading"
+				:loading="isLoading"
+				block
+			/>
+<template #content>
+	<div v-if="pivotData"
+</template>
+
+		</UCollapsible> -->
 		<UCollapsible>
 			<UButton
 				label="Open Raw Pivot Info"
@@ -80,6 +144,9 @@ const numericFields = computed(() => {
 		typeof data.value[0]![key] === 'number'
 	);
 });
+
+const activeRowFields = computed(() => rowFields.value.filter((f) => f !== ''));
+const activeColumnFields = computed(() => columnFields.value.filter((f) => f !== ''));
 
 const propsToDataRows = async () => {
 	isLoading.value = true;
