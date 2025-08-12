@@ -1,4 +1,5 @@
 import { getMonth, getQuarter, getYear } from 'date-fns';
+import type { AccountTypeClass } from '~/generated/graphql';
 
 export interface SalesData {
 	id: string;
@@ -105,6 +106,80 @@ export const flatEntryToDataRow = async (entry: TFlatJournalEntryLedgerRecSchema
 		accountClass: glAccount.accountType.class,
 		debit,
 		credit
+	};
+};
 
+export interface ILedgerPivotRowData {
+	periodId: number;
+	periodLabel: string;
+	postingDate: Date;
+	periodQuarter: number;
+	postingMonth: number;
+	postingYear: number;
+	glAccountLabel: string;
+	entryAmount: number;
+	journalNumber: number;
+	id: number;
+	glAccountType: string;
+	glAccountTypeSortOrder: number;
+	accountClass: AccountTypeClass;
+	debit: number;
+	credit: number;
+}
+
+export interface ILedgerPivotRow {
+	id: string;
+	label: string;
+	level: number;
+	isGroup: boolean;
+	isExpanded: boolean;
+	parentId: string | null;
+	children: string[];
+	cells: PivotCell[];
+	total: PivotCell;
+	rawData: ILedgerPivotRowData[];
+}
+
+export interface ILedgerPivotTable {
+	headers: string[];
+	rows: ILedgerPivotRow[];
+	totals: PivotCell[];
+	grandTotal: PivotCell;
+}
+
+export const flatEntryToLedgerPivotRow = async (entry: TFlatJournalEntryLedgerRecSchema): Promise<ILedgerPivotRowData> => {
+	const {
+		periodId,
+		periodLabel,
+		postingDate,
+		glAccountLabel,
+		entryAmount,
+		journalNumber,
+		id,
+		glAccount,
+		debit,
+		credit
+	} = entry;
+
+	const periodQuarter = getQuarter(postingDate);
+	const postingMonth = getMonth(postingDate);
+	const postingYear = getYear(postingDate);
+
+	return {
+		periodId,
+		periodLabel,
+		postingDate,
+		periodQuarter,
+		postingMonth,
+		postingYear,
+		glAccountLabel,
+		entryAmount,
+		journalNumber,
+		id,
+		glAccountType: glAccount.accountTypeName,
+		glAccountTypeSortOrder: glAccount.accountType.sortOrder,
+		accountClass: glAccount.accountType.class,
+		debit,
+		credit
 	};
 };
