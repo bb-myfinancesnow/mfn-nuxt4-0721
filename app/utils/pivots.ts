@@ -15,6 +15,19 @@ export interface PivotConfig {
 	aggregation: 'sum' | 'count' | 'average' | 'min' | 'max';
 }
 
+export interface PivotRow {
+	id: string;
+	label: string;
+	level: number;
+	isGroup: boolean;
+	isExpanded: boolean;
+	parentId: string | null;
+	children: string[];
+	cells: PivotCell[];
+	total: PivotCell;
+	rawData: SalesData[];
+}
+
 export interface PivotCell {
 	value: number;
 	count: number;
@@ -22,11 +35,7 @@ export interface PivotCell {
 
 export interface PivotTable {
 	headers: string[];
-	rows: Array<{
-		label: string;
-		cells: PivotCell[];
-		total: PivotCell;
-	}>;
+	rows: PivotRow[];
 	totals: PivotCell[];
 	grandTotal: PivotCell;
 }
