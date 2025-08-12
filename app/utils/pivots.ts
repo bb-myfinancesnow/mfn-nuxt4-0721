@@ -147,7 +147,7 @@ export interface ILedgerPivotTable {
 	grandTotal: PivotCell;
 }
 
-export const flatEntryToLedgerPivotRow = async (entry: TFlatJournalEntryLedgerRecSchema): Promise<ILedgerPivotRowData> => {
+export const flatEntryToLedgerPivotRow = (entry: TFlatJournalEntryLedgerRecSchema): ILedgerPivotRowData => {
 	const {
 		periodId,
 		periodLabel,
