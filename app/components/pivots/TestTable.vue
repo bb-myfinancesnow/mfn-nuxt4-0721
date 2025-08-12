@@ -162,7 +162,7 @@ interface DataRow {
 	[key: string]: string | number | Date;
 }
 
-interface PivotData {
+interface TestPivotData {
 	rows: { [key: string]: { [key: string]: number | string; total: number } };
 	columns: string[];
 	columnTotals: { [key: string]: number };
@@ -191,12 +191,12 @@ const numericFields = computed(() => {
 	);
 });
 
-const pivotData = computed((): PivotData | null => {
+const pivotData = computed((): TestPivotData | null => {
 	if (!selectedRowField.value || !selectedColumnField.value || !selectedValueField.value) {
 		return null;
 	}
 
-	const pivot: PivotData = {
+	const pivot: TestPivotData = {
 		rows: {},
 		columns: [],
 		columnTotals: {},

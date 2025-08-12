@@ -30,3 +30,32 @@ export interface PivotTable {
 	totals: PivotCell[];
 	grandTotal: PivotCell;
 }
+
+export interface IPivotDataRow {
+	[key: string]: string | number | Date;
+}
+
+export interface IPivotColumnHeader {
+	key: string;
+	label: string;
+	colspan: number;
+}
+
+export interface INestedRowData {
+	[key: string]: INestedRowData | number | boolean | undefined;
+	_total?: number;
+	_isLeaf?: boolean;
+	_expanded?: boolean;
+	_level?: number;
+	children?: { [key: string]: INestedRowData };
+}
+
+export interface IPivotData {
+	rows: { [key: string]: INestedRowData };
+	columnHeaders: IPivotColumnHeader[][];
+	leafColumns: { key: string; path: string[] }[];
+	columnTotals: { [key: string]: number };
+	grandTotal: number;
+}
+
+export type TAggregationFunction = 'sum' | 'avg' | 'count' | 'min' | 'max';
