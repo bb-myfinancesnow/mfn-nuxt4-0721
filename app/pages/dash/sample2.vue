@@ -20,7 +20,7 @@
 		<template #body>
 			<!-- <div>sample</div> -->
 			<div>
-				<PivotsTestTable />
+				<PivotsTestNested />
 			</div>
 			<!-- <UPageGrid class="lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-px">
 
