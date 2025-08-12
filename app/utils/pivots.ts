@@ -1,3 +1,5 @@
+import { getMonth, getQuarter, getYear } from 'date-fns';
+
 export interface SalesData {
 	id: string;
 	product: string;
@@ -68,3 +70,41 @@ export interface IPivotData {
 }
 
 export type TAggregationFunction = 'sum' | 'avg' | 'count' | 'min' | 'max';
+
+export const flatEntryToDataRow = async (entry: TFlatJournalEntryLedgerRecSchema): Promise<IPivotDataRow> => {
+	const {
+		periodId,
+		periodLabel,
+		postingDate,
+		glAccountLabel,
+		entryAmount,
+		journalNumber,
+		id,
+		glAccount,
+		debit,
+		credit
+	} = entry;
+
+	const periodQuarter = getQuarter(postingDate);
+	const postingMonth = getMonth(postingDate);
+	const postingYear = getYear(postingDate);
+
+	return {
+		periodId,
+		periodLabel,
+		postingDate,
+		periodQuarter,
+		postingMonth,
+		postingYear,
+		glAccountLabel,
+		entryAmount,
+		journalNumber,
+		id,
+		glAccountType: glAccount.accountTypeName,
+		glAccountTypeSortOrder: glAccount.accountType.sortOrder,
+		accountClass: glAccount.accountType.class,
+		debit,
+		credit
+
+	};
+};
