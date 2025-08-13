@@ -145,8 +145,8 @@
 
 		<!-- Pivot Table -->
 		<div v-if="pivotData" class="pivot-table-wrapper overflow-auto border border-gray-300 rounded-lg max-h-96">
-			<table class="min-w-full bg-white">
-				<thead class="sticky top-0 bg-white z-10">
+			<table class="min-w-full ">
+				<thead class="sticky top-0  z-10">
 					<!-- Column header rows -->
 					<tr v-for="(headerRow, level) in pivotData.columnHeaders" :key="`header-${level}`" class="bg-gray-100">
 						<!-- Row field headers -->
@@ -206,11 +206,11 @@
 						<td
 							v-for="col in pivotData.leafColumns"
 							:key="col.key"
-							class="px-2 py-2 text-center border-r border-gray-300 text-sm"
+							class="px-2 py-2 text-center border-r  text-sm"
 						>
 							{{ formatValue(pivotData.columnTotals[col.key]) }}
 						</td>
-						<td class="px-4 py-2 text-center bg-gray-300">
+						<td class="px-4 py-2 text-center bg-gray-500">
 							{{ formatValue(pivotData.grandTotal) }}
 						</td>
 					</tr>
